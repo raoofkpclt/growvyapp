@@ -14,7 +14,6 @@ import { uploadFile } from "../utils/uploadFile";
 
 export const addCreative = async (creative: Creative, file?: File | null) => {
   try {
-    console.log("1");
     let imageUrl = "";
     let logoUrl = "";
 
@@ -22,10 +21,9 @@ export const addCreative = async (creative: Creative, file?: File | null) => {
     // POSTER IMAGE
     // =========================
     if (creative.type === "poster" && file) {
-      console.log("2");
       imageUrl = await uploadFile(file);
     }
-    console.log("3");
+
     // =========================
     // WEBSITE LOGO
     // =========================
@@ -55,7 +53,7 @@ export const addCreative = async (creative: Creative, file?: File | null) => {
     };
 
     const docRef = await addDoc(collection(db, "creatives"), creativeData);
-    console.log("4", docRef);
+
     return {
       ...creativeData,
       id: docRef.id,
@@ -75,8 +73,8 @@ export const getCreatives = async (): Promise<Creative[]> => {
     const querySnapshot = await getDocs(collection(db, "creatives"));
 
     return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
       ...(doc.data() as Creative),
+      id: doc.id,
     }));
   } catch (error) {
     console.log("Get Creative Error:", error);

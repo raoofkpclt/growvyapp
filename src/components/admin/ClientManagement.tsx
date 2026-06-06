@@ -1,5 +1,5 @@
-import React, { useState ,useEffect} from "react";
-import type { Client, Creative } from "../../utils/types/Types";
+import React, { useState, useEffect } from "react";
+import type { Client } from "../../utils/types/Types";
 import AddClientModal from "./Modal/AddClientModal";
 import EditClientModal from "./Modal/EditClientModal";
 import DeleteConfirmModal from "./Modal/DeleteConfirmModal";
@@ -13,73 +13,63 @@ const ClientManagement = () => {
   const [showAddClient, setShowAddClient] = useState(false);
   const [showEditClient, setShowEditClient] = useState<Client | null>(null);
 
-  const [deleteClientId, setDeleteClientId] =
-  useState<string | null>(null);
+  const [deleteClientId, setDeleteClientId] = useState<string | null>(null);
 
-const [deleteLoading, setDeleteLoading] =
-  useState(false);
-  
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [workFilter, setWorkFilter] = useState<string>("all");
 
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const data = await getClients();
+        setClients(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
- useEffect(() => {
-  const loadClients = async () => {
+    loadClients();
+  }, []);
+
+  const handleDeleteClient = async () => {
+    if (!deleteClientId) return;
+
     try {
-      const data = await getClients();
-      setClients(data);
+      setDeleteLoading(true);
+
+      await deleteClient(deleteClientId);
+
+      setClients((prev) =>
+        prev.filter((c) => c.firestoreId !== deleteClientId),
+      );
+
+      setDeleteClientId(null);
     } catch (error) {
       console.log(error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
-
-  loadClients();
-}, []);
-
-
-
- const handleDeleteClient = async () => {
-  if (!deleteClientId) return;
-
-  try {
-    setDeleteLoading(true);
-
-    await deleteClient(deleteClientId);
-
-    setClients((prev) =>
-      prev.filter(
-        (c) => c.firestoreId !== deleteClientId
-      )
-    );
-
-    setDeleteClientId(null);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    setDeleteLoading(false);
-  }
-};
   return (
     <div>
       <div className="animate-fade-in space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            
-
             {(["all", "active", "inactive"] as const).map((f) => (
-  <button
-    key={f}
-    onClick={() => setWorkFilter(f)}
-    className={`text-xs px-3 py-1.5 rounded-lg border transition-all capitalize
+              <button
+                key={f}
+                onClick={() => setWorkFilter(f)}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all capitalize
       ${
         workFilter === f
           ? "bg-violet-600 text-white border-violet-500"
           : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
       }`}
-  >
-    {f}
-  </button>
-))}
+              >
+                {f}
+              </button>
+            ))}
           </div>
           <button
             onClick={() => setShowAddClient(true)}
@@ -91,73 +81,73 @@ const [deleteLoading, setDeleteLoading] =
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {clients
-  .filter((client) => {
-    if (workFilter === "all") return true;
-    return client.status === workFilter;
-  })
-  .map((client) => (
-            <div
-              key={client.id}
-              className="bg-[#0f1117] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/10 transition-all duration-300"
-            >
-              {/* Portfolio banner */}
-              <div className="h-32 overflow-hidden relative">
-                <img
-                  src={client.portfolioImage}
-                  alt=""
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] via-transparent to-transparent" />
-                <span
-                  className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full ${client.status === "active" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-zinc-500/20 text-zinc-400 border border-zinc-500/30"}`}
-                >
-                  {client.status}
-                </span>
-              </div>
+            .filter((client) => {
+              if (workFilter === "all") return true;
+              return client.status === workFilter;
+            })
+            .map((client) => (
+              <div
+                key={client.id}
+                className="bg-[#0f1117] border border-white/5 rounded-2xl overflow-hidden group hover:border-white/10 transition-all duration-300"
+              >
+                {/* Portfolio banner */}
+                <div className="h-32 overflow-hidden relative">
+                  <img
+                    src={client.portfolioImage}
+                    alt=""
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] via-transparent to-transparent" />
+                  <span
+                    className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full ${client.status === "active" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-zinc-500/20 text-zinc-400 border border-zinc-500/30"}`}
+                  >
+                    {client.status}
+                  </span>
+                </div>
 
-              {/* Profile */}
-              <div className="px-5 pb-5 -mt-7 relative">
-                <img
-                  src={client.profileImage}
-                  alt={client.name}
-                  className="w-12 h-12 rounded-xl border-2 border-[#0f1117] object-cover mb-3"
-                />
-                <h3 className="text-white font-semibold text-sm">
-                  {client.name}
-                </h3>
-                <p className="text-xs text-zinc-500 mb-1">{client.email}</p>
-                <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 mb-4">
-                  {client.description}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedClient(client);
-                      setTab("work");
-                      setWorkFilter("by-client");
-                    }}
-                    className="flex-1 text-xs py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 transition-colors"
-                  >
-                    Work
-                  </button>
-                  <button
-                    onClick={() => setShowEditClient({ ...client })}
-                    className="flex-1 text-xs py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() =>
-  setDeleteClientId(client.firestoreId || null)
-}
-                    className="px-3 text-xs py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
-                  >
-                    ✕
-                  </button>
+                {/* Profile */}
+                <div className="px-5 pb-5 -mt-7 relative">
+                  <img
+                    src={client.profileImage}
+                    alt={client.name}
+                    className="w-12 h-12 rounded-xl border-2 border-[#0f1117] object-cover mb-3"
+                  />
+                  <h3 className="text-white font-semibold text-sm">
+                    {client.name}
+                  </h3>
+                  <p className="text-xs text-zinc-500 mb-1">{client.email}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 mb-4">
+                    {client.description}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedClient(client);
+                        setTab("work");
+                        setWorkFilter("by-client");
+                      }}
+                      className="flex-1 text-xs py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 transition-colors"
+                    >
+                      Work
+                    </button>
+                    <button
+                      onClick={() => setShowEditClient({ ...client })}
+                      className="flex-1 text-xs py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() =>
+                        setDeleteClientId(client.firestoreId || null)
+                      }
+                      className="px-3 text-xs py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
 
           {/* Add placeholder */}
           <button
@@ -183,30 +173,28 @@ const [deleteLoading, setDeleteLoading] =
         />
       )}
       {showEditClient && (
-  <EditClientModal
-    client={showEditClient}
-    onClose={() => setShowEditClient(null)}
-    onSave={(updatedClient) => {
-      setClients((prev) =>
-        prev.map((client) =>
-          client.id === updatedClient.id
-            ? updatedClient
-            : client
-        )
-      );
+        <EditClientModal
+          client={showEditClient}
+          onClose={() => setShowEditClient(null)}
+          onSave={(updatedClient) => {
+            setClients((prev) =>
+              prev.map((client) =>
+                client.id === updatedClient.id ? updatedClient : client,
+              ),
+            );
 
-      setShowEditClient(null);
-    }}
-  />
-)}
+            setShowEditClient(null);
+          }}
+        />
+      )}
 
-{deleteClientId && (
-  <DeleteConfirmModal
-    loading={deleteLoading}
-    onClose={() => setDeleteClientId(null)}
-    onConfirm={handleDeleteClient}
-  />
-)}
+      {deleteClientId && (
+        <DeleteConfirmModal
+          loading={deleteLoading}
+          onClose={() => setDeleteClientId(null)}
+          onConfirm={handleDeleteClient}
+        />
+      )}
     </div>
   );
 };

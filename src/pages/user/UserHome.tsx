@@ -1,11 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  serverTimestamp,
-} from "firebase/firestore";
-
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase/firebase";
 import { translations, WHAT_WE_DO, WHY_GROWVY } from "../../constant/Constant";
 import HomeNav from "../../components/user/Modal/HomeNav";
@@ -37,7 +31,7 @@ interface Service {
 // ───────────────────────────────
 
 const UserHome: React.FC = () => {
-  const {language,changeLanguage}=useLanguage()
+  const { language, changeLanguage } = useLanguage();
 
   const [startAnimation, setStartAnimation] = useState(false);
 
@@ -50,9 +44,6 @@ const UserHome: React.FC = () => {
   const [works, setWorks] = useState<Work[]>([]);
 
   const [services, setServices] = useState<Service[]>([]);
-
-
-
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -84,7 +75,9 @@ const UserHome: React.FC = () => {
             ),
           );
         }
-      } catch {}
+      } catch {
+        console.log("error")
+      }
 
       try {
         const snap = await getDocs(collection(db, "works"));
@@ -100,7 +93,9 @@ const UserHome: React.FC = () => {
             ),
           );
         }
-      } catch {}
+      } catch {
+        console.log("error")
+      }
 
       try {
         const snap = await getDocs(collection(db, "services"));
@@ -116,11 +111,11 @@ const UserHome: React.FC = () => {
             ),
           );
         }
-      } catch {}
+      } catch {
+        console.log("error")
+      }
     })();
   }, []);
-
-
 
   return (
     <div
@@ -160,7 +155,6 @@ const UserHome: React.FC = () => {
         <div className="w-full px-[5%] py-6 flex items-center justify-between relative">
           {/* EMPTY LEFT */}
 
-          
           {/* CENTER LOGO */}
 
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
@@ -172,8 +166,6 @@ const UserHome: React.FC = () => {
               className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
             />
           </div>
-
-          
 
           {/* LANGUAGE SWITCH */}
 
@@ -421,14 +413,14 @@ const UserHome: React.FC = () => {
       <HomeNav language={language} />
 
       <section className="relative py-24 flex justify-center items-center overflow-hidden">
-  {/* GLOW */}
-  <div className="absolute w-[400px] h-[400px] bg-orange-500/10 blur-[140px] rounded-full" />
+        {/* GLOW */}
+        <div className="absolute w-[400px] h-[400px] bg-orange-500/10 blur-[140px] rounded-full" />
 
-  {/* IMAGE */}
-  <img
-    src="../../../public/img/vectors/7.png"
-    alt="Growvy Vector"
-    className="
+        {/* IMAGE */}
+        <img
+          src="../../../public/img/vectors/7.png"
+          alt="Growvy Vector"
+          className="
       relative z-10
       w-[280px]
       md:w-[420px]
@@ -437,12 +429,12 @@ const UserHome: React.FC = () => {
       animate-spin-slow
       drop-shadow-[0_0_60px_rgba(251,146,60,0.35)]
     "
-  />
+        />
 
-  {/* TAGLINE */}
-  <div className="absolute z-20 text-center">
-    <h2
-  className="
+        {/* TAGLINE */}
+        <div className="absolute z-20 text-center">
+          <h2
+            className="
     text-[clamp(2rem,8vw,8rem)]
     font-black
     leading-[0.85]
@@ -451,14 +443,12 @@ const UserHome: React.FC = () => {
     uppercase
     drop-shadow-[0_0_60px_rgba(34,211,238,0.45)]
   "
->
-  {t.brandingTagline1}
-  <span className="block text-orange-400">
-    {t.brandingTagline2}
-  </span>
-</h2>
-  </div>
-</section>
+          >
+            {t.brandingTagline1}
+            <span className="block text-orange-400">{t.brandingTagline2}</span>
+          </h2>
+        </div>
+      </section>
 
       <section className="relative px-[5%] py-36 overflow-hidden" id="about">
         {/* BACKGROUND GRID */}
@@ -796,58 +786,54 @@ const UserHome: React.FC = () => {
 
       {/* CLIENTS */}
 
-    <section
-  className="px-[5%] py-32 relative overflow-hidden bg-white"
-  onMouseEnter={() => {
-    if (!startAnimation) {
-      setStartAnimation(true);
-    }
-  }}
->
-  <div className="text-center mb-16">
-    <SectionLabel>{t.trustedBy}</SectionLabel>
+      <section
+        className="px-[5%] py-32 relative overflow-hidden bg-white"
+        onMouseEnter={() => {
+          if (!startAnimation) {
+            setStartAnimation(true);
+          }
+        }}
+      >
+        <div className="text-center mb-16">
+          <SectionLabel>{t.trustedBy}</SectionLabel>
 
-    <h2 className="text-5xl font-black text-black mt-4">
-       {t.trustedByTitle1}
-      <span className="block text-orange-400">
-        {t.trustedByTitle2}
-      </span>
-    </h2>
-  </div>
+          <h2 className="text-5xl font-black text-black mt-4">
+            {t.trustedByTitle1}
+            <span className="block text-orange-400">{t.trustedByTitle2}</span>
+          </h2>
+        </div>
 
- <div className="max-w-6xl mx-auto">
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
-  {clients.map((client, index) => {
-    const positions = [
-      { x: -250, y: -120 },
-      { x: 220, y: -150 },
-      { x: -180, y: 180 },
-      { x: 250, y: 120 },
-      { x: -320, y: 50 },
-      { x: 320, y: -80 },
-      { x: -100, y: -220 },
-      { x: 180, y: 220 },
-    ];
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
+            {clients.map((client, index) => {
+              const positions = [
+                { x: -250, y: -120 },
+                { x: 220, y: -150 },
+                { x: -180, y: 180 },
+                { x: 250, y: 120 },
+                { x: -320, y: 50 },
+                { x: 320, y: -80 },
+                { x: -100, y: -220 },
+                { x: 180, y: 220 },
+              ];
 
-    return (
-      <div
-        key={client.id}
-        className={`
+              return (
+                <div
+                  key={client.id}
+                  className={`
           flex items-center justify-center h-24
           ${startAnimation ? "logo-reveal" : ""}
         `}
-        style={{
-          animationDelay: `${index * 0.15}s`,
-          ["--start-x" as any]:
-            `${positions[index % positions.length].x}px`,
-          ["--start-y" as any]:
-            `${positions[index % positions.length].y}px`,
-        }}
-      >
-        <img
-          src={client.profileImage}
-          alt={client.name}
-          className="
+                  style={{
+                    animationDelay: `${index * 0.15}s`,
+                    ["--start-x" as any]: `${positions[index % positions.length].x}px`,
+                    ["--start-y" as any]: `${positions[index % positions.length].y}px`,
+                  }}
+                >
+                  <img
+                    src={client.profileImage}
+                    alt={client.name}
+                    className="
             max-h-14
             w-auto
             object-contain
@@ -856,13 +842,13 @@ const UserHome: React.FC = () => {
             transition-all
             duration-300
           "
-        />
-      </div>
-    );
-  })}
-</div>
-</div>
-</section>
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* CONTACT */}
 

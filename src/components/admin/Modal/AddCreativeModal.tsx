@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Field } from "./Modal";
 import type { Client, Creative } from "../../../utils/types/Types";
-import { addDoc,collection } from "firebase/firestore";
-import { db } from "../../../config/firebase/firebase";
-import { uploadFile } from "../../../utils/uploadFile";
 import { addCreative } from "../../../service/workService";
 
 interface Props {
@@ -15,7 +12,6 @@ interface Props {
 const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [websiteLogo, setWebsiteLogo] = useState<File | null>(null);
- 
 
   const [creativeForm, setCreativeForm] = useState({
     clientId: "",
@@ -26,195 +22,93 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
     websiteUrl: "",
   });
 
-
-  
-//   const handleAddCreative = async () => {
-//   try {
-//     if (!creativeForm.title || !creativeForm.clientId) {
-//       alert("Please fill required fields");
-//       return;
-//     }
-
-//     let imageUrl = "";
-
-//     // =========================
-//     // POSTER
-//     // =========================
-//     if (creativeForm.type === "poster") {
-//       if (!posterFile) {
-//         alert("Please select poster image");
-//         return;
-//       }
-
-//       imageUrl = await uploadFile(posterFile);
-
-//       await addDoc(collection(db, "creatives"), {
-//         clientId: creativeForm.clientId,
-//         type: "poster",
-//         title: creativeForm.title,
-//         imageUrl,
-//         uploadedAt: new Date().toISOString(),
-//       });
-//     }
-
-//     // =========================
-//     // REEL
-//     // =========================
-//     if (creativeForm.type === "reel") {
-//       await addDoc(collection(db, "creatives"), {
-//         clientId: creativeForm.clientId,
-//         type: "reel",
-//         title: creativeForm.title,
-//         instagramUrl: creativeForm.instagramUrl,
-//         uploadedAt: new Date().toISOString(),
-//       });
-//     }
-
-//     // =========================
-//     // WEBSITE
-//     // =========================
-//     if (creativeForm.type === "website") {
-//       let logoUrl = "";
-
-//       if (websiteLogo) {
-//         logoUrl = await uploadFile(websiteLogo);
-//       }
-
-//       await addDoc(collection(db, "creatives"), {
-//         clientId: creativeForm.clientId,
-//         type: "website",
-//         title: creativeForm.title,
-//         websiteUrl: creativeForm.websiteUrl,
-//         logoUrl,
-//         uploadedAt: new Date().toISOString(),
-//       });
-//     }
-
-//     alert("Creative Added Successfully");
-
-//     // Reset form
-//     setCreativeForm({
-//       clientId: "",
-//       type: "poster",
-//       title: "",
-//       imageUrl: "",
-//       instagramUrl: "",
-//       websiteUrl: "",
-//     });
-
-//     setPosterFile(null);
-//     setWebsiteLogo(null);
-
-//     onClose();
-//   } catch (error) {
-//     console.log(error);
-//     alert("Something went wrong");
-//   }
-// };
-
-
-const handleAddCreative = async () => {
-  try {
-    if (!creativeForm.title || !creativeForm.clientId) {
-      alert("Please fill required fields");
-      return;
-    }
-
-    // =========================
-    // CREATE CREATIVE OBJECT
-    // =========================
-    const creativeData: Creative = {
-      id: Date.now().toString(),
-
-      clientId: creativeForm.clientId,
-
-      type: creativeForm.type,
-
-      title: creativeForm.title,
-
-      imageUrl: "",
-
-      instagramUrl: creativeForm.instagramUrl,
-
-      websiteUrl: creativeForm.websiteUrl,
-
-      uploadedAt: new Date()
-        .toISOString()
-        .slice(0, 10),
-    };
-
-    let savedCreative;
-
-    // =========================
-    // POSTER
-    // =========================
-    if (creativeForm.type === "poster") {
-      if (!posterFile) {
-        alert("Select poster image");
+  const handleAddCreative = async () => {
+    try {
+      if (!creativeForm.title || !creativeForm.clientId) {
+        alert("Please fill required fields");
         return;
       }
 
-      savedCreative = await addCreative(
-        creativeData,
-        posterFile
-      );
+      // =========================
+      // CREATE CREATIVE OBJECT
+      // =========================
+      const creativeData: Creative = {
+        id: Date.now().toString(),
+
+        clientId: creativeForm.clientId,
+
+        type: creativeForm.type,
+
+        title: creativeForm.title,
+
+        imageUrl: "",
+
+        instagramUrl: creativeForm.instagramUrl,
+
+        websiteUrl: creativeForm.websiteUrl,
+
+        uploadedAt: new Date().toISOString().slice(0, 10),
+      };
+
+      let savedCreative;
+
+      // =========================
+      // POSTER
+      // =========================
+      if (creativeForm.type === "poster") {
+        if (!posterFile) {
+          alert("Select poster image");
+          return;
+        }
+
+        savedCreative = await addCreative(creativeData, posterFile);
+      }
+
+      // =========================
+      // REEL
+      // =========================
+      else if (creativeForm.type === "reel") {
+        savedCreative = await addCreative(creativeData);
+      }
+
+      // =========================
+      // WEBSITE
+      // =========================
+      else if (creativeForm.type === "website") {
+        savedCreative = await addCreative(creativeData, websiteLogo);
+      }
+
+      // =========================
+      // UPDATE UI
+      // =========================
+      if (savedCreative) {
+        onSave(savedCreative);
+      }
+
+      // =========================
+      // RESET
+      // =========================
+      setCreativeForm({
+        clientId: "",
+        type: "poster",
+        title: "",
+        imageUrl: "",
+        instagramUrl: "",
+        websiteUrl: "",
+      });
+
+      setPosterFile(null);
+      setWebsiteLogo(null);
+
+      alert("Creative Added");
+
+      onClose();
+    } catch (error) {
+      console.log(error);
+
+      alert("Failed to save creative");
     }
-
-    // =========================
-    // REEL
-    // =========================
-    else if (
-      creativeForm.type === "reel"
-    ) {
-      savedCreative = await addCreative(
-        creativeData
-      );
-    }
-
-    // =========================
-    // WEBSITE
-    // =========================
-    else if (
-      creativeForm.type === "website"
-    ) {
-      savedCreative = await addCreative(
-        creativeData,
-        websiteLogo
-      );
-    }
-
-    // =========================
-    // UPDATE UI
-    // =========================
-    if (savedCreative) {
-      onSave(savedCreative);
-    }
-
-    // =========================
-    // RESET
-    // =========================
-    setCreativeForm({
-      clientId: "",
-      type: "poster",
-      title: "",
-      imageUrl: "",
-      instagramUrl: "",
-      websiteUrl: "",
-    });
-
-    setPosterFile(null);
-    setWebsiteLogo(null);
-
-    alert("Creative Added");
-
-    onClose();
-  } catch (error) {
-    console.log(error);
-
-    alert("Failed to save creative");
-  }
-};
-
+  };
 
   return (
     <Modal title="Upload Creative" onClose={onClose}>

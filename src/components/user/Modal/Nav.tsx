@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { translations, NAV_LINKS } from "../../../constant/Constant";
-import { Link ,NavLink} from "react-router-dom";
-import logo from "../../../assets/Logo/logo-1.png"
-
+import { Link, NavLink } from "react-router-dom";
+import logo from "../../../assets/Logo/logo-1.png";
 
 type Language = "en" | "ar";
 
@@ -42,26 +41,23 @@ const Nav = ({ language, setLanguage }: Props) => {
             : "bg-transparent"
         }`}
       >
-       {/* LOGO */}
+        {/* LOGO */}
 
-<Link
-  to="/"
-  className="flex items-center justify-center"
->
-  <img
-    src={logo}
-    alt="Growvy Logo"
-    className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
-  />
-</Link>
+        <Link to="/" className="flex items-center justify-center">
+          <img
+            src={logo}
+            alt="Growvy Logo"
+            className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+          />
+        </Link>
 
         <ul className="hidden lg:flex items-center gap-10">
           {NAV_LINKS.map((item) => (
             <li key={item.key}>
-             <NavLink
-  to={item.path}
-  className={({ isActive }) =>
-    `
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `
     text-sm uppercase tracking-[0.15em]
     transition-all duration-300 relative
     ${
@@ -81,10 +77,10 @@ const Nav = ({ language, setLanguage }: Props) => {
 
     hover:after:w-full
     `
-  }
->
-  {t.nav[item.key as keyof typeof t.nav]}
-</NavLink>
+                }
+              >
+                {t.nav[item.key as keyof typeof t.nav]}
+              </NavLink>
             </li>
           ))}
         </ul>
@@ -95,28 +91,28 @@ const Nav = ({ language, setLanguage }: Props) => {
           {/* LANGUAGE SWITCH */}
 
           <div className="hidden sm:flex items-center gap-2">
-  <button
-    onClick={() => setLanguage("en")}
-    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-      language === "en"
-        ? "border border-orange-400 bg-orange-500/20 text-white shadow-[0_0_25px_rgba(251,146,60,0.4)]"
-        : "border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white/70 shadow-[0_0_15px_rgba(251,146,60,0.15)] hover:border-orange-400 hover:bg-orange-500/10 hover:text-white hover:shadow-[0_0_25px_rgba(251,146,60,0.3)]"
-    }`}
-  >
-    EN
-  </button>
+            <button
+              onClick={() => setLanguage("en")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                language === "en"
+                  ? "border border-orange-400 bg-orange-500/20 text-white shadow-[0_0_25px_rgba(251,146,60,0.4)]"
+                  : "border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white/70 shadow-[0_0_15px_rgba(251,146,60,0.15)] hover:border-orange-400 hover:bg-orange-500/10 hover:text-white hover:shadow-[0_0_25px_rgba(251,146,60,0.3)]"
+              }`}
+            >
+              EN
+            </button>
 
-  <button
-    onClick={() => setLanguage("ar")}
-    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-      language === "ar"
-        ? "border border-orange-400 bg-orange-500/20 text-white shadow-[0_0_25px_rgba(251,146,60,0.4)]"
-        : "border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white/70 shadow-[0_0_15px_rgba(251,146,60,0.15)] hover:border-orange-400 hover:bg-orange-500/10 hover:text-white hover:shadow-[0_0_25px_rgba(251,146,60,0.3)]"
-    }`}
-  >
-    عربي
-  </button>
-</div>
+            <button
+              onClick={() => setLanguage("ar")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                language === "ar"
+                  ? "border border-orange-400 bg-orange-500/20 text-white shadow-[0_0_25px_rgba(251,146,60,0.4)]"
+                  : "border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white/70 shadow-[0_0_15px_rgba(251,146,60,0.15)] hover:border-orange-400 hover:bg-orange-500/10 hover:text-white hover:shadow-[0_0_25px_rgba(251,146,60,0.3)]"
+              }`}
+            >
+              عربي
+            </button>
+          </div>
 
           {/* MOBILE MENU BUTTON */}
 

@@ -1,6 +1,6 @@
 import React from "react";
-import logo from "../../../public/img/logo-1.png"
-import HomeNav from "../../components/user/Modal/HomeNav"
+import logo from "../../../public/img/logo-1.png";
+import HomeNav from "../../components/user/Modal/HomeNav";
 
 const Footer = () => {
   return (
@@ -11,23 +11,21 @@ const Footer = () => {
 
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* LOGO */}
-<div className="flex justify-center">
-  <img
-    src={logo}
-    alt="Growvy Logo"
-    className="w-[140px] md:w-[170px] object-contain opacity-95 hover:scale-105 transition duration-300"
-  />
-</div>
+        <div className="flex justify-center">
+          <img
+            src={logo}
+            alt="Growvy Logo"
+            className="w-[140px] md:w-[170px] object-contain opacity-95 hover:scale-105 transition duration-300"
+          />
+        </div>
 
         <p className="text-white/60 leading-[1.9] mt-6 max-w-[700px]">
-          Creative branding, digital marketing, video production, and
-          web development agency helping brands grow globally.
+          Creative branding, digital marketing, video production, and web
+          development agency helping brands grow globally.
         </p>
 
         {/* NAVIGATION */}
-       <HomeNav
-         language="en"
-       />
+        <HomeNav language="en" />
 
         {/* KSA OFFICE */}
         <div className="mt-16">

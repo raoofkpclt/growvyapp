@@ -1,5 +1,3 @@
-// src/pages/user/ClientDetails.tsx
-
 import React, { useEffect, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,9 +22,7 @@ const ClientDetails = () => {
 
   const navigate = useNavigate();
 
-  
-  
-    const {language,changeLanguage}=useLanguage()
+  const { language, changeLanguage } = useLanguage();
 
   const [client, setClient] = useState<Client | null>(null);
 
@@ -34,41 +30,37 @@ const ClientDetails = () => {
 
   const t = translations[language];
 
-  
-
-
   useEffect(() => {
-  const fetchClient = async () => {
-    try {
-      setLoading(true);
+    const fetchClient = async () => {
+      try {
+        setLoading(true);
 
-      if (!id) return;
+        if (!id) return;
 
-      // GET SINGLE DOCUMENT USING FIRESTORE DOC ID
-      const docRef = doc(db, "clients", id);
+        // GET SINGLE DOCUMENT USING FIRESTORE DOC ID
+        const docRef = doc(db, "clients", id);
 
-      const snapshot = await getDoc(docRef);
+        const snapshot = await getDoc(docRef);
 
-      if (snapshot.exists()) {
-        const data = {
-          firestoreId: snapshot.id,
-          ...(snapshot.data() as Client),
-        };
+        if (snapshot.exists()) {
+          const data = {
+            firestoreId: snapshot.id,
+            ...(snapshot.data() as Client),
+          };
 
-        setClient(data);
-      } else {
-        setClient(null);
+          setClient(data);
+        } else {
+          setClient(null);
+        }
+      } catch (error) {
+        console.log("Fetch Client Error:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.log("Fetch Client Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchClient();
-}, [id]);
-
+    fetchClient();
+  }, [id]);
 
   // ─────────────────────────────────────────────
 
@@ -125,7 +117,7 @@ const ClientDetails = () => {
             transition-all
             "
           >
-           ← {t.backButton}
+            ← {t.backButton}
           </button>
 
           {/* LOADING */}
@@ -156,33 +148,29 @@ const ClientDetails = () => {
                   </h1>
 
                   <p className="mt-8 text-white/60 text-lg leading-[2] max-w-[700px]">
-  {t.clientDescription}{" "}
-  <span className="text-orange-400 font-semibold">
-    {client.name}
-  </span>{" "}
-  {t.clientDescription2}
-</p>
+                    {t.clientDescription}{" "}
+                    <span className="text-orange-400 font-semibold">
+                      {client.name}
+                    </span>{" "}
+                    {t.clientDescription2}
+                  </p>
                   {/* INFO CARDS */}
 
-                  <div className="grid sm:grid-cols-2 gap-6 mt-12">
-                    
-                    
-                  </div>
+                  <div className="grid sm:grid-cols-2 gap-6 mt-12"></div>
                 </div>
 
                 {/* RIGHT */}
 
-<div className="relative flex items-center justify-center min-h-[500px]">
+                <div className="relative flex items-center justify-center min-h-[500px]">
+                  {/* Glow */}
+                  <div className="absolute w-[500px] h-[500px] bg-orange-500/10 blur-[160px] rounded-full" />
 
-  {/* Glow */}
-  <div className="absolute w-[500px] h-[500px] bg-orange-500/10 blur-[160px] rounded-full" />
-
-  {/* Logo */}
-  {client.profileImage ? (
-    <img
-      src={client.profileImage}
-      alt={client.name}
-      className="
+                  {/* Logo */}
+                  {client.profileImage ? (
+                    <img
+                      src={client.profileImage}
+                      alt={client.name}
+                      className="
         relative z-10
         w-full
         max-w-[700px]
@@ -191,40 +179,39 @@ const ClientDetails = () => {
         rounded-[40px]
         
       "
-    />
-  ) : (
-    <div
-      className="
+                    />
+                  ) : (
+                    <div
+                      className="
         relative z-10
         text-[180px]
         font-black
         text-white/10
       "
-    >
-      {client.name?.charAt(0)}
-    </div>
-  )}
-</div>
-               
+                    >
+                      {client.name?.charAt(0)}
+                    </div>
+                  )}
+                </div>
               </div>
               {/* PORTFOLIO SECTION */}
 
-<div className="mt-32">
-  <div className="flex items-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
-    <div className="w-10 h-px bg-yellow-400" />
-    {t.portfolio}
-  </div>
+              <div className="mt-32">
+                <div className="flex items-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
+                  <div className="w-10 h-px bg-yellow-400" />
+                  {t.portfolio}
+                </div>
 
-  <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1] tracking-[-0.05em]">
-   {t.featuredWorks1}
-<br />
-{t.featuredWorks2}
-  </h2>
+                <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1] tracking-[-0.05em]">
+                  {t.featuredWorks1}
+                  <br />
+                  {t.featuredWorks2}
+                </h2>
 
-  {client.portfolioImage ? (
-    <div className="mt-16">
-      <div
-        className="
+                {client.portfolioImage ? (
+                  <div className="mt-16">
+                    <div
+                      className="
         group
         relative
         overflow-hidden
@@ -235,11 +222,11 @@ const ClientDetails = () => {
         backdrop-blur-xl
         
         "
-      >
-        <img
-          src={client.portfolioImage}
-          alt={client.name}
-          className="
+                    >
+                      <img
+                        src={client.portfolioImage}
+                        alt={client.name}
+                        className="
           w-full
           min-h-[400vh]
           object-cover
@@ -247,23 +234,18 @@ const ClientDetails = () => {
           duration-700
           group-hover:scale-[1.02]
           "
-        />
+                      />
 
-       
-        <div />
-
-        
-      </div>
-    </div>
-  ) : (
-    <div className="mt-16 bg-white/5 border border-white/10 rounded-[30px] p-16 text-center text-white/50">
-      {t.noPortfolio}
-    </div>
-  )}
-</div>
+                      <div />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-16 bg-white/5 border border-white/10 rounded-[30px] p-16 text-center text-white/50">
+                    {t.noPortfolio}
+                  </div>
+                )}
+              </div>
               {/* PROJECT SECTION */}
-
-             
             </>
           )}
         </div>
@@ -271,7 +253,7 @@ const ClientDetails = () => {
 
       {/* FOOTER */}
 
-     <Footer/>
+      <Footer />
     </div>
   );
 };

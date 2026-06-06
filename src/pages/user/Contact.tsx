@@ -1,23 +1,13 @@
-// src/pages/user/Contact.tsx
-
-import React, { useState } from "react";
-
+import React from "react";
 import Nav from "../../components/user/Modal/Nav";
-
-import {
-  translations,
-} from "../../constant/Constant";
+import { translations } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
-
-
 
 // ─────────────────────────────────────────────
 
 const Contact = () => {
-
-  const {language,changeLanguage}=useLanguage()
-  
+  const { language, changeLanguage } = useLanguage();
 
   const t = translations[language];
 
@@ -27,9 +17,7 @@ const Contact = () => {
     <div
       dir={language === "ar" ? "rtl" : "ltr"}
       className={`min-h-screen bg-[#081120] text-white overflow-x-hidden ${
-        language === "ar"
-          ? "font-[Cairo]"
-          : "font-sans"
+        language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
       {/* GRID BACKGROUND */}
@@ -48,60 +36,41 @@ const Contact = () => {
       {/* GLOW EFFECT */}
 
       <div className="fixed inset-0 -z-10 overflow-hidden">
-
         <div className="absolute top-[-200px] left-[-100px] w-[500px] h-[500px] bg-blue-600/20 blur-[140px] rounded-full" />
 
         <div className="absolute bottom-[-200px] right-[-100px] w-[500px] h-[500px] bg-cyan-500/20 blur-[160px] rounded-full" />
-
       </div>
 
       {/* NAVBAR */}
 
-      <Nav
-        language={language}
-        setLanguage={changeLanguage}
-      />
+      <Nav language={language} setLanguage={changeLanguage} />
 
       {/* HERO */}
 
       <section className="px-[5%] pt-20">
-
         <div className="max-w-[1400px] mx-auto text-center">
-
           <div className="flex items-center justify-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
-
             <div className="w-10 h-px bg-yellow-400" />
 
-            {language === "en"
-              ? "Contact Us"
-              : "تواصل معنا"}
+            {language === "en" ? "Contact Us" : "تواصل معنا"}
 
             <div className="w-10 h-px bg-yellow-400" />
           </div>
 
           <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
-
-            {language === "en"
-              ? "Let's Build"
-              : "لنصنع"}
+            {language === "en" ? "Let's Build" : "لنصنع"}
 
             <br />
 
             <span className="text-orange-400">
-
-              {language === "en"
-                ? "Something Great"
-                : "شيئًا رائعًا"}
-
+              {language === "en" ? "Something Great" : "شيئًا رائعًا"}
             </span>
           </h1>
 
           <p className="max-w-[750px] mx-auto mt-8 text-white/60 text-lg leading-[2]">
-
             {language === "en"
               ? "Get in touch with Growvy for branding, marketing, creative production, and digital solutions."
               : "تواصل مع جروفي لخدمات التسويق، الهوية التجارية، الإنتاج الإبداعي، والحلول الرقمية."}
-
           </p>
         </div>
       </section>
@@ -110,24 +79,19 @@ const Contact = () => {
 
       <section className="px-[30%] py-20 relative overflow-hidden" id="contact">
         {/* Glow */}
-        
-        
-         
 
-          
-          
-          <img
-            src="/img/vectors/phone-orange.png"
-            alt="Contact Growvy"
-            className="w-full max-w-[500px] mx-auto my-16"
-          />
+        <img
+          src="/img/vectors/phone-orange.png"
+          alt="Contact Growvy"
+          className="w-full max-w-[500px] mx-auto my-16"
+        />
 
-          {/* BUTTONS */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-16">
-            {/* CALL */}
-            <a
-              href="tel:+919074769643"
-              className="
+        {/* BUTTONS */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-16">
+          {/* CALL */}
+          <a
+            href="tel:+919074769643"
+            className="
       group
       inline-flex
       items-center
@@ -150,20 +114,20 @@ const Contact = () => {
       transition-all
       duration-300
     "
-            >
-              <span>{t.callUs}</span>
+          >
+            <span>{t.callUs}</span>
 
-              <span className="group-hover:translate-x-1 transition-transform duration-300">
-                →
-              </span>
-            </a>
+            <span className="group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
+          </a>
 
-            {/* WHATSAPP */}
-            <a
-              href="https://wa.me/919074769643"
-              target="_blank"
-              rel="noreferrer"
-              className="
+          {/* WHATSAPP */}
+          <a
+            href="https://wa.me/919074769643"
+            target="_blank"
+            rel="noreferrer"
+            className="
       group
       inline-flex
       items-center
@@ -186,23 +150,20 @@ const Contact = () => {
       transition-all
       duration-300
     "
-            >
-              <span>{t.whatsappUs}</span>
+          >
+            <span>{t.whatsappUs}</span>
 
-              <span className="group-hover:translate-x-1 transition-transform duration-300">
-                →
-              </span>
-            </a>
-        
+            <span className="group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
+          </a>
         </div>
       </section>
 
       {/* MAP / EXTRA SECTION */}
 
       <section className="px-[5%] pb-32">
-
         <div className="max-w-[1400px] mx-auto">
-
           <div
             className="
             relative
@@ -216,7 +177,8 @@ const Contact = () => {
             md:p-16
             "
           >
-            <div className="absolute inset-0 opacity-[0.03]"
+            <div
+              className="absolute inset-0 opacity-[0.03]"
               style={{
                 backgroundImage: `
                   linear-gradient(rgba(34,211,238,0.3) 1px, transparent 1px),
@@ -227,66 +189,57 @@ const Contact = () => {
             />
 
             <div className="relative z-10 grid lg:grid-cols-2 gap-16 items-start">
+              {/* LEFT SIDE */}
 
-  {/* LEFT SIDE */}
+              <div>
+                <h2 className="text-[clamp(2rem,5vw,4rem)] font-black leading-[1]">
+                  {language === "en"
+                    ? "Let's Talk Business"
+                    : "دعنا نتحدث عن أعمالك"}
+                </h2>
 
-  <div>
+                <p className="mt-6 text-white/60 text-lg leading-[2]">
+                  {language === "en"
+                    ? "Contact our team in Saudi Arabia or India for branding, websites, marketing, and creative solutions."
+                    : "تواصل مع فريقنا في السعودية أو الهند لخدمات الهوية التجارية والمواقع الإلكترونية والتسويق والحلول الإبداعية."}
+                </p>
 
-    <h2 className="text-[clamp(2rem,5vw,4rem)] font-black leading-[1]">
-      {language === "en"
-        ? "Let's Talk Business"
-        : "دعنا نتحدث عن أعمالك"}
-    </h2>
+                {/* INDIA OFFICE */}
 
-    <p className="mt-6 text-white/60 text-lg leading-[2]">
-      {language === "en"
-        ? "Contact our team in Saudi Arabia or India for branding, websites, marketing, and creative solutions."
-        : "تواصل مع فريقنا في السعودية أو الهند لخدمات الهوية التجارية والمواقع الإلكترونية والتسويق والحلول الإبداعية."}
-    </p>
+                <div className="mt-12">
+                  <p className="text-white/60 leading-[2]">
+                    Growvy Branding
+                    <br />
+                    Al-Zahra
+                    <br />
+                    Jeddah
+                    <br />
+                    Kingdom of Saudi Arabia
+                  </p>
 
-    
+                  <a
+                    href="mailto:business@growvyofficial.com"
+                    className="inline-block mt-4 text-yellow-400 hover:text-orange-300"
+                  >
+                    business@growvyofficial.com
+                  </a>
+                  <br />
+                  <a
+                    href="mailto:info@growvyofficial.com"
+                    className="inline-block mt-4 text-yellow-400 hover:text-yellow-300"
+                  >
+                    info@growvyofficial.com
+                  </a>
+                </div>
+              </div>
 
-   
-    {/* INDIA OFFICE */}
+              {/* RIGHT SIDE - ENQUIRY FORM */}
 
-    <div className="mt-12">
-     
-      <p className="text-white/60 leading-[2]">
-      Growvy Branding
-        <br />
-        Al-Zahra
-        <br />
-        Jeddah
-        <br />
-        Kingdom of Saudi Arabia
-      </p>
-
-      
-
-     <a
-        href="mailto:business@growvyofficial.com"
-        className="inline-block mt-4 text-yellow-400 hover:text-orange-300"
-      >
-        business@growvyofficial.com
-      </a>
-      <br />
-      <a
-        href="mailto:info@growvyofficial.com"
-        className="inline-block mt-4 text-yellow-400 hover:text-yellow-300"
-      >
-        info@growvyofficial.com
-      </a>
-    </div>
-  </div>
-
-  {/* RIGHT SIDE - ENQUIRY FORM */}
-
-  <form className="space-y-5">
-
-    <input
-      type="text"
-      placeholder={language === "en" ? "Full Name" : "الاسم الكامل"}
-      className="
+              <form className="space-y-5">
+                <input
+                  type="text"
+                  placeholder={language === "en" ? "Full Name" : "الاسم الكامل"}
+                  className="
         w-full
         px-6
         py-4
@@ -296,12 +249,14 @@ const Contact = () => {
         outline-none
         focus:border-orange-400
       "
-    />
+                />
 
-    <input
-      type="email"
-      placeholder={language === "en" ? "Email Address" : "البريد الإلكتروني"}
-      className="
+                <input
+                  type="email"
+                  placeholder={
+                    language === "en" ? "Email Address" : "البريد الإلكتروني"
+                  }
+                  className="
         w-full
         px-6
         py-4
@@ -311,12 +266,14 @@ const Contact = () => {
         outline-none
         focus:border-orange-400
       "
-    />
+                />
 
-    <input
-      type="tel"
-      placeholder={language === "en" ? "Phone Number" : "رقم الهاتف"}
-      className="
+                <input
+                  type="tel"
+                  placeholder={
+                    language === "en" ? "Phone Number" : "رقم الهاتف"
+                  }
+                  className="
         w-full
         px-6
         py-4
@@ -326,12 +283,16 @@ const Contact = () => {
         outline-none
         focus:border-orange-400
       "
-    />
+                />
 
-    <textarea
-      rows={5}
-      placeholder={language === "en" ? "Tell us about your project..." : "أخبرنا عن مشروعك..."}
-      className="
+                <textarea
+                  rows={5}
+                  placeholder={
+                    language === "en"
+                      ? "Tell us about your project..."
+                      : "أخبرنا عن مشروعك..."
+                  }
+                  className="
         w-full
         px-6
         py-4
@@ -342,11 +303,11 @@ const Contact = () => {
         focus:border-orange-400
         resize-none
       "
-    />
+                />
 
-    <button
-  type="submit"
-  className="
+                <button
+                  type="submit"
+                  className="
     w-full
     py-4
     rounded-2xl
@@ -365,15 +326,13 @@ const Contact = () => {
     transition-all
     duration-500
   "
->
-  <span className="relative z-10">
-    {language === "en"
-      ? "Send Enquiry"
-      : "إرسال الاستفسار"}
-  </span>
+                >
+                  <span className="relative z-10">
+                    {language === "en" ? "Send Enquiry" : "إرسال الاستفسار"}
+                  </span>
 
-  <div
-    className="
+                  <div
+                    className="
       absolute
       inset-0
       opacity-0
@@ -385,19 +344,17 @@ const Contact = () => {
       transition-opacity
       duration-500
     "
-  />
-</button>
-
-  </form>
-
-</div>
+                  />
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
 
-      <Footer/>
+      <Footer />
     </div>
   );
 };

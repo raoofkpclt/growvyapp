@@ -5,12 +5,7 @@ interface Props {
   language: "en" | "ar";
 }
 
-export default function AutoSwitchSection({
-  language,
-}: Props) {
-
-  
-
+export default function AutoSwitchSection({ language }: Props) {
   const [active, setActive] = useState(0);
 
   // AUTO SWITCH
@@ -24,7 +19,6 @@ export default function AutoSwitchSection({
 
   return (
     <section className="relative py-32 overflow-hidden">
-
       {/* GRID */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -55,10 +49,8 @@ export default function AutoSwitchSection({
           px-[5%]
         "
       >
-
         {/* IMAGE */}
         <div className="relative flex justify-center items-center">
-
           <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full" />
 
           <img
@@ -85,7 +77,6 @@ export default function AutoSwitchSection({
             ${language === "ar" ? "text-right" : "text-left"}
           `}
         >
-
           <p
             className="
               text-orange-400
@@ -129,32 +120,20 @@ export default function AutoSwitchSection({
           </p>
 
           {/* BUTTONS */}
-          <div className="flex flex-wrap gap-4 mt-10">
-
-            
-
-            
-
-          </div>
+          <div className="flex flex-wrap gap-4 mt-10"></div>
 
           {/* INDICATORS */}
           <div className="flex gap-3 mt-12">
-
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setActive(index)}
                 className={`
                   h-2 rounded-full transition-all duration-500
-                  ${
-                    active === index
-                      ? "w-10 bg-yellow-400"
-                      : "w-2 bg-white/20"
-                  }
+                  ${active === index ? "w-10 bg-yellow-400" : "w-2 bg-white/20"}
                 `}
               />
             ))}
-
           </div>
         </div>
       </div>

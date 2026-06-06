@@ -1,9 +1,6 @@
-// src/pages/user/Services.tsx
-
-import React, { useState } from "react";
+import React from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import Nav from "../../components/user/Modal/Nav";
-
 import {
   translations,
   SERVICES_DROPDOWN,
@@ -84,19 +81,15 @@ const Services = () => {
 
       {/* SERVICES GRID */}
 
-      
-
-              
-
       {/* SERVICES DROPDOWN */}
 
       <section className="px-[5%] pb-32">
         <div className="max-w-[1000px] mx-auto text-center">
           <div>
-<img
-  src="/img/vectors/6.png"
-  alt=""
-  className="
+            <img
+              src="/img/vectors/6.png"
+              alt=""
+              className="
     w-[280px]
     md:w-[300px]
     mx-auto
@@ -105,8 +98,8 @@ const Services = () => {
     opacity-90
     animate-float
   "
-/>
-      </div>
+            />
+          </div>
           {/* HEADING */}
           <div className="mb-20">
             <div className="flex items-center justify-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
@@ -116,11 +109,11 @@ const Services = () => {
             </div>
 
             <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
-  {t.servicesPageTitle1}
-  <span className="block text-orange-400">
-    {t.servicesPageTitle2}
-  </span>
-</h2>
+              {t.servicesPageTitle1}
+              <span className="block text-orange-400">
+                {t.servicesPageTitle2}
+              </span>
+            </h2>
           </div>
 
           {/* SERVICES */}
@@ -217,24 +210,18 @@ const Services = () => {
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               {/* LEFT */}
 
-              
-
-
               <div>
-  <div className="flex items-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
-    <div className="w-10 h-px bg-yellow-400" />
-    {t.whyChooseGrowvy}
-  </div>
+                <div className="flex items-center gap-3 text-yellow-400 uppercase tracking-[0.25em] text-xs font-bold mb-8">
+                  <div className="w-10 h-px bg-yellow-400" />
+                  {t.whyChooseGrowvy}
+                </div>
 
-  <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1] tracking-[-0.05em]">
-    {t.whyTitleSer1}
+                <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1] tracking-[-0.05em]">
+                  {t.whyTitleSer1}
 
-    <span className="text-orange-400">
-      {" "}
-      {t.whyTitleSer2}
-    </span>
-  </h2>
-</div>
+                  <span className="text-orange-400"> {t.whyTitleSer2}</span>
+                </h2>
+              </div>
 
               {/* RIGHT */}
 

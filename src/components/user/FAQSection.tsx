@@ -30,19 +30,14 @@ const FAQSection = ({ language }: Props) => {
         <div className="text-center mb-20">
           <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
             {t.faqTitle1}
-            <span className="block text-orange-400">
-              {t.faqTitle2}
-            </span>
+            <span className="block text-orange-400">{t.faqTitle2}</span>
           </h2>
         </div>
 
         {/* FAQ Items */}
         <div className="flex flex-col gap-6">
           {FAQ_DATA.map((item, index) => (
-            <div
-              key={index}
-              className="border-b border-white/10 pb-6"
-            >
+            <div key={index} className="border-b border-white/10 pb-6">
               <button
                 onClick={() => toggleFAQ(index)}
                 className="w-full flex items-center justify-between text-left"

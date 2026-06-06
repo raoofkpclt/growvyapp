@@ -14,7 +14,7 @@ const AddClientModal = ({ onClose, onSave }: any) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "", // ADD PHONE
+    phone: "", 
     description: "",
   });
 
@@ -65,7 +65,6 @@ const AddClientModal = ({ onClose, onSave }: any) => {
   return (
     <Modal title="Add New Client" onClose={onClose}>
       <div className="space-y-4">
-
         <div className="grid grid-cols-2 gap-3">
           <Field
             label="Full Name"
@@ -121,30 +120,22 @@ const AddClientModal = ({ onClose, onSave }: any) => {
 
         {/* Profile Image */}
         <div>
-          <label className="text-sm text-zinc-400">
-            Profile Image
-          </label>
+          <label className="text-sm text-zinc-400">Profile Image</label>
 
           <input
             type="file"
-            onChange={(e) =>
-              setProfileFile(e.target.files?.[0] || null)
-            }
+            onChange={(e) => setProfileFile(e.target.files?.[0] || null)}
             className="w-full mt-1"
           />
         </div>
 
         {/* Portfolio Image */}
         <div>
-          <label className="text-sm text-zinc-400">
-            Portfolio Image
-          </label>
+          <label className="text-sm text-zinc-400">Portfolio Image</label>
 
           <input
             type="file"
-            onChange={(e) =>
-              setPortfolioFile(e.target.files?.[0] || null)
-            }
+            onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)}
             className="w-full mt-1"
           />
         </div>

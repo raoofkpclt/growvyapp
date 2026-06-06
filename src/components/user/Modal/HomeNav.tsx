@@ -4,12 +4,10 @@ import { Link } from "react-router-dom";
 
 interface Props {
   language: "en" | "ar";
-  
 }
 
 const Nav = ({ language }: Props) => {
   const [scrolled, setScrolled] = useState(false);
-
 
   const t = translations[language];
 
@@ -27,28 +25,22 @@ const Nav = ({ language }: Props) => {
 
   return (
     <>
+      {/* NAVBAR */}
 
-     {/* NAVBAR */}
+      <nav
+        dir={language === "ar" ? "rtl" : "ltr"}
+        className={`sticky top-0 z-50  py-15 px-4 md:px-[5%] flex items-center justify-center transition-all duration-300 ${
+          scrolled ? "bg-[#081120]/95 backdrop-blur-2xl" : "bg-[#081120]"
+        }`}
+      >
+        {/* NAV LINKS */}
 
-<nav
-  dir={language === "ar" ? "rtl" : "ltr"}
-  className={`sticky top-0 z-50  py-15 px-4 md:px-[5%] flex items-center justify-center transition-all duration-300 ${
-    scrolled
-      ? "bg-[#081120]/95 backdrop-blur-2xl"
-      : "bg-[#081120]"
-  }`}
->
-
-  {/* NAV LINKS */}
-
-  <ul className="flex items-center gap-4 sm:gap-6 md:gap-10 flex-wrap justify-center">
-
-    {NAV_LINKS.map((item) => (
-      <li key={item.key}>
-
-        <Link
-  to={item.path}
-  className="
+        <ul className="flex items-center gap-4 sm:gap-6 md:gap-10 flex-wrap justify-center">
+          {NAV_LINKS.map((item) => (
+            <li key={item.key}>
+              <Link
+                to={item.path}
+                className="
     text-white/70
     hover:text-orange-400
     transition-all
@@ -76,14 +68,13 @@ const Nav = ({ language }: Props) => {
     hover:after:w-full
     hover:drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]
   "
->
-  {t.nav[item.key as keyof typeof t.nav]}
-</Link>
-
-      </li>
-    ))}
-  </ul>
-</nav>
+              >
+                {t.nav[item.key as keyof typeof t.nav]}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </>
   );
 };

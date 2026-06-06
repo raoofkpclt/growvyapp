@@ -7,22 +7,16 @@ interface Props {
   loading?: boolean;
 }
 
-const DeleteConfirmModal = ({
-  onClose,
-  onConfirm,
-  loading,
-}: Props) => {
+const DeleteConfirmModal = ({ onClose, onConfirm, loading }: Props) => {
   return (
     <Modal title="Delete Client" onClose={onClose}>
       <div className="space-y-5">
         <div>
-          <h3 className="text-white text-sm font-medium">
-            Are you sure?
-          </h3>
+          <h3 className="text-white text-sm font-medium">Are you sure?</h3>
 
           <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
-            This action will permanently delete this
-            client. This cannot be undone.
+            This action will permanently delete this client. This cannot be
+            undone.
           </p>
         </div>
 

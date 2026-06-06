@@ -121,3 +121,18 @@
 .animate-float {
   animation: float 4s ease-in-out infinite;
 }
+
+
+@keyframes floatGlow {
+  0%,100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-float-glow {
+  animation: floatGlow 4s ease-in-out infinite;
+}

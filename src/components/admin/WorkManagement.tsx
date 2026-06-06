@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCreatives ,deleteCreative} from "../../service/workService";
+import { getCreatives, deleteCreative } from "../../service/workService";
 import type { Creative, Client } from "../../utils/types/Types";
 import AddCreativeModal from "./Modal/AddCreativeModal";
 import { collection, getDocs } from "firebase/firestore";
@@ -41,36 +41,31 @@ const WorkManagement = () => {
     };
 
     const fetchCreatives = async () => {
-  const data = await getCreatives();
+      const data = await getCreatives();
 
-  setCreatives(data);
-};
-
+      setCreatives(data);
+    };
 
     fetchCreatives();
     fetchClients();
   }, []);
 
- 
-const handleDelete = async (id: string) => {
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this work?"
-  );
-
-  if (!confirmDelete) return;
-
-  try {
-    await deleteCreative(id);
-
-    setCreatives((prev) =>
-      prev.filter((item) => item.id !== id)
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this work?",
     );
-  } catch (error) {
-    console.log(error);
-    alert("Failed to delete work");
-  }
-};
 
+    if (!confirmDelete) return;
+
+    try {
+      await deleteCreative(id);
+
+      setCreatives((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.log(error);
+      alert("Failed to delete work");
+    }
+  };
 
   return (
     <div>
@@ -164,8 +159,8 @@ const handleDelete = async (id: string) => {
                       {owner?.name}
                     </p>
                     <button
-  onClick={() => handleDelete(c.id!)}
-  className="
+                      onClick={() => handleDelete(c.id!)}
+                      className="
     flex
     items-center
     justify-center
@@ -178,9 +173,9 @@ const handleDelete = async (id: string) => {
     hover:bg-red-500/20
     transition-all
   "
->
-  🗑 Delete
-</button>
+                    >
+                      🗑 Delete
+                    </button>
                   </div>
                   <p className="text-xs text-zinc-700 mt-1">{c.uploadedAt}</p>
                   <div className="mt-3 flex gap-2">
@@ -193,7 +188,6 @@ const handleDelete = async (id: string) => {
                       >
                         View on Instagram
                       </a>
-                      
                     )}
                     {c.type === "website" && c.websiteUrl && (
                       <a

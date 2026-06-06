@@ -11,18 +11,12 @@ interface Props {
   onSave: (client: Client) => void;
 }
 
-const EditClientModal = ({
-  client,
-  onClose,
-  onSave,
-}: Props) => {
+const EditClientModal = ({ client, onClose, onSave }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const [profileFile, setProfileFile] =
-    useState<File | null>(null);
+  const [profileFile, setProfileFile] = useState<File | null>(null);
 
-  const [portfolioFile, setPortfolioFile] =
-    useState<File | null>(null);
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
   const [form, setForm] = useState<Client>({
     ...client,
@@ -30,11 +24,11 @@ const EditClientModal = ({
 
   const handleEditClient = async () => {
     try {
-      console.log(1)
+      console.log(1);
       // if (!client.firestoreId) return;
 
       setLoading(true);
-console.log(2)
+      console.log(2);
       let profileImage = form.profileImage;
       let portfolioImage = form.portfolioImage;
 
@@ -42,33 +36,31 @@ console.log(2)
       if (profileFile) {
         profileImage = await uploadFile(profileFile);
       }
-console.log(1)
+      console.log(1);
       // Upload new portfolio image
       if (portfolioFile) {
         portfolioImage = await uploadFile(portfolioFile);
       }
-console.log(1)
+      console.log(1);
       const updatedClient = {
-  id: form.id,
-  name: form.name,
-  email: form.email,
-  phone: form.phone,
-  description: form.description,
-  profileImage,
-  portfolioImage,
-  status: form.status,
-  joinedDate: form.joinedDate,
-};
-console.log(1)
+        id: form.id,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        description: form.description,
+        profileImage,
+        portfolioImage,
+        status: form.status,
+        joinedDate: form.joinedDate,
+      };
+      console.log(1);
       // Update in Firebase
-      await editClient(
-        updatedClient
-      );
+      await editClient(updatedClient);
 
-     onSave({
-  ...updatedClient,
-  firestoreId: client.firestoreId,
-});
+      onSave({
+        ...updatedClient,
+        firestoreId: client.firestoreId,
+      });
 
       onClose();
     } catch (error) {
@@ -81,7 +73,6 @@ console.log(1)
   return (
     <Modal title="Edit Client" onClose={onClose}>
       <div className="space-y-4">
-
         {/* Name + Email */}
         <div className="grid grid-cols-2 gap-3">
           <Field
@@ -154,17 +145,11 @@ console.log(1)
 
         {/* Upload New Profile Image */}
         <div>
-          <label className="text-sm text-zinc-400">
-            Change Profile Image
-          </label>
+          <label className="text-sm text-zinc-400">Change Profile Image</label>
 
           <input
             type="file"
-            onChange={(e) =>
-              setProfileFile(
-                e.target.files?.[0] || null
-              )
-            }
+            onChange={(e) => setProfileFile(e.target.files?.[0] || null)}
             className="w-full mt-1"
           />
         </div>
@@ -192,11 +177,7 @@ console.log(1)
 
           <input
             type="file"
-            onChange={(e) =>
-              setPortfolioFile(
-                e.target.files?.[0] || null
-              )
-            }
+            onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)}
             className="w-full mt-1"
           />
         </div>
@@ -215,9 +196,7 @@ console.log(1)
             disabled={loading}
             className="flex-1 py-2 rounded-xl bg-violet-600 text-white"
           >
-            {loading
-              ? "Updating..."
-              : "Update Client"}
+            {loading ? "Updating..." : "Update Client"}
           </button>
         </div>
       </div>
