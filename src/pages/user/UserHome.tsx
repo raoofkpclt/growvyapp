@@ -47,7 +47,7 @@ const UserHome: React.FC = () => {
 
   const [services, setServices] = useState<Service[]>([]);
 
-  // const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // ─────────────────────────────────────────────
 
@@ -263,7 +263,7 @@ const UserHome: React.FC = () => {
 
             {/* VIDEO */}
 
-             {/* <video
+             <video
   ref={videoRef}
   autoPlay
   muted
@@ -275,20 +275,7 @@ const UserHome: React.FC = () => {
   onError={(e) => console.log("Video error", e)}
 >
   <source src="/video/aa.mp4" type="video/mp4" />
-</video>  */}
-
-<video
-  src="/video/aa.mp4"
-  controls
-  autoPlay
-  muted
-  loop
-  style={{
-    width: "100%",
-    height: "600px",
-    objectFit: "cover",
-  }}
-/>
+</video> 
 
  
 
