@@ -47,7 +47,7 @@ const UserHome: React.FC = () => {
 
   const [services, setServices] = useState<Service[]>([]);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // const videoRef = useRef<HTMLVideoElement>(null);
 
   // ─────────────────────────────────────────────
 
