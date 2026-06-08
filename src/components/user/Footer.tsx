@@ -1,6 +1,7 @@
 import React from "react";
 import logo from "../../../public/img/logo-1.png";
 import HomeNav from "../../components/user/Modal/HomeNav";
+import { Link } from "react-router-dom";
 
 const Footer : React.FC= () => {
   return (
@@ -12,11 +13,13 @@ const Footer : React.FC= () => {
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* LOGO */}
         <div className="flex justify-center">
-          <img
-            src={logo}
-            alt="Growvy Logo"
-            className="w-[140px] md:w-[170px] object-contain opacity-95 hover:scale-105 transition duration-300"
-          />
+          <Link to="/login" className="flex justify-center">
+  <img
+    src={logo}
+    alt="Growvy Logo"
+    className="w-[140px] md:w-[170px] object-contain opacity-95 hover:scale-105 transition duration-300 cursor-pointer"
+  />
+</Link>
         </div>
 
         <p className="text-white/60 leading-[1.9] mt-6 max-w-[700px]">
