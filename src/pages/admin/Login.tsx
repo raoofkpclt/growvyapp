@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebase/firebase.ts";
-import logo from "../../assets/logo/logo-1.png";
+import logo from "../../../public/img/logo-1.png";
 import { useNavigate } from "react-router-dom";
 
 type FormErrors = {
