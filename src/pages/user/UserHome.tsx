@@ -272,7 +272,7 @@ const UserHome: React.FC = () => {
   preload="auto"
   className="relative z-10 w-full h-[300px] md:h-[600px] lg:h-[850px] object-cover mix-blend-lighten opacity-[0.92]"
 >
-  <source src="/video/hero-video.mp4" type="video/mp4" />
+  <source src="/video/aa.mp4" type="video/mp4" />
 </video> 
 
  
