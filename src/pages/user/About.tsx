@@ -86,7 +86,7 @@ const About: React.FC = () => {
           <div className="flex justify-center mt-20">
             <div className="relative w-full max-w-[800px] overflow-hidden rounded-[40px]">
               <img
-                src="/public/img/vectors/16.png"
+                src="/img/vectors/16.png"
                 alt="Growvy"
                 className="w-full object-cover"
               />
