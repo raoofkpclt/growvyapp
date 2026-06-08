@@ -22,7 +22,7 @@ import ProtectRoutes from "./routes/ProtectRotes";
 import PublicRoute from "./routes/PublicRoute";
 
 import { AuthProvider } from "./context/AuthContext";
-import InstagramReel from "./components/user/AutoSwitchSection";
+
 
 
 function App() {
@@ -52,10 +52,7 @@ function App() {
   path="/client-details/:id"
   element={<ClientDetails />}
 />
-          <Route
-  path="/instareel"
-  element={<InstagramReel />}
-/>
+          
           <Route
             path="/works"
             element={<Works />}

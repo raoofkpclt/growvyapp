@@ -168,7 +168,7 @@ const ClientManagement: React.FC = () => {
       {showAddClient && (
         <AddClientModal
           onClose={() => setShowAddClient(false)}
-          onSave={(newClient) => {
+          onSave={(newClient:Client) => {
             setClients((prev) => [newClient, ...prev]);
             setShowAddClient(false);
           }}

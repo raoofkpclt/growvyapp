@@ -139,7 +139,7 @@ const Nav = ({ language, setLanguage }: Props) => {
           {NAV_LINKS.map((item) => (
             <a
               key={item.key}
-              href={`${item.id}`}
+              href={`${item.path}`}
               onClick={() => setMenuOpen(false)}
               className="text-white text-2xl font-bold hover:text-cyan-400 transition-colors"
             >

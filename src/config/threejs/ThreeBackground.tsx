@@ -48,9 +48,7 @@ function GridLines() {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={2}
-            array={new Float32Array([-30, i, 0, 30, i, 0])}
-            itemSize={3}
+            args={[new Float32Array([-30, i, 0, 30, i, 0]), 3]}
           />
         </bufferGeometry>
 
@@ -63,9 +61,7 @@ function GridLines() {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={2}
-            array={new Float32Array([i, -30, 0, i, 30, 0])}
-            itemSize={3}
+            args={[new Float32Array([i, -30, 0, i, 30, 0]), 3]}
           />
         </bufferGeometry>
 
