@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase/firebase";
 import { translations, WHAT_WE_DO, WHY_GROWVY } from "../../constant/Constant";
@@ -47,7 +47,7 @@ const UserHome: React.FC = () => {
 
   const [services, setServices] = useState<Service[]>([]);
 
-  // const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // ─────────────────────────────────────────────
 
@@ -263,7 +263,7 @@ const UserHome: React.FC = () => {
 
             {/* VIDEO */}
 
-             {/* <video
+             <video
   ref={videoRef}
   autoPlay
   muted
@@ -275,16 +275,7 @@ const UserHome: React.FC = () => {
   onError={(e) => console.log("Video error", e)}
 >
   <source src="/video/aa.mp4" type="video/mp4" />
-</video>  */}
-<video
-  src="/video/aa.mp4"
-  controls
-  autoPlay
-  muted
-  loop
-  playsInline
-  className="w-full h-[600px] object-cover"
-/>
+</video> 
 
  
 
