@@ -9,6 +9,8 @@ import AutoSwitchSection from "../../components/user/AutoSwitchSection";
 import Footer from "../../components/user/Footer";
 import FAQSection from "../../components/user/FAQSection";
 import { useLanguage } from "../../context/LanguageContext";
+import unoImg from "../../../public/img/vectors/7.png"
+
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
@@ -421,7 +423,8 @@ const UserHome: React.FC = () => {
 
         {/* IMAGE */}
         <img
-          src="../../../public/img/vectors/7.png"
+          // src="/img/vectors/7.png"
+          src={unoImg}
           alt="Growvy Vector"
           className="
       relative z-10
