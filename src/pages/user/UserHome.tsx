@@ -640,7 +640,7 @@ const UserHome: React.FC = () => {
           <a href="/clients" className="group block">
             <div className="relative overflow-hidden rounded-[36px]">
               <img
-                src="/public/img/vectors/8.png"
+                src="/img/vectors/8.png"
                 alt="Digital Marketing"
                 className="w-full object-cover group-hover:scale-105 transition duration-700"
               />
@@ -661,7 +661,7 @@ const UserHome: React.FC = () => {
           <a href="/clients" className="group block">
             <div className="relative overflow-hidden rounded-[36px]">
               <img
-                src="/public/img/vectors/6.png"
+                src="/img/vectors/6.png"
                 alt="Branding"
                 className="w-full  object-cover group-hover:scale-105 transition duration-700"
               />
@@ -682,7 +682,7 @@ const UserHome: React.FC = () => {
           <a href="/clients" className="group block">
             <div className="relative overflow-hidden rounded-[36px]">
               <img
-                src="/public/img/vectors/12.png"
+                src="/img/vectors/12.png"
                 alt="Websites"
                 className="w-full object-cover group-hover:scale-105 transition duration-700"
               />

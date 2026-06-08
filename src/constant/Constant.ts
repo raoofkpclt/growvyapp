@@ -694,32 +694,32 @@ export const slides = [
 
 export const WHAT_WE_DO = [
   {
-    image: "/public/img/gif/1.gif",
+    image: "/img/gif/1.gif",
     en: { title: "Brand Strategy" },
     ar: { title: "استراتيجية العلامة التجارية" },
   },
   {
-    image: "/public/img/gif/2.gif",
+    image: "/img/gif/2.gif",
     en: { title: "Branding" },
     ar: { title: "الهوية التجارية" },
   },
   {
-    image: "/public/img/gif/3.gif",
+    image: "/img/gif/3.gif",
     en: { title: "Marketing" },
     ar: { title: "التسويق" },
   },
   {
-    image: "/public/img/gif/4.gif",
+    image: "/img/gif/4.gif",
     en: { title: "Reels & Video Production" },
     ar: { title: "إنتاج الريلز والفيديو" },
   },
   {
-    image: "/public/img/gif/5.gif",
+    image: "/img/gif/5.gif",
     en: { title: "Web Designing & Development" },
     ar: { title: "تصميم وتطوير المواقع" },
   },
   {
-    image: "/public/img/gif/6.gif",
+    image: "/img/gif/6.gif",
     en: { title: "Social Media Management" },
     ar: { title: "إدارة وسائل التواصل الاجتماعي" },
   },
