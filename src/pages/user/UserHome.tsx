@@ -50,6 +50,9 @@ const UserHome: React.FC = () => {
   // ─────────────────────────────────────────────
 
   useEffect(() => {
+    console.log(
+      scrolled,works,services
+    )
     const fn = () => setScrolled(window.scrollY > 40);
 
     window.addEventListener("scroll", fn);

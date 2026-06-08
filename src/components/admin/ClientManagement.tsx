@@ -6,7 +6,7 @@ import DeleteConfirmModal from "./Modal/DeleteConfirmModal";
 
 import { getClients, deleteClient } from "../../service/clientService";
 
-const ClientManagement = () => {
+const ClientManagement: React.FC = () => {
   const [tab, setTab] = useState<"dashboard" | "clients" | "work">("clients");
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -19,7 +19,9 @@ const ClientManagement = () => {
 
   const [workFilter, setWorkFilter] = useState<string>("all");
 
+  
   useEffect(() => {
+    console.log(tab,selectedClient)
     const loadClients = async () => {
       try {
         const data = await getClients();

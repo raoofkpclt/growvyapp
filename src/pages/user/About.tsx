@@ -4,7 +4,7 @@ import { translations, values } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
 
-const About = () => {
+const About: React.FC = () => {
   const { language, changeLanguage } = useLanguage();
 
   const t = translations[language];

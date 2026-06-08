@@ -17,7 +17,7 @@ import { useLanguage } from "../../context/LanguageContext";
 
 // ─────────────────────────────────────────────
 
-const ClientDetails = () => {
+const ClientDetails: React.FC = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();

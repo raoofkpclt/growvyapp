@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Client } from "../../../utils/types/Types";
 import { Modal, Field, TextAreaField } from "./Modal";
 

@@ -37,7 +37,7 @@ interface Work {
 
 // ─────────────────────────────────────────────
 
-const Works = () => {
+const Works : React.FC= () => {
   const { language, changeLanguage } = useLanguage();
 
   const [works, setWorks] = useState<Work[]>([]);

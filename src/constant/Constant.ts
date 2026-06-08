@@ -54,7 +54,7 @@ export const translations = {
       "Every brand we deal with develops its identity as a well-structured, fast-growing brand. The business you build deserves to be seen, and we make sure it is.",
 
     viewWork: "View Our Growth",
-    letsTalk: "Let's Engag",
+    letsTalk: "Let's Engage",
 
     whoWeAre: "Who We Are",
 
@@ -123,15 +123,14 @@ seeOurWorks: "See Our Works",
 
 whyChooseGrowvy: "Why Choose Growvy",
 
-whyTitle1: "We Create Digital",
-whyTitle2: "Experiences That Grow Brands",
+whyTitle1: "Your Ambition ",
+whyTitle2: "Our Strategy",
 
 whyTitleSer1: "We build brands that",
 whyTitleSer2: "Grow",
 
 whyDesc:
-  "Growvy combines creativity, strategy, and technology to build impactful brands, engaging content, and premium digital experiences that help businesses stand out in the modern world.",
-
+  "We are the real growth makers with a strong strategy and consistent execution. We build, execute and stay until your brand becomes something people remember and results show.",
 servicesPageTitle1: "What We",
 servicesPageTitle2: "Create",
 

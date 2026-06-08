@@ -1,6 +1,6 @@
 import React from "react";
 
-const Dashboard = () => {
+const Dashboard : React.FC= () => {
   return (
     <div>
       <div className="space-y-7 animate-fade-in">

@@ -2,7 +2,7 @@ import React from "react";
 import logo from "../../../public/img/logo-1.png";
 import HomeNav from "../../components/user/Modal/HomeNav";
 
-const Footer = () => {
+const Footer : React.FC= () => {
   return (
     <footer className="relative overflow-hidden border-t border-white/10 px-[5%] py-24">
       {/* Glow Effects */}

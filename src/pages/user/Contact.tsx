@@ -6,7 +6,7 @@ import { useLanguage } from "../../context/LanguageContext";
 
 // ─────────────────────────────────────────────
 
-const Contact = () => {
+const Contact : React.FC= () => {
   const { language, changeLanguage } = useLanguage();
 
   const t = translations[language];

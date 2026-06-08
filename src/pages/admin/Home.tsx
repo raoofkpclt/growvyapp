@@ -116,7 +116,7 @@ const TextAreaField = ({
 );
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const Home = () => {
+const Home : React.FC= () => {
   const [tab, setTab] = useState<"dashboard" | "clients" | "work">("dashboard");
   const [clients, setClients] = useState<Client[]>([]);
   const [creatives, setCreatives] = useState<Creative[]>([]);

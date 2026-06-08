@@ -5,9 +5,9 @@ import AddCreativeModal from "./Modal/AddCreativeModal";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase/firebase";
 
-const WorkManagement = () => {
+const WorkManagement: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedClient] = useState<Client | null>(null);
   const [creatives, setCreatives] = useState<Creative[]>([]);
   const [showAddCreative, setShowAddCreative] = useState(false);
   const [workFilter, setWorkFilter] = useState<string>("all");
@@ -23,6 +23,7 @@ const WorkManagement = () => {
         : creatives.filter((c) => c.type === workFilter);
 
   useEffect(() => {
+    console.log(loadingClients,)
     const fetchClients = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "clients"));

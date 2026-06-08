@@ -14,7 +14,7 @@ import { useLanguage } from "../../context/LanguageContext";
 
 // ─────────────────────────────────────────────
 
-const Clients = () => {
+const Clients : React.FC= () => {
   const navigate = useNavigate();
 
   const { language, changeLanguage } = useLanguage();

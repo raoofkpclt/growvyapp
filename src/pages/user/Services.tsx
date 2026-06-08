@@ -10,7 +10,7 @@ import Footer from "../../components/user/Footer";
 
 // ─────────────────────────────────────────────
 
-const Services = () => {
+const Services : React.FC= () => {
   const { language, changeLanguage } = useLanguage();
 
   const t = translations[language];
