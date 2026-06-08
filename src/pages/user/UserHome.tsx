@@ -11,7 +11,6 @@ import FAQSection from "../../components/user/FAQSection";
 import { useLanguage } from "../../context/LanguageContext";
 import unoImg from "../../../public/img/vectors/7.png";
 
-
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
@@ -53,9 +52,7 @@ const UserHome: React.FC = () => {
   // ─────────────────────────────────────────────
 
   useEffect(() => {
-    console.log(
-      scrolled,works,services
-    )
+    console.log(scrolled, works, services);
     const fn = () => setScrolled(window.scrollY > 40);
 
     window.addEventListener("scroll", fn);
@@ -82,7 +79,7 @@ const UserHome: React.FC = () => {
           );
         }
       } catch {
-        console.log("error")
+        console.log("error");
       }
 
       try {
@@ -100,7 +97,7 @@ const UserHome: React.FC = () => {
           );
         }
       } catch {
-        console.log("error")
+        console.log("error");
       }
 
       try {
@@ -118,7 +115,7 @@ const UserHome: React.FC = () => {
           );
         }
       } catch {
-        console.log("error")
+        console.log("error");
       }
     })();
   }, []);
@@ -266,7 +263,7 @@ const UserHome: React.FC = () => {
 
             {/* VIDEO */}
 
-           <video
+             <video
   ref={videoRef}
   autoPlay
   muted
@@ -276,7 +273,9 @@ const UserHome: React.FC = () => {
   className="relative z-10 w-full h-[300px] md:h-[600px] lg:h-[850px] object-cover mix-blend-lighten opacity-[0.92]"
 >
   <source src="/video/hero-video.mp4" type="video/mp4" />
-</video>
+</video> 
+
+ 
 
             {/* DARK OVERLAY */}
           </div>
