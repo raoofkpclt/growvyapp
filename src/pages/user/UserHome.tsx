@@ -10,7 +10,7 @@ import Footer from "../../components/user/Footer";
 import FAQSection from "../../components/user/FAQSection";
 import { useLanguage } from "../../context/LanguageContext";
 import unoImg from "../../../public/img/vectors/7.png";
-import heroVideo from "../../../public/video/hero-video.mp4"
+
 
 // ─────────────────────────────────────────────
 // TYPES
