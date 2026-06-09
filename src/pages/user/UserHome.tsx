@@ -272,6 +272,7 @@ const UserHome: React.FC = () => {
   playsInline
   preload="auto"
   onLoadedData={() => console.log("Video loaded")}
+  className="h-auto w-auto object-contain"
   onError={(e) => {
     const video = e.currentTarget;
     console.log("Video Error Code:", video.error?.code);
@@ -329,11 +330,13 @@ const UserHome: React.FC = () => {
                 h-16 md:h-20
                 w-auto
                 object-contain
+                rounded-xl
                 grayscale
                 opacity-60
                 hover:grayscale-0
                 hover:opacity-100
                 transition-all duration-500
+                
               "
                   />
                 ) : (
@@ -843,19 +846,22 @@ const UserHome: React.FC = () => {
                     ["--start-y" as any]: `${positions[index % positions.length].y}px`,
                   }}
                 >
-                  <img
-                    src={client.profileImage}
-                    alt={client.name}
-                    className="
-            max-h-14
-            w-auto
-            object-contain
-            grayscale
-            hover:grayscale-0
-            transition-all
-            duration-300
-          "
-                  />
+                 <img
+  src={client.profileImage}
+  alt={client.name}
+  className="
+    h-28 md:h-32 lg:h-36
+    w-auto
+    object-contain
+    grayscale
+    opacity-80
+    hover:grayscale-0
+    hover:opacity-100
+    hover:scale-105
+    transition-all
+    duration-500
+  "
+/>
                 </div>
               );
             })}

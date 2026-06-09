@@ -68,7 +68,7 @@ const About: React.FC = () => {
           {/* STATS */}
           <div className="flex flex-wrap items-center justify-center gap-6 mt-14">
             <div className="px-8 py-6">
-              <h2 className="text-5xl font-black text-yellow-400">150+</h2>
+              <h2 className="text-5xl font-black text-yellow-400">50+</h2>
 
               <p className="mt-2 text-white/60">{t.projectsCompleted}</p>
             </div>
@@ -76,7 +76,7 @@ const About: React.FC = () => {
             <div className="w-px h-20 bg-white/10 hidden md:block" />
 
             <div className="px-8 py-6">
-              <h2 className="text-5xl font-black text-yellow-400">80+</h2>
+              <h2 className="text-5xl font-black text-yellow-400">20+</h2>
 
               <p className="mt-2 text-white/60">{t.happyClientsText}</p>
             </div>
