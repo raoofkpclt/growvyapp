@@ -271,13 +271,15 @@ const UserHome: React.FC = () => {
   loop
   playsInline
   preload="auto"
-  className="relative z-10 w-full h-[300px] md:h-[600px] lg:h-[850px] object-cover mix-blend-lighten opacity-[0.92]"
   onLoadedData={() => console.log("Video loaded")}
-  onError={(e) => console.log("Video error", e)}
+  onError={(e) => {
+    const video = e.currentTarget;
+    console.log("Video Error Code:", video.error?.code);
+    console.log("Video Error:", video.error);
+  }}
 >
-  {/* <source src="/public/video/hero-video.mp4" type="video/mp4" /> */}
-  <source src={heroVideo} type="video/mp4" />
-</video> 
+  <source src="/video/hero-video.mp4" type="video/mp4" />
+</video>
 
  
 
