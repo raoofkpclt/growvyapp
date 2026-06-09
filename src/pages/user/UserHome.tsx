@@ -10,6 +10,7 @@ import Footer from "../../components/user/Footer";
 import FAQSection from "../../components/user/FAQSection";
 import { useLanguage } from "../../context/LanguageContext";
 import unoImg from "../../../public/img/vectors/7.png";
+import heroVideo from "../../../public/video/hero-video.mp4"
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -274,7 +275,8 @@ const UserHome: React.FC = () => {
   onLoadedData={() => console.log("Video loaded")}
   onError={(e) => console.log("Video error", e)}
 >
-  <source src="/video/aa.mp4" type="video/mp4" />
+  {/* <source src="/public/video/hero-video.mp4" type="video/mp4" /> */}
+  <source src={heroVideo} type="video/mp4" />
 </video> 
 
  
