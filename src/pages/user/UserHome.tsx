@@ -279,7 +279,7 @@ const UserHome: React.FC = () => {
     console.log("object")
   }}
 >
-  <source src="/video/hero-video.mp4" type="video/mp4" />
+  <source src="https://growvy-app-new.s3.ap-south-1.amazonaws.com/WhatsApp+Video+2026-05-27+at+15.47.33.mp4" type="video/mp4" />
 </video>
 
  

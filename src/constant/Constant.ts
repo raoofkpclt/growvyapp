@@ -45,7 +45,7 @@ export const translations = {
       testimonials: "TESTIMONIAL",
     },
 
-    heroBadge: "Creative Agency",
+    heroBadge: "Creative Studio",
 
     heroTitle1: "We are here to build",
     heroTitle2: "Brand that grow",
@@ -58,10 +58,11 @@ export const translations = {
 
     whoWeAre: "Who We Are",
 
-    aboutTitle: "A studio obsessed with creative growth",
+    // aboutTitle: "A studio obsessed with creative growth",
+    aboutTitle: "A Creative Force With a Clear Goal",
 
     aboutDesc:
-      "Growvy was born from a belief that great design and bold storytelling can transform any brand.",
+      "Brand with a settled goal to build a business and develop it through a strong strategy and branding beyond design",
 
     projects: "Projects Done",
     happyClients: "Happy Clients",
@@ -106,8 +107,8 @@ solutions: "Solutions",
 
 exploreServices: "Explore Services",
 // EN
-worksTitle1: "Selected",
-worksTitle2: "Works",
+worksTitle1: "The impact of ",
+worksTitle2: "Teamwork",
 
 marketing: "Marketing",
 branding: "Branding",
@@ -123,14 +124,14 @@ seeOurWorks: "See Our Works",
 
 whyChooseGrowvy: "Why Choose Growvy",
 
-whyTitle1: "Your Ambition ",
-whyTitle2: "Our Strategy",
+whyTitle1: "Focused on Growth ",
+whyTitle2: "Committed to Results",
 
 whyTitleSer1: "We build brands that",
 whyTitleSer2: "Grow",
 
-whyDesc:
-  "We are the real growth makers with a strong strategy and consistent execution. We build, execute and stay until your brand becomes something people remember and results show.",
+whyDesc:"We are the real growth makers with a strong strategy and consistent execution. We build, execute and stay until your brand becomes something people remember and results show. We don't measure our success by the work we deliver; we measure it by the growth you achieve. Because at Growvy, your win is the only finish line that matters",
+  
 servicesPageTitle1: "What We",
 servicesPageTitle2: "Create",
 
@@ -664,30 +665,30 @@ export const SERVICES = [
 
 export const slides = [
   {
-    image: "/img/vectors/1.png",
+    image: "/img/vectors/3.png",
 
     en: {
-      title: "Creative Branding",
-      desc: "Building powerful digital identities for modern brands.",
+      title: "Branding That Speaks",
+      desc: "The kind of branding that turns a business into a name people trust",
     },
 
     ar: {
-      title: "الهوية الإبداعية",
-      desc: "نبني هويات رقمية قوية للعلامات التجارية الحديثة.",
+      title: "هوية تتحدث",
+      desc: "النوع من بناء العلامة التجارية الذي يحوّل الأعمال إلى اسم يثق به الناس",
     },
   },
 
   {
-    image: "/img/vectors/9.png",
+    image: "/img/vectors/17.png",
 
     en: {
-      title: "Digital Marketing",
-      desc: "Helping businesses grow through strategic marketing.",
+      title: "Marketing That Sells",
+      desc: "Marketing that finds your audience and turns them into real customers",
     },
 
     ar: {
-      title: "التسويق الرقمي",
-      desc: "نساعد الشركات على النمو من خلال التسويق الاستراتيجي.",
+      title: "وتسويق يحقق النتائج",
+      desc: "تسويق يصل إلى جمهورك المستهدف ويحوّله إلى عملاء حقيقيين ",
     },
   },
 ];
@@ -701,7 +702,7 @@ export const WHAT_WE_DO = [
   {
     image: "/img/gif/2.gif",
     en: { title: "Branding" },
-    ar: { title: "الهوية التجارية" },
+    ar: { title: "بناء العلامة التجارية" },
   },
   {
     image: "/img/gif/3.gif",
@@ -711,12 +712,12 @@ export const WHAT_WE_DO = [
   {
     image: "/img/gif/4.gif",
     en: { title: "Reels & Video Production" },
-    ar: { title: "إنتاج الريلز والفيديو" },
+    ar: { title: "إنتاج المحتوى والريلز" },
   },
   {
     image: "/img/gif/5.gif",
     en: { title: "Web Designing & Development" },
-    ar: { title: "تصميم وتطوير المواقع" },
+    ar: { title: "تصميم وتطوير المواقع الإلكترونية" },
   },
   {
     image: "/img/gif/6.gif",
