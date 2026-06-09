@@ -276,6 +276,7 @@ const UserHome: React.FC = () => {
     const video = e.currentTarget;
     console.log("Video Error Code:", video.error?.code);
     console.log("Video Error:", video.error);
+    console.log("object")
   }}
 >
   <source src="/video/hero-video.mp4" type="video/mp4" />
