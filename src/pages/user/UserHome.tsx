@@ -48,6 +48,10 @@ const UserHome: React.FC = () => {
 
   const [services, setServices] = useState<Service[]>([]);
 
+  const [clientsLoading, setClientsLoading] = useState(true);
+
+  const [appLoading, setAppLoading] = useState(true);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 const positionRef = useRef(0);
@@ -125,7 +129,10 @@ console.log("snap",snap.docs)
         }
       } catch {
         console.log("error");
-      }
+      }finally {
+  setClientsLoading(false);
+  setAppLoading(false)
+}
 
       try {
         const snap = await getDocs(collection(db, "works"));
@@ -166,6 +173,30 @@ console.log("snap",snap.docs)
 
     
   }, []);
+
+  if (appLoading) {
+  return (
+    <div className="fixed inset-0 bg-[#081120] flex items-center justify-center">
+      <div className="relative w-28 h-28">
+        {/* Outer Ring */}
+        <div className="absolute inset-0 rounded-full border-[8px] border-orange-500/20" />
+
+        {/* Animated Ring */}
+        <div className="absolute inset-0 rounded-full border-[8px] border-transparent border-t-orange-500 border-r-yellow-400 animate-spin" />
+
+        {/* Inner Glow */}
+        <div className="absolute inset-4 rounded-full bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-lg" />
+
+        {/* Center Logo */}
+        <img
+          src="/img/logo-1.png"
+          alt="Growvy"
+          className="absolute inset-0 m-auto w-14 h-14 object-contain"
+        />
+      </div>
+    </div>
+  );
+}
 
   return (
     <div
@@ -863,54 +894,77 @@ console.log("snap",snap.docs)
         </div>
 
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
-            {clients.slice(0, 12).map((client, index) => {
-              const positions = [
-                { x: -250, y: -120 },
-                { x: 220, y: -150 },
-                { x: -180, y: 180 },
-                { x: 250, y: 120 },
-                { x: -320, y: 50 },
-                { x: 320, y: -80 },
-                { x: -100, y: -220 },
-                { x: 180, y: 220 },
-              ];
+  {clientsLoading ? (
+    <div className="flex justify-center items-center py-32">
+      <div className="relative w-20 h-20">
+        {/* Orange Ring */}
+        <div
+          className="
+            absolute inset-0
+            rounded-full
+            border-[6px]
+            border-orange-500/20
+          "
+        />
 
-              return (
-                <div
-                  key={client.id}
-                  className={`
-          flex items-center justify-center h-24
-          ${startAnimation ? "logo-reveal" : ""}
-        `}
-                  style={{
-                    animationDelay: `${index * 0.15}s`,
-                    ["--start-x" as any]: `${positions[index % positions.length].x}px`,
-                    ["--start-y" as any]: `${positions[index % positions.length].y}px`,
-                  }}
-                >
-                 <img
-  src={client.profileImage}
-  alt={client.name}
-  className="
-    h-28 md:h-32 lg:h-36
-    w-auto
-    object-contain
-    grayscale
-    opacity-80
-    rounded-xl
-    hover:grayscale-0
-    hover:opacity-100
-    hover:scale-105
-    transition-all
-    duration-500
-  "
-/>
-                </div>
-              );
-            })}
-          </div>
+        {/* Animated Ring */}
+        <div
+          className="
+            absolute inset-0
+            rounded-full
+            border-[6px]
+            border-transparent
+            border-t-orange-500
+            border-r-yellow-400
+            animate-spin
+          "
+        />
+
+        {/* Glow */}
+        <div
+          className="
+            absolute inset-2
+            rounded-full
+            bg-gradient-to-r
+            from-orange-500/20
+            to-yellow-400/20
+            blur-md
+          "
+        />
+      </div>
+    </div>
+  ) : (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
+      {clients.slice(0, 12).map((client, index) => (
+        <div
+          key={client.id}
+          className={`
+            flex items-center justify-center h-24
+            ${startAnimation ? "logo-reveal" : ""}
+          `}
+        >
+          <img
+            src={client.profileImage}
+            alt={client.name}
+            className="
+              h-28 md:h-32 lg:h-36
+              w-auto
+              object-contain
+              grayscale
+              opacity-80
+              rounded-xl
+              hover:grayscale-0
+              hover:opacity-100
+              hover:scale-105
+              transition-all
+              duration-500
+            "
+          />
         </div>
+      ))}
+    </div>
+  )}
+</div>
       </section>
 
       {/* CONTACT */}
