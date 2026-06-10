@@ -364,7 +364,7 @@ console.log("snap",snap.docs)
        {/* MARQUEE */}
 <div className="relative z-20 overflow-hidden">
   <div
-    
+    ref={marqueeRef}
     className="flex items-center gap-24 w-max"
     style={{ willChange: "transform" }}
   >
@@ -544,7 +544,9 @@ console.log("snap",snap.docs)
 
           {/* TITLE */}
           <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
-            {t.aboutTitle}
+            {t.aboutTitle1}
+            <br />
+            <span className="text-orange-400">{t.aboutTitle2}</span>
           </h2>
 
           {/* DESCRIPTION */}
@@ -862,7 +864,7 @@ console.log("snap",snap.docs)
 
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
-            {clients.map((client, index) => {
+            {clients.slice(0, 12).map((client, index) => {
               const positions = [
                 { x: -250, y: -120 },
                 { x: 220, y: -150 },

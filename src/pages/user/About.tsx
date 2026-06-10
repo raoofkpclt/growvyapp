@@ -125,9 +125,9 @@ const About: React.FC = () => {
 
                 <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-black leading-[1] tracking-[-0.05em]">
                   {t.storyTitle1}
-                  <br />
-
-                  {t.storyTitle2}
+                  
+                <span className="text-orange-400">{t.storyTitle2}</span>
+                  
                 </h2>
               </div>
 

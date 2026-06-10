@@ -58,8 +58,8 @@ export const translations = {
 
     whoWeAre: "Who We Are",
 
-    // aboutTitle: "A studio obsessed with creative growth",
-    aboutTitle: "A Creative Force With a Clear Goal",
+    aboutTitle1: "A Creative Force",
+    aboutTitle2: "With a Clear Goal",
 
     aboutDesc:
       "Brand with a settled goal to build a business and develop it through a strong strategy and branding beyond design",
@@ -89,7 +89,7 @@ export const translations = {
 
     selectService: "Select a service…",
 
-    // ENGLISH
+
     statsProjects: "Projects",
     statsClients: "Clients",
     statsYears: "Years",
@@ -100,189 +100,171 @@ export const translations = {
     statsYearsCount: "5+",
     statsCreativeCount: "100%",
 
-    // English
-whatWeDo: "What We Do",
-creativeDigital: "Creative Digital",
-solutions: "Solutions",
+    whatWeDo: "What We Do",
+    creativeDigital: "Our Areas of",
+    solutions: "Mastery",
 
-exploreServices: "Explore Services",
-// EN
-worksTitle1: "The impact of ",
-worksTitle2: "Teamwork",
+    exploreServices: "Explore Services",
 
-marketing: "Marketing",
-branding: "Branding",
-development: "Development",
+    worksTitle1: "The impact of ",
+    worksTitle2: "Teamwork",
 
-digitalMarketing: "Digital Marketing",
-brandingProjects: "Branding Projects",
-websites: "Websites",
+    marketing: "Marketing",
+    branding: "Branding",
+    development: "Development",
 
-seeOurWorks: "See Our Works",
+    digitalMarketing: "Digital Marketing",
+    brandingProjects: "Branding Projects",
+    websites: "Websites",
 
-// ENGLISH
-
-whyChooseGrowvy: "Why Choose Growvy",
-
-whyTitle1: "Focused on Growth ",
-whyTitle2: "Committed to Results",
-
-whyTitleSer1: "We build brands that",
-whyTitleSer2: "Grow",
-
-whyDesc:"We are the real growth makers with a strong strategy and consistent execution. We build, execute and stay until your brand becomes something people remember and results show. We don't measure our success by the work we deliver; we measure it by the growth you achieve. Because at Growvy, your win is the only finish line that matters",
-  
-servicesPageTitle1: "What We",
-servicesPageTitle2: "Create",
+    seeOurWorks: "See Our Works",
 
 
-  // EN
-contactTitle1: "Connect With",
-contactTitle2: "Growvy",
+    whyChooseGrowvy: "Why Choose Growvy",
 
-contactDesc:
-  "Let's build something amazing together. Contact us for branding, marketing, websites, and creative digital solutions.",
+    whyTitle1: "Focused on Growth ",
+    whyTitle2: "Committed to Results",
 
-callUs: "Call Us",
-whatsappUs: "WhatsApp Us",
+    whyTitleSer1: "We build brands that",
+    whyTitleSer2: "Grow",
 
-// EN
-faq: "FAQ",
-faqTitle1: "Frequently Asked",
-faqTitle2: "Questions",
+    whyDesc:
+      "We are the real growth makers with a strong strategy and consistent execution. We build, execute and stay until your brand becomes something people remember and results show. We don't measure our success by the work we deliver; we measure it by the growth you achieve. Because at Growvy, your win is the only finish line that matters",
 
+    servicesPageTitle1: "What We",
+    servicesPageTitle2: "Create",
 
-trustedByTitle1: "Trusted By",
-trustedByTitle2: "Leading Brands",
+    contactTitle1: "Start your growth",
+    contactTitle2: "Jurney with us",
 
+    contactDesc:
+      "Every great brand started with one conversation. This is yours. Tell us where you are, and we'll show you where you can go.",
+    callUs: "Call Us",
+    whatsappUs: "WhatsApp Us",
 
-brandingTagline1: "Branding Beyond",
-brandingTagline2: "Design",
+ 
+    faq: "FAQ",
+    faqTitle1: "Frequently Asked",
+    faqTitle2: "Questions",
 
+    trustedByTitle1: "We grew them",
+    trustedByTitle2: "You could be next",
 
-aboutLabel: "About Growvy",
+    brandingTagline1: "Branding Beyond",
+    brandingTagline2: "Design",
 
-aboutHeroTitle1: "Creative",
-aboutHeroTitle2: "Digital Agency",
+    aboutLabel: "About Growvy",
 
-aboutHeroDesc:
-  "Growvy is a modern creative agency focused on building powerful digital experiences, cinematic visual storytelling, branding, and high-performance marketing solutions for ambitious businesses.",
+    aboutHeroTitle1: "The passionate ones",
+    aboutHeroTitle2: "who delivers",
 
-projectsCompleted: "Projects Completed",
-happyClientsText: "Happy Clients",
+    aboutHeroDesc:
+      "Growvy is built to solve real problems, create real identities, and put businesses exactly where they deserve to be in front of the right people.",
+    projectsCompleted: "Projects Completed",
+    happyClientsText: "Happy Clients",
 
-impactTitle: "We Create Impact",
-impactDesc:
-  "Combining creativity, technology, and strategy to deliver meaningful digital experiences.",
+    impactTitle: "We Create Impact",
+    impactDesc:
+      "Combining creativity, technology, and strategy to deliver meaningful digital experiences.",
 
-ourStory: "Our Story",
+    ourStory: "Our Story",
 
-storyTitle1: "Building brands",
-storyTitle2: "for the future.",
+    storyTitle1: "The Moment That ",
+    storyTitle2: "Built a Brand",
 
-storyDesc1:
-  "At Growvy, we believe design is more than visuals — it's about creating emotional connections and memorable experiences.",
+    storyDesc1:
+      "A brand built to give you real growth, to create a brand identity and be recognised in crowded markets. We work towards focusing on real problems and true solutions to run the business and get a natural business rise. The root of Growvy comes from a shattered business of some friends of ours, with a great, high-quality product, but they lost their market presence due to a lack of marketing and branding knowledge. ",
+    storyDesc2:
+      "That was the wake-up call for us to start helping businesses grow in the digital world and find their voice and identity. From then, we are here helping businesses in their journey to achieve the one word “growth”",
+    ourValues: "Our Values",
 
-storyDesc2:
-  "From branding and UI/UX design to content production and marketing campaigns, we partner with businesses to create scalable and impactful digital ecosystems.",
+    valuesTitle1: "What drives",
+    valuesTitle2: "Growvy",
 
-ourValues: "Our Values",
+    portfolioTitle1: "The impact of",
+    portfolioTitle2: "team work",
 
-valuesTitle1: "What drives",
-valuesTitle2: "Growvy",
+    portfolioDesc:
+      "Every service we offer starts with listening. We dig into your business, understand your goal, and build a strategy around it. Then we execute sharply, focused, and consistently until the results show",
 
+    clientsTitle1: "We grew them ",
+    clientsTitle2: "You could be next",
 
-portfolioTitle1: "Creative",
-portfolioTitle2: "Portfolio",
+    clientsDesc:
+      "Every name here trusted us with the most important thing about their business, their brand. Every one of them grew, and that's what we're most proud of",
 
-portfolioDesc:
-  "Explore our latest projects, branding work, digital experiences, cinematic productions, and creative campaigns built for modern brands.",
+    clientDetails: "Client Details",
 
+    clientDescription: "We collaborated with",
 
-clientsTitle1: "Trusted by",
-clientsTitle2: "Amazing Brands",
+    clientDescription2:
+      "to deliver creative digital solutions, branding strategies, and high-quality visual experiences that elevate their brand presence.",
 
-clientsDesc:
-  "We collaborate with startups, businesses, and enterprises to create impactful digital experiences, branding, and marketing solutions.",
+    portfolio: "Portfolio",
 
+    featuredWorks1: "Featured",
+    featuredWorks2: "Works",
 
-  clientDetails: "Client Details",
+    backButton: "Back",
 
-clientDescription:
-  "We collaborated with",
+    clientNotFound: "Client Not Found",
 
-clientDescription2:
-  "to deliver creative digital solutions, branding strategies, and high-quality visual experiences that elevate their brand presence.",
+    noPortfolio: "No portfolio image available.",
 
-portfolio: "Portfolio",
+    // EN
+    contactLabel: "Contact Us",
 
-featuredWorks1: "Featured",
-featuredWorks2: "Works",
+    location: "Location",
 
-backButton: "Back",
+    readyTitle1: "Ready to Grow",
+    readyTitle2: "Your Brand?",
 
-clientNotFound: "Client Not Found",
-
-noPortfolio: "No portfolio image available.",
-
-
-// EN
-contactLabel: "Contact Us",
-
-location: "Location",
-
-readyTitle1: "Ready to Grow",
-readyTitle2: "Your Brand?",
-
-readyDesc:
-  "We help businesses create premium digital experiences, branding systems, and performance-driven marketing.",
-
-
-
+    readyDesc:
+      "We help businesses create premium digital experiences, branding systems, and performance-driven marketing.",
   },
 
   ar: {
     nav: {
-      about: "من نحن",
-
-      services: "الخدمات",
-      works: "الأعمال",
-      clients: "العملاء",
-      contact: "تواصل معنا",
-      mission: "التوجيه",
-      team: "فريق مايندز",
-      testimonials: "آراء العملاء",
+      about: "الجذور",
+      services: "الخبرة",
+      works: "النمو",
+      clients: "الشركاء",
+      contact: "تواصل",
+      mission: "التوجه",
+      team: "العقول",
+      testimonials: "الشهادات",
     },
 
-    heroBadge: "وكالة إبداعية",
+    heroBadge: "استوديو إبداعي",
 
-    heroTitle1: "نحن نبني علامات",
-    heroTitle2: "تجارية تنمو وتتألق",
+    heroTitle1: "نحن هنا لبناء علامات",
+    heroTitle2: "تجارية تنمو",
 
     heroDesc:
-      "جروفي وكالة إبداعية متخصصة في بناء العلامات التجارية والتجارب الرقمية وصناعة المحتوى.",
+      "كل علامة تجارية نعمل معها نساعدها على تطوير هويتها لتصبح علامة قوية ومنظمة وسريعة النمو. الأعمال التي تبنيها تستحق أن تُرى، ونحن نحرص على تحقيق ذلك.",
 
-    viewWork: "شاهد أعمالنا",
-    letsTalk: "تواصل معنا",
+    viewWork: "استكشف نمونا",
+    letsTalk: "لنتواصل",
 
     whoWeAre: "من نحن",
 
-    aboutTitle: "استوديو مهووس بالنمو الإبداعي",
+    aboutTitle1: "قوة إبداعية",
+    aboutTitle2: "بهدف واضح",
 
     aboutDesc:
-      "ولدت جروفي من إيمان بأن التصميم الرائع والسرد القوي يمكنهما تحويل أي علامة تجارية.",
+      "علامة تجارية تأسست بهدف واضح يتمثل في بناء الأعمال وتطويرها من خلال استراتيجية قوية وعلامة تجارية تتجاوز حدود التصميم.",
 
-    projects: "مشروع",
-    happyClients: "عميل سعيد",
-    excellence: "سنوات خبرة",
+    projects: "المشاريع المنجزة",
+    happyClients: "العملاء السعداء",
+    excellence: "سنوات التميز",
 
-    trustedBy: "موثوق من قبل",
+    trustedBy: "موثوق به من قبل",
 
     servicesTitle: "خدمات مصممة للعلامات التجارية الحديثة",
 
     worksTitle: "أعمالنا المميزة",
 
-    contactTitle: "جاهز للنمو معنا؟",
+    contactTitle: "هل أنت مستعد للنمو معنا؟",
 
     sendMessage: "إرسال الرسالة",
 
@@ -292,376 +274,146 @@ readyDesc:
     message: "الرسالة",
 
     yourName: "اسمك",
-    yourEmail: "example@email.com",
-    yourMessage: "أخبرنا عن مشروعك...",
+    yourEmail: "your@email.com",
+    yourMessage: "حدثنا عن مشروعك...",
 
-    selectService: "اختر الخدمة",
+    selectService: "اختر خدمة...",
 
-    // ARABIC
-    statsProjects: "مشاريع",
-    statsClients: "عملاء",
-    statsYears: "سنوات",
-    statsCreative: "إبداع",
+    statsProjects: "المشاريع",
+    statsClients: "العملاء",
+    statsYears: "السنوات",
+    statsCreative: "الإبداع",
 
     statsProjectsCount: "50+",
     statsClientsCount: "20+",
     statsYearsCount: "5+",
     statsCreativeCount: "100%",
 
-    // Arabic
-whatWeDo: "ماذا نقدم",
-creativeDigital: "حلول رقمية",
-solutions: "إبداعية",
+    whatWeDo: "ماذا نفعل",
+    creativeDigital: "مجالات",
+    solutions: "خبرتنا",
 
-exploreServices: "استكشف الخدمات",
+    exploreServices: "استكشف الخدمات",
 
-// AR
-worksTitle1: "أبرز",
-worksTitle2: "الأعمال",
+    worksTitle1: "أثر",
+    worksTitle2: "العمل الجماعي",
 
-marketing: "التسويق",
-branding: "الهوية التجارية",
-development: "التطوير",
+    marketing: "التسويق",
+    branding: "بناء العلامة التجارية",
+    development: "التطوير",
 
-digitalMarketing: "التسويق الرقمي",
-brandingProjects: "مشاريع الهوية التجارية",
-websites: "المواقع الإلكترونية",
+    digitalMarketing: "التسويق الرقمي",
+    brandingProjects: "مشاريع العلامات التجارية",
+    websites: "المواقع الإلكترونية",
 
-seeOurWorks: "شاهد أعمالنا",
+    seeOurWorks: "شاهد أعمالنا",
 
-// ARABIC
+    whyChooseGrowvy: "لماذا جروفي",
 
-whyChooseGrowvy: "لماذا جروفي",
+    whyTitle1: "نركز على النمو",
+    whyTitle2: "ونلتزم بالنتائج",
 
-whyTitle1: "نصنع تجارب رقمية",
-whyTitle2: "تنمّي العلامات التجارية",
+    whyTitleSer1: "نبني علامات تجارية",
+    whyTitleSer2: "تنمو",
 
-whyTitleSer1: "نبني علامات تجارية",
-whyTitleSer2: "تنمو",
+    whyDesc:
+      "نحن نصنع النمو الحقيقي من خلال استراتيجية قوية وتنفيذ متواصل. نبني وننفذ ونبقى إلى جانبك حتى تصبح علامتك التجارية شيئاً يتذكره الناس وتظهر النتائج بوضوح. نحن لا نقيس نجاحنا بما نقدمه من أعمال، بل بالنمو الذي تحققه. لأن نجاحك في جروفي هو الهدف الوحيد الذي يهمنا.",
 
-whyDesc:
-  "تجمع جروفي بين الإبداع والاستراتيجية والتقنية لبناء علامات تجارية مؤثرة ومحتوى جذاب وتجارب رقمية مميزة تساعد الشركات على التميز في العالم الحديث.",
+    servicesPageTitle1: "ما الذي",
+    servicesPageTitle2: "نقدمه",
 
+    contactTitle1: "ابدأ رحلة",
+    contactTitle2: "نموك معنا",
 
-servicesPageTitle1: "ما الذي",
-servicesPageTitle2: "نبتكره",
+    contactDesc:
+      "كل علامة تجارية عظيمة بدأت بمحادثة واحدة. وهذه هي محادثتك. أخبرنا أين أنت اليوم، وسنريك إلى أين يمكنك أن تصل.",
 
+    callUs: "اتصل بنا",
+    whatsappUs: "راسلنا عبر واتساب",
 
-  // AR
-contactTitle1: "تواصل مع",
-contactTitle2: "جروفي",
+    faq: "الأسئلة الشائعة",
+    faqTitle1: "الأسئلة",
+    faqTitle2: "الشائعة",
 
-contactDesc:
-  "دعنا نبني شيئاً مميزاً معاً. تواصل معنا لخدمات الهوية التجارية والتسويق والمواقع والحلول الرقمية الإبداعية.",
+    trustedByTitle1: "لقد ساعدناهم على النمو",
+    trustedByTitle2: "وقد تكون أنت التالي",
 
-callUs: "اتصل بنا",
-whatsappUs: "راسلنا عبر واتساب",
+    brandingTagline1: "علامة تجارية تتجاوز",
+    brandingTagline2: "حدود التصميم",
 
-// AR
-faq: "الأسئلة الشائعة",
-faqTitle1: "الأسئلة",
-faqTitle2: "الشائعة",
+    aboutLabel: "عن جروفي",
 
+    aboutHeroTitle1: "الشغوفون",
+    aboutHeroTitle2: "الذين ينجزون",
 
-trustedByTitle1: "موثوق من قبل",
-trustedByTitle2: "علامات تجارية رائدة",
+    aboutHeroDesc:
+      "بُنيت جروفي لحل المشكلات الحقيقية، وصناعة هويات حقيقية، ووضع الأعمال في المكان الذي تستحقه أمام الجمهور المناسب.",
 
+    projectsCompleted: "المشاريع المنجزة",
+    happyClientsText: "العملاء السعداء",
 
+    impactTitle: "نصنع التأثير",
 
-brandingTagline1: "الهوية التجارية",
-brandingTagline2: "بما يتجاوز الحدود",
+    impactDesc:
+      "نجمع بين الإبداع والتقنية والاستراتيجية لتقديم تجارب رقمية ذات أثر حقيقي.",
 
-aboutLabel: "عن جروفي",
+    ourStory: "قصتنا",
 
-aboutHeroTitle1: "وكالة",
-aboutHeroTitle2: "إبداعية رقمية",
+    storyTitle1: "اللحظة التي",
+    storyTitle2: "صنعت علامة تجارية",
 
-aboutHeroDesc:
-  "جروفي وكالة إبداعية حديثة متخصصة في بناء التجارب الرقمية المؤثرة وصناعة الهوية التجارية والحلول التسويقية عالية الأداء.",
+    storyDesc1:
+      "بُنيت جروفي لتمنح الأعمال نمواً حقيقياً، وتساعدها على بناء هوية قوية والتميز في الأسواق المزدحمة. نركز على المشكلات الحقيقية والحلول الفعالة التي تساعد الأعمال على النمو بشكل طبيعي. بدأت فكرة جروفي عندما شاهدنا أعمالاً لأصدقاء يمتلكون منتجات عالية الجودة، لكنها فقدت حضورها في السوق بسبب ضعف التسويق وبناء العلامة التجارية.",
 
-projectsCompleted: "مشروع مكتمل",
-happyClientsText: "عميل سعيد",
+    storyDesc2:
+      "كانت تلك اللحظة بمثابة جرس إنذار دفعنا لمساعدة الشركات على النمو في العالم الرقمي وإيجاد صوتها وهويتها الخاصة. ومنذ ذلك الحين ونحن نساعد الشركات في رحلتها نحو تحقيق كلمة واحدة: النمو.",
 
-impactTitle: "نصنع التأثير",
-impactDesc:
-  "نجمع بين الإبداع والتقنية والاستراتيجية لتقديم تجارب رقمية ذات معنى.",
+    ourValues: "قيمنا",
 
-ourStory: "قصتنا",
+    valuesTitle1: "ما الذي يقود",
+    valuesTitle2: "جروفي",
 
-storyTitle1: "نبني العلامات التجارية",
-storyTitle2: "للمستقبل",
+    portfolioTitle1: "أثر",
+    portfolioTitle2: "العمل الجماعي",
 
-storyDesc1:
-  "في جروفي نؤمن أن التصميم يتجاوز المظهر ليخلق روابط عاطفية وتجارب لا تُنسى.",
+    portfolioDesc:
+      "كل خدمة نقدمها تبدأ بالاستماع. نتعمق في فهم أعمالك وأهدافك، ثم نبني استراتيجية تناسبك. بعد ذلك ننفذ بدقة وتركيز واستمرارية حتى تظهر النتائج.",
 
-storyDesc2:
-  "من الهوية التجارية وتصميم واجهات المستخدم إلى إنتاج المحتوى والحملات التسويقية، نساعد الشركات على بناء منظومات رقمية مؤثرة.",
+    clientsTitle1: "ساعدناهم على النمو",
+    clientsTitle2: "وقد تكون أنت التالي",
 
-ourValues: "قيمنا",
+    clientsDesc:
+      "كل اسم هنا منحنا أثمن ما يملكه في عمله، وهو علامته التجارية. وقد حقق كل واحد منهم نمواً حقيقياً، وهذا أكثر ما نفخر به.",
 
-valuesTitle1: "ما الذي يقود",
-valuesTitle2: "جروفي",
+    clientDetails: "تفاصيل العميل",
 
+    clientDescription: "تعاوننا مع",
 
-portfolioTitle1: "أعمالنا",
-portfolioTitle2: "الإبداعية",
+    clientDescription2:
+      "لتقديم حلول رقمية إبداعية واستراتيجيات للعلامة التجارية وتجارب بصرية عالية الجودة تعزز حضورها في السوق.",
 
-portfolioDesc:
-  "استكشف أحدث مشاريعنا وأعمال الهوية التجارية والتجارب الرقمية والإنتاجات الإبداعية والحملات التسويقية المصممة للعلامات التجارية الحديثة.",
+    portfolio: "معرض الأعمال",
 
+    featuredWorks1: "أبرز",
+    featuredWorks2: "الأعمال",
 
+    backButton: "رجوع",
 
-clientsTitle1: "نفخر بثقة",
-clientsTitle2: "علامات تجارية مميزة",
+    clientNotFound: "العميل غير موجود",
 
-clientsDesc:
-  "نتعاون مع الشركات الناشئة والمؤسسات والعلامات التجارية لتقديم تجارب رقمية مؤثرة وحلول متكاملة في الهوية التجارية والتسويق.",
+    noPortfolio: "لا توجد صورة متاحة للمعرض.",
 
+    contactLabel: "تواصل معنا",
 
-clientDetails: "تفاصيل العميل",
+    location: "الموقع",
 
-clientDescription:
-  "تعاوننا مع",
+    readyTitle1: "هل أنت مستعد",
+    readyTitle2: "لتنمية علامتك التجارية؟",
 
-clientDescription2:
-  "لتقديم حلول رقمية إبداعية واستراتيجيات هوية تجارية وتجارب بصرية عالية الجودة تعزز حضور العلامة التجارية.",
-
-portfolio: "معرض الأعمال",
-
-featuredWorks1: "أبرز",
-featuredWorks2: "الأعمال",
-
-backButton: "رجوع",
-
-clientNotFound: "العميل غير موجود",
-
-noPortfolio: "لا توجد صورة معرض أعمال متاحة.",
-
-// AR
-contactLabel: "تواصل معنا",
-
-location: "الموقع",
-
-readyTitle1: "هل أنت مستعد",
-readyTitle2: "لتنمية علامتك التجارية؟",
-
-readyDesc:
-  "نساعد الشركات على بناء تجارب رقمية متميزة وهويات تجارية قوية وتسويق قائم على الأداء.",
-
-
-
+    readyDesc:
+      "نساعد الشركات على بناء تجارب رقمية متميزة، وأنظمة علامات تجارية متكاملة، وتسويق يعتمد على الأداء لتحقيق النمو.",
   },
 };
-
-// ─────────────────────────────────────────────
-// SERVICES
-// ─────────────────────────────────────────────
-
-export const SERVICES = [
-  {
-    id: "1",
-    icon: "📈",
-
-    en: {
-      title: "Digital Marketing",
-      description:
-        "Complete digital marketing solutions including SEO, social media marketing, paid ads, and online brand growth.",
-    },
-
-    ar: {
-      title: "التسويق الرقمي",
-      description:
-        "حلول تسويق رقمي متكاملة تشمل تحسين محركات البحث، التسويق عبر وسائل التواصل الاجتماعي، الإعلانات المدفوعة، ونمو العلامة التجارية عبر الإنترنت.",
-    },
-  },
-
-  {
-    id: "2",
-    icon: "🎨",
-
-    en: {
-      title: "Branding",
-      description:
-        "Modern brand identity design including logos, visual systems, brand guidelines, and positioning.",
-    },
-
-    ar: {
-      title: "الهوية التجارية",
-      description:
-        "تصميم هوية تجارية حديثة تشمل الشعارات، الأنظمة البصرية، أدلة العلامة التجارية، واستراتيجية التمركز.",
-    },
-  },
-
-  {
-    id: "3",
-    icon: "✨",
-
-    en: {
-      title: "Creative Designing",
-      description:
-        "Creative graphic design solutions for social media, advertising, campaigns, and visual communication.",
-    },
-
-    ar: {
-      title: "التصميم الإبداعي",
-      description:
-        "حلول تصميم جرافيكي إبداعية لوسائل التواصل الاجتماعي، الإعلانات، الحملات التسويقية، والتواصل البصري.",
-    },
-  },
-
-  {
-    id: "4",
-    icon: "🚀",
-
-    en: {
-      title: "Performance Marketing",
-      description:
-        "ROI-focused paid advertising campaigns across Meta, Google, YouTube, and digital platforms.",
-    },
-
-    ar: {
-      title: "التسويق بالأداء",
-      description:
-        "حملات إعلانية مدفوعة تركز على تحقيق العائد عبر منصات ميتا، جوجل، يوتيوب، والمنصات الرقمية.",
-    },
-  },
-
-  {
-    id: "5",
-    icon: "🎬",
-
-    en: {
-      title: "Video Production",
-      description:
-        "Professional cinematic video production, commercials, reels, editing, and branded content creation.",
-    },
-
-    ar: {
-      title: "إنتاج الفيديو",
-      description:
-        "إنتاج فيديوهات احترافية تشمل الإعلانات التجارية، الريلز، المونتاج، وصناعة المحتوى للعلامات التجارية.",
-    },
-  },
-
-  {
-    id: "6",
-    icon: "🧠",
-
-    en: {
-      title: "Strategy Building",
-      description:
-        "Business growth strategies, marketing planning, campaign strategy, and digital transformation consulting.",
-    },
-
-    ar: {
-      title: "بناء الاستراتيجيات",
-      description:
-        "استراتيجيات نمو الأعمال، التخطيط التسويقي، استراتيجيات الحملات، واستشارات التحول الرقمي.",
-    },
-  },
-
-  {
-    id: "7",
-    icon: "💻",
-
-    en: {
-      title: "Website Designing",
-      description:
-        "Modern responsive websites, UI/UX design, web applications, and conversion-focused digital experiences.",
-    },
-
-    ar: {
-      title: "تصميم المواقع",
-      description:
-        "تصميم مواقع حديثة ومتجاوبة، واجهات وتجارب مستخدم، تطبيقات ويب، وتجارب رقمية تركز على التحويل.",
-    },
-  },
-
-  {
-    id: "8",
-    icon: "📱",
-
-    en: {
-      title: "Social Media Management",
-      description:
-        "Complete social media management including content creation, scheduling, audience engagement, and analytics.",
-    },
-
-    ar: {
-      title: "إدارة وسائل التواصل",
-      description:
-        "إدارة كاملة لوسائل التواصل الاجتماعي تشمل صناعة المحتوى، الجدولة، التفاعل مع الجمهور، والتحليلات.",
-    },
-  },
-
-  {
-    id: "9",
-    icon: "🔍",
-
-    en: {
-      title: "SEO Optimization",
-      description:
-        "Search engine optimization services to improve rankings, traffic, visibility, and online authority.",
-    },
-
-    ar: {
-      title: "تحسين محركات البحث",
-      description:
-        "خدمات تحسين محركات البحث لزيادة الظهور، رفع الترتيب، تحسين الزيارات، وتعزيز الحضور الرقمي.",
-    },
-  },
-
-  {
-    id: "10",
-    icon: "📝",
-
-    en: {
-      title: "Content Creation",
-      description:
-        "Creative content writing, visual storytelling, ad copywriting, and multimedia content production.",
-    },
-
-    ar: {
-      title: "صناعة المحتوى",
-      description:
-        "كتابة محتوى إبداعي، سرد بصري، كتابة إعلانات، وإنتاج محتوى متعدد الوسائط.",
-    },
-  },
-
-  {
-    id: "11",
-    icon: "🖥️",
-
-    en: {
-      title: "UI/UX Design",
-      description:
-        "User-centered interface and experience design for websites, apps, and digital products.",
-    },
-
-    ar: {
-      title: "تصميم UI/UX",
-      description:
-        "تصميم واجهات وتجارب مستخدم تركز على المستخدم للمواقع، التطبيقات، والمنتجات الرقمية.",
-    },
-  },
-
-  {
-    id: "12",
-    icon: "🌐",
-
-    en: {
-      title: "Full Digital Solutions",
-      description:
-        "End-to-end digital marketing and creative services tailored for startups, businesses, and enterprises.",
-    },
-
-    ar: {
-      title: "الحلول الرقمية المتكاملة",
-      description:
-        "خدمات رقمية وإبداعية متكاملة للشركات الناشئة، المؤسسات، والأعمال التجارية.",
-    },
-  },
-];
 
 export const slides = [
   {
@@ -726,192 +478,174 @@ export const WHAT_WE_DO = [
   },
 ];
 
-
-
 export const WHY_GROWVY = [
   {
-    
-
     en: {
-      title: "Creative Strategy",
+      title: "Purpose Driven",
       description:
-        "Innovative ideas and strategic planning designed to elevate your brand presence.",
+        "Every brand we build starts with thinking that goes beyond the surface. We dig into your market, your audience, and your goals, and build a direction that gives your business a clear and purposeful path forward",
     },
 
     ar: {
-      title: "الاستراتيجية الإبداعية",
+      title: "نحقق الاهداف",
       description:
-        "أفكار مبتكرة وخطط استراتيجية مصممة لتعزيز حضور علامتك التجارية.",
+        "كل علامة تجارية نبنيها تبدأ بفكر يتجاوز المظاهر. نتعمق في فهم سوقك، وجمهورك، وأهدافك، ثم نرسم مساراً واضحاً وهادفاً يمنح أعمالك اتجاهاً ثابتاً نحو النمو",
     },
   },
 
   {
-    
-
     en: {
-      title: "Modern Design",
+      title: "Visual Power",
       description:
-        "Premium visual experiences with modern UI, branding, and creative storytelling.",
+        "We don't design to decorate. Every visual we create is crafted to stop attention, hold it, and leave an impression that lasts. Design at Growvy is a statement, not a service",
     },
 
     ar: {
-      title: "التصميم الحديث",
+      title: "القوة البصرية",
       description:
-        "تجارب بصرية مميزة مع واجهات حديثة وهوية تجارية وسرد إبداعي.",
+        "نحن لا نصمم لمجرد الزينة. كل عنصر بصري نبتكره صُمم ليجذب الانتباه، ويحافظ عليه، ويترك أثراً يدوم. في جروفي، التصميم هو رسالة وهوية، وليس مجرد خدمة",
     },
   },
 
   {
-    
     en: {
-      title: "Result Driven",
+      title: "Lasting Impression",
       description:
-        "Focused on delivering measurable growth, engagement, and business impact.",
+        "We put your brand in front of the right people at the right time with the right message. Every campaign is built around real data, clear goals, and a strategy that turns audiences into customers",
     },
 
     ar: {
-      title: "التركيز على النتائج",
+      title: "أثر يدوم",
       description:
-        "نركز على تحقيق نمو ملموس وزيادة التفاعل وتحقيق تأثير حقيقي للأعمال.",
+        "نضع علامتك التجارية أمام الجمهور المناسب، في الوقت المناسب، وبالرسالة المناسبة. كل حملة نبنيها تعتمد على بيانات حقيقية، وأهداف واضحة، واستراتيجية تحول الجمهور إلى عملاء",
     },
   },
 
   {
-    
-
     en: {
-      title: "Full Digital Support",
+      title: "Clarity Vision",
       description:
-        "From branding to marketing and development, everything under one creative agency.",
+        "We tell your brand's story through visuals that move people. From concept to final cut, every video, every reel, and every frame we produce is crafted to connect, engage, and convert audiences",
     },
 
     ar: {
-      title: "دعم رقمي متكامل",
+      title: "رؤية واضحة",
       description:
-        "من الهوية التجارية إلى التسويق والتطوير، كل شيء تحت سقف وكالة إبداعية واحدة.",
+        "نروي قصة علامتك التجارية من خلال محتوى بصري يلامس الناس. من الفكرة الأولى إلى النسخة النهائية، نصنع كل فيديو وكل ريل وكل مشهد بعناية ليخلق تواصلاً حقيقياً، ويجذب الانتباه، ويحوّل الجمهور إلى عملاء",
     },
   },
 ];
-
 
 export const FAQ_DATA = [
   {
     en: {
-      question: "What services does Growvy provide?",
+      question: "What does Growvy do for faster business growth?",
       answer:
-        "Growvy provides branding, digital marketing, social media management, reels & video production, website designing, and web development services.",
+        "Growvy helps businesses grow through branding, marketing, content creation, and digital solutions that increase visibility, attract customers, and deliver measurable results.",
     },
-
     ar: {
-      question: "ما هي الخدمات التي تقدمها جروفي؟",
+      question: "كيف تساعد جروفي الشركات على تحقيق نمو أسرع؟",
       answer:
-        "تقدم جروفي خدمات الهوية التجارية، التسويق الرقمي، إدارة وسائل التواصل الاجتماعي، إنتاج الريلز والفيديو، تصميم المواقع وتطويرها.",
+        "تساعد جروفي الشركات على النمو من خلال بناء العلامة التجارية، والتسويق، وصناعة المحتوى، والحلول الرقمية التي تزيد من الظهور، وتجذب العملاء، وتحقق نتائج قابلة للقياس.",
     },
   },
 
   {
     en: {
-      question: "Do you create websites for businesses?",
+      question: "What makes Growvy different from others?",
       answer:
-        "Yes, we design and develop modern, responsive, and high-performance websites tailored for businesses and brands.",
+        "We focus on growth beyond design. Every strategy, campaign, and creative solution we deliver is aligned with clear business goals and measurable outcomes.",
     },
-
     ar: {
-      question: "هل تقومون بإنشاء مواقع إلكترونية للشركات؟",
+      question: "ما الذي يميز جروفي عن الآخرين؟",
       answer:
-        "نعم، نقوم بتصميم وتطوير مواقع إلكترونية حديثة ومتجاوبة وعالية الأداء مخصصة للشركات والعلامات التجارية.",
+        "نركز على النمو الذي يتجاوز التصميم. كل استراتيجية أو حملة أو تصميم نقدمه مرتبط بهدف تجاري واضح ونتائج قابلة للقياس.",
     },
   },
 
   {
     en: {
-      question: "Can Growvy manage our social media accounts?",
+      question: "How does Growvy create effective branding?",
       answer:
-        "Absolutely. We handle content creation, posting, strategy, engagement, and complete social media management.",
+        "We build brands through research, strategy, positioning, visual identity, and consistent communication that helps businesses stand out and earn customer trust.",
     },
-
     ar: {
-      question: "هل يمكن لجروفي إدارة حساباتنا على وسائل التواصل الاجتماعي؟",
+      question: "كيف تبني جروفي علامة تجارية فعّالة؟",
       answer:
-        "بالتأكيد، نحن نتولى إنشاء المحتوى والنشر ووضع الاستراتيجيات والتفاعل مع الجمهور والإدارة الكاملة لوسائل التواصل الاجتماعي.",
+        "نبني العلامات التجارية من خلال البحث، والاستراتيجية، والتموضع، والهوية البصرية، والتواصل المتسق الذي يساعد الشركات على التميز وكسب ثقة العملاء.",
     },
   },
 
   {
     en: {
-      question: "Do you offer branding and logo design?",
+      question: "How much does it cost to work with Growvy?",
       answer:
-        "Yes, we create complete branding solutions including logos, brand identity, visual guidelines, and creative direction.",
+        "The cost depends on your goals, requirements, and project scope. We provide customized solutions tailored to your business needs and objectives.",
     },
-
     ar: {
-      question: "هل تقدمون خدمات الهوية التجارية وتصميم الشعارات؟",
+      question: "كم تبلغ تكلفة العمل مع جروفي؟",
       answer:
-        "نعم، نقدم حلولاً متكاملة للهوية التجارية تشمل تصميم الشعارات والهوية البصرية وأدلة العلامة التجارية والتوجيه الإبداعي.",
+        "تعتمد التكلفة على أهدافك ومتطلباتك ونطاق المشروع. نقدم حلولاً مخصصة تناسب احتياجات عملك وأهدافه.",
     },
   },
 
   {
     en: {
-      question: "How can I contact Growvy?",
+      question: "How long does a project take?",
       answer:
-        "You can connect with us through WhatsApp, email, or phone directly from our contact section.",
+        "Project timelines vary depending on complexity and requirements. Most projects are completed within a few weeks to a few months.",
     },
-
     ar: {
-      question: "كيف يمكنني التواصل مع جروفي؟",
+      question: "كم يستغرق تنفيذ المشروع؟",
       answer:
-        "يمكنك التواصل معنا عبر واتساب أو البريد الإلكتروني أو الهاتف مباشرة من قسم التواصل.",
+        "تختلف مدة المشروع حسب مستوى التعقيد والمتطلبات. تستغرق معظم المشاريع من عدة أسابيع إلى عدة أشهر.",
     },
   },
 ];
-
 export const values = [
   {
     en: {
-      title: "Innovation",
-      desc: "Creating modern digital experiences with bold creativity.",
+      title: "Honesty",
+      desc: "Building trust through transparency, integrity, and accountability in everything we do.",
     },
     ar: {
-      title: "الابتكار",
-      desc: "نصنع تجارب رقمية حديثة بإبداع جريء.",
+      title: "الشفافية",
+      desc: "نبني الثقة من خلال الشفافية والنزاهة وتحمل المسؤولية في كل ما نقوم به.",
     },
   },
   {
     en: {
-      title: "Strategy",
-      desc: "Building data-driven solutions that generate results.",
+      title: "Partnership",
+      desc: "Working closely with our clients as dedicated partners invested in their success.",
     },
     ar: {
-      title: "الاستراتيجية",
-      desc: "نبني حلولاً قائمة على البيانات تحقق النتائج.",
+      title: "الشراكة",
+      desc: "نعمل مع عملائنا كشركاء حقيقيين ملتزمين بنجاحهم ونمو أعمالهم.",
     },
   },
   {
     en: {
-      title: "Quality",
-      desc: "Delivering premium work with precision and consistency.",
+      title: "Impact",
+      desc: "Creating measurable results that drive growth, visibility, and long-term value.",
     },
     ar: {
-      title: "الجودة",
-      desc: "نقدم أعمالاً متميزة بدقة واحترافية.",
+      title: "الأثر",
+      desc: "نحقق نتائج ملموسة تدعم النمو وتعزز الظهور وتبني قيمة مستدامة.",
     },
   },
 ];
-
 
 export const SERVICES_DROPDOWN = [
   {
     en: {
       title: "Brand Strategy",
       description:
-        "We find out what your business should stand for, who it should talk to, and why people choose you.",
+        "We find out what your business should stand for, to whom it should talk, and why people choose you. From positioning to messaging, we build the direction your business needs to move with clarity, attract the right people, and grow with purpose. Strategy is the foundation on which everything else is built.",
     },
-
     ar: {
       title: "استراتيجية العلامة التجارية",
       description:
-        "نحدد ما الذي يجب أن تمثله علامتك التجارية، ولمن تتحدث، ولماذا يختارك العملاء.",
+        "نحدد ما الذي يجب أن تمثله أعمالك، ومن هو جمهورك المستهدف، ولماذا يختارك العملاء دون غيرك. ومن تحديد المكانة السوقية إلى صياغة الرسائل التسويقية، نبني الاتجاه الذي تحتاجه أعمالك للتحرك بوضوح، وجذب العملاء المناسبين، والنمو بهدف واضح. فالاستراتيجية هي الأساس الذي يُبنى عليه كل شيء.",
     },
   },
 
@@ -919,13 +653,12 @@ export const SERVICES_DROPDOWN = [
     en: {
       title: "Branding",
       description:
-        "Complete branding solutions including logos, visual identity, packaging, and premium brand systems.",
+        "We make sure your business is remembered and recognised in markets. Through a brand identity and personality, people understand your trustworthiness and choose you over others. From strong strategies, branding builds your long-term reputation, and clients follow.",
     },
-
     ar: {
-      title: "الهوية التجارية",
+      title: "بناء العلامة التجارية",
       description:
-        "حلول متكاملة للهوية التجارية تشمل الشعارات والهوية البصرية والتغليف وأنظمة العلامة التجارية.",
+        "نحرص على أن تكون أعمالك معروفة ولا تُنسى في السوق. ومن خلال بناء هوية وشخصية قوية للعلامة التجارية، يفهم العملاء قيمك ويثقون بك ويختارونك دون غيرك. فالعلامة التجارية المبنية على استراتيجية قوية تصنع سمعة طويلة الأمد وتجذب العملاء باستمرار.",
     },
   },
 
@@ -933,41 +666,38 @@ export const SERVICES_DROPDOWN = [
     en: {
       title: "Marketing",
       description:
-        "Performance-driven marketing campaigns focused on visibility, engagement, and business growth.",
+        "Through creative marketing, we grow your business or your product's reach to the real audience you are looking for. We research, strategise, and execute to achieve the goals you dream of and turn them into reality.",
     },
-
     ar: {
       title: "التسويق",
       description:
-        "حملات تسويقية تعتمد على الأداء لزيادة الظهور والتفاعل ونمو الأعمال.",
+        "من خلال التسويق الإبداعي، نساعد أعمالك أو منتجاتك على الوصول إلى الجمهور الحقيقي الذي تبحث عنه. نبحث ونخطط وننفذ لتحقيق أهداف أعمالك وتحويل طموحاتك إلى نتائج واقعية.",
     },
   },
 
   {
     en: {
-      title: "Reels & Video Production",
+      title: "Reels & Production",
       description:
-        "High-quality cinematic reels, commercials, editing, and creative video production.",
+        "We build visual clarity for your business through production and reel-making. We consistently create engaging, result-driven content so your audience recognises your brand, connects with your content, and keeps coming back.",
     },
-
     ar: {
-      title: "إنتاج الريلز والفيديو",
+      title: "إنتاج المحتوى والريلز",
       description:
-        "إنتاج احترافي للريلز والفيديوهات والإعلانات والمونتاج الإبداعي.",
+        "نمنح علامتك التجارية وضوحاً بصرياً من خلال الإنتاج الإبداعي وصناعة الريلز. وننتج باستمرار محتوى جذاباً وموجهاً لتحقيق النتائج، مما يساعد جمهورك على التعرف على علامتك التجارية والتفاعل معها والعودة إليها باستمرار.",
     },
   },
 
   {
     en: {
-      title: "Web Designing & Development",
+      title: "Web Design & Development",
       description:
-        "Modern responsive websites and scalable web applications built for performance.",
+        "We put your business on the internet the right way through brand-consistent visuals, layouts, and structure. We create websites that build trust from the first impression. With the right integrations and functionality, we develop fast, high-performance websites that work for your business 24/7.",
     },
-
     ar: {
-      title: "تصميم وتطوير المواقع",
+      title: "تصميم وتطوير المواقع الإلكترونية",
       description:
-        "تصميم وتطوير مواقع حديثة ومتجاوبة وتطبيقات ويب قابلة للتوسع.",
+        "نضع أعمالك على الإنترنت بالطريقة الصحيحة من خلال تصميم متوافق مع هويتك البصرية، وهيكل احترافي وتجربة مستخدم متميزة. نصمم مواقع إلكترونية تبني الثقة منذ اللحظة الأولى، مع توفير التكاملات والوظائف المناسبة لضمان السرعة والكفاءة والعمل المستمر لخدمة أعمالك على مدار الساعة.",
     },
   },
 
@@ -975,17 +705,15 @@ export const SERVICES_DROPDOWN = [
     en: {
       title: "Social Media Management",
       description:
-        "Content creation, posting, engagement, analytics, and complete social media growth management.",
+        "We manage your social media, plan content, create ideas, design visuals, publish consistently, track performance, and improve every month. We make sure your business gets the visibility it deserves and reaches the audience it was built for.",
     },
-
     ar: {
       title: "إدارة وسائل التواصل الاجتماعي",
       description:
-        "إدارة متكاملة لوسائل التواصل تشمل صناعة المحتوى والنشر والتحليلات.",
+        "نتولى إدارة حساباتك على وسائل التواصل الاجتماعي بالكامل. نخطط للمحتوى، ونبتكر الأفكار، ونصمم المواد البصرية، وننشر باستمرار، ونراقب الأداء، ونطوره شهرياً. نضمن حصول أعمالك على الظهور الذي تستحقه والوصول إلى الجمهور الذي بُنيت من أجله.",
     },
   },
 ];
-
 
 export const WORK_CATEGORIES = [
   {

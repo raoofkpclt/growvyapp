@@ -62,19 +62,19 @@ const Services : React.FC= () => {
           </div>
 
           <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
-            {language === "en" ? "Creative" : "حلول"}
+            {language === "en" ? "The process" : "الرحلة"}
 
             <br />
 
             <span className="text-orange-400">
-              {language === "en" ? "Solutions" : "إبداعية"}
+              {language === "en" ? "behind every brand" : "وراء كل علامة تجارية"}
             </span>
           </h1>
 
           <p className="max-w-[750px] mx-auto mt-8 text-white/60 text-lg leading-[2]">
             {language === "en"
-              ? "We provide strategic branding, digital experiences, cinematic production, web development, creative campaigns, and modern marketing solutions tailored for ambitious brands."
-              : "نقدم حلولاً إبداعية متكاملة تشمل الهوية التجارية، التسويق الرقمي، إنتاج الفيديو، تطوير المواقع، والحملات التسويقية الحديثة للعلامات التجارية الطموحة."}
+              ? "Every service we offer starts with listening. We dig into your business, understand your goal, and build a strategy around it. Then we execute sharply, focused, and consistently until the results show"
+              :"كل خدمة نقدمها تبدأ بالاستماع. نتعمق في فهم أعمالك، وندرك أهدافك، ثم نبني استراتيجية ترتكز عليها. بعد ذلك ننفذها بدقة وتركيز واستمرارية حتى تظهر النتائج الحقيقية"}
           </p>
         </div>
       </section>
