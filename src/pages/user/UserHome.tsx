@@ -49,11 +49,46 @@ const UserHome: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+const positionRef = useRef(0);
+const animationRef = useRef(0);
 
+useEffect(() => {
+  if (clients.length === 0) return;
+
+  const startAnimation = () => {
+    const el = marqueeRef.current;
+    if (!el) return;
+
+    const singleWidth = el.scrollWidth / 4;
+
+    const animate = () => {
+      positionRef.current -= 0.5;
+
+      if (Math.abs(positionRef.current) >= singleWidth) {
+        positionRef.current = 0;
+      }
+
+      el.style.transform = `translateX(${positionRef.current}px)`;
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  const timer = setTimeout(startAnimation, 1000);
+
+  return () => {
+    clearTimeout(timer);
+    cancelAnimationFrame(animationRef.current);
+  };
+}, [clients]);
   // ─────────────────────────────────────────────
 
   useEffect(() => {
     console.log(scrolled, works, services);
+    console.log("width", marqueeRef.current?.scrollWidth);
     const fn = () => setScrolled(window.scrollY > 40);
 
     window.addEventListener("scroll", fn);
@@ -62,22 +97,31 @@ const UserHome: React.FC = () => {
   }, []);
 
   // ─────────────────────────────────────────────
-
+useEffect(() => {
+  console.log("clients updated", clients);
+}, [clients]);
   useEffect(() => {
     (async () => {
       try {
         const snap = await getDocs(collection(db, "clients"));
-
+console.log("snap",snap.docs)
         if (!snap.empty) {
+          
           setClients(
+            
             snap.docs.map(
               (d) =>
-                ({
+                
+                (
+                  
+                  {
+                    
                   id: d.id,
                   ...d.data(),
                 }) as Client,
             ),
           );
+          console.log("clients",clients)
         }
       } catch {
         console.log("error");
@@ -119,6 +163,8 @@ const UserHome: React.FC = () => {
         console.log("error");
       }
     })();
+
+    
   }, []);
 
   return (
@@ -315,39 +361,34 @@ const UserHome: React.FC = () => {
         <div className="absolute bottom-[-100px] right-[20%] w-[300px] h-[300px] bg-blue-500/10 blur-[160px] rounded-full" />
 
         {/* MARQUEE */}
-        <div className="relative z-20 overflow-hidden">
-          <div className="flex items-center gap-24 w-max animate-marquee">
-            {[...clients, ...clients].map((client, index) => (
-              <div
-                key={`${client.id}-${index}`}
-                className="flex items-center justify-center shrink-0"
-              >
-                {client.profileImage ? (
-                  <img
-                    src={client.profileImage}
-                    alt={client.name}
-                    className="
-                h-16 md:h-20
-                w-auto
-                object-contain
-                rounded-xl
-                grayscale
-                opacity-60
-                hover:grayscale-0
-                hover:opacity-100
-                transition-all duration-500
-                
-              "
-                  />
-                ) : (
-                  <span className="text-white/30 text-2xl font-bold">
-                    {client.name}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+       {/* MARQUEE */}
+<div className="relative z-20 overflow-hidden">
+  <div
+    
+    className="flex items-center gap-24 w-max"
+    style={{ willChange: "transform" }}
+  >
+    
+    {[...clients, ...clients, ...clients, ...clients].map((client, index) => (
+      <div
+        key={`${client.id}-${index}`}
+        className="flex items-center justify-center shrink-0"
+      >
+        
+        {client.profileImage ? (
+          <img
+            src={client.profileImage}
+            alt={client.name}
+            className="h-20 md:h-26 w-auto object-contain rounded-xl grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+          />
+        ) : (
+          <span className="text-white text-2xl font-bold">{client.name}</span>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
       </section>
       <section className="relative min-h-screen overflow-hidden bg-[#081120]">
         {/* 3D BACKGROUND */}
