@@ -896,6 +896,7 @@ console.log("snap",snap.docs)
     object-contain
     grayscale
     opacity-80
+    rounded-xl
     hover:grayscale-0
     hover:opacity-100
     hover:scale-105
