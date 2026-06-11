@@ -205,6 +205,7 @@ const UserHome: React.FC = () => {
           name="description"
           content="Growvy helps businesses grow through branding, digital marketing, SEO, content marketing, and web development."
         />
+        <meta name="google-site-verification" content="VWuGziXofMN-giFRHf-AIAZHRQWXPgCYAqT3gDVXYVU" />
         <meta
           name="keywords"
           content="digital marketing, branding, web development, social media management"
