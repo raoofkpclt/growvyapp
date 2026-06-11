@@ -12,47 +12,102 @@ import type { Creative } from "../utils/types/Types";
 
 import { uploadFile } from "../utils/uploadFile";
 
-export const addCreative = async (creative: Creative, file?: File | null) => {
+// export const addCreative = async (creative: Creative, file?: File | null) => {
+//   try {
+//     let imageUrl = "";
+//     let logoUrl = "";
+
+//     // =========================
+//     // POSTER IMAGE
+//     // =========================
+//     if (creative.type === "poster" && file) {
+//       imageUrl = await uploadFile(file);
+//     }
+
+//     // =========================
+//     // WEBSITE LOGO
+//     // =========================
+//     if (creative.type === "website" && file) {
+//       logoUrl = await uploadFile(file);
+//     }
+
+//     // =========================
+//     // SAVE FIRESTORE
+//     // =========================
+//     const creativeData = {
+//       clientId: creative.clientId || "",
+
+//       type: creative.type || "",
+
+//       title: creative.title || "",
+
+//       imageUrl: imageUrl || "",
+
+//       instagramUrl: creative.instagramUrl || "",
+
+//       websiteUrl: creative.websiteUrl || "",
+
+//       logoUrl: logoUrl || "",
+
+//       uploadedAt: new Date().toISOString(),
+//     };
+
+//     const docRef = await addDoc(collection(db, "creatives"), creativeData);
+
+//     return {
+//       ...creativeData,
+//       id: docRef.id,
+//     };
+//   } catch (error) {
+//     console.log(error);
+
+//     throw error;
+//   }
+// };
+
+export const addCreative = async (
+  creative: Creative,
+  file?: File | null
+) => {
   try {
     let imageUrl = "";
     let logoUrl = "";
+    let thumbnailUrl = "";
 
-    // =========================
-    // POSTER IMAGE
-    // =========================
+    // POSTER
     if (creative.type === "poster" && file) {
       imageUrl = await uploadFile(file);
     }
 
-    // =========================
+    // REEL THUMBNAIL
+    if (creative.type === "reel" && file) {
+      thumbnailUrl = await uploadFile(file);
+    }
+
     // WEBSITE LOGO
-    // =========================
     if (creative.type === "website" && file) {
       logoUrl = await uploadFile(file);
     }
 
-    // =========================
-    // SAVE FIRESTORE
-    // =========================
     const creativeData = {
       clientId: creative.clientId || "",
-
       type: creative.type || "",
-
       title: creative.title || "",
 
-      imageUrl: imageUrl || "",
+      imageUrl,
+      thumbnailUrl,
+      logoUrl,
 
       instagramUrl: creative.instagramUrl || "",
-
       websiteUrl: creative.websiteUrl || "",
-
-      logoUrl: logoUrl || "",
 
       uploadedAt: new Date().toISOString(),
     };
 
-    const docRef = await addDoc(collection(db, "creatives"), creativeData);
+    const docRef = await addDoc(
+      collection(db, "creatives"),
+      creativeData
+    );
 
     return {
       ...creativeData,
@@ -60,10 +115,10 @@ export const addCreative = async (creative: Creative, file?: File | null) => {
     };
   } catch (error) {
     console.log(error);
-
     throw error;
   }
 };
+
 
 // ==============================
 // GET CREATIVES

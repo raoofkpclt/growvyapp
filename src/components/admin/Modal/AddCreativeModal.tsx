@@ -12,12 +12,14 @@ interface Props {
 const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [websiteLogo, setWebsiteLogo] = useState<File | null>(null);
+  const [reelThumbnail, setReelThumbnail] = useState<File | null>(null);
 
   const [creativeForm, setCreativeForm] = useState({
     clientId: "",
     type: "poster" as Creative["type"],
     title: "",
     imageUrl: "",
+    thumbnailUrl:"",
     instagramUrl: "",
     websiteUrl: "",
   });
@@ -44,7 +46,7 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
         imageUrl: "",
 
         instagramUrl: creativeForm.instagramUrl,
-
+        thumbnailUrl: "",
         websiteUrl: creativeForm.websiteUrl,
 
         uploadedAt: new Date().toISOString().slice(0, 10),
@@ -68,7 +70,16 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
       // REEL
       // =========================
       else if (creativeForm.type === "reel") {
-        savedCreative = await addCreative(creativeData);
+        if (!reelThumbnail) {
+  alert("Select reel thumbnail");
+  return;
+}
+
+savedCreative = await addCreative(
+  creativeData,
+  reelThumbnail
+);
+setReelThumbnail(null);
       }
 
       // =========================
@@ -93,6 +104,7 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
         type: "poster",
         title: "",
         imageUrl: "",
+        thumbnailUrl:"",
         instagramUrl: "",
         websiteUrl: "",
       });
@@ -199,7 +211,7 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
         )}
 
         {/* Reel URL */}
-        {creativeForm.type === "reel" && (
+        {/* {creativeForm.type === "reel" && (
           <Field
             label="Instagram Reel URL"
             value={creativeForm.instagramUrl}
@@ -211,7 +223,42 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
             }
             placeholder="https://www.instagram.com/reel/..."
           />
-        )}
+        )} */}
+
+        {creativeForm.type === "reel" && (
+  <div className="space-y-4">
+    <Field
+      label="Instagram Reel URL"
+      value={creativeForm.instagramUrl}
+      onChange={(e) =>
+        setCreativeForm((p) => ({
+          ...p,
+          instagramUrl: e.target.value,
+        }))
+      }
+      placeholder="https://www.instagram.com/reel/..."
+    />
+
+    <div>
+      <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
+        Reel Thumbnail
+      </label>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setReelThumbnail(e.target.files?.[0] || null)}
+        className="w-full mt-2"
+      />
+
+      {reelThumbnail && (
+        <p className="text-xs text-zinc-500 mt-1">
+          Selected: {reelThumbnail.name}
+        </p>
+      )}
+    </div>
+  </div>
+)}
 
         {/* Website Section */}
         {creativeForm.type === "website" && (

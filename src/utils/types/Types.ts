@@ -17,8 +17,13 @@ export interface Creative {
   clientId: string;
   type: "poster" | "reel" | "website";
   title: string;
-  imageUrl?: string;
+
+  imageUrl?: string;      // poster
+  thumbnailUrl?: string;  // reel
+  logoUrl?: string;       // website
+
   instagramUrl?: string;
   websiteUrl?: string;
+
   uploadedAt: string;
 }

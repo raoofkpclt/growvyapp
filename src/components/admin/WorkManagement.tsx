@@ -118,13 +118,39 @@ const WorkManagement: React.FC = () => {
                     />
                   )}
                   {c.type === "reel" && (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-900/30 to-fuchsia-900/30">
-                      <div className="text-center">
-                        <div className="text-3xl mb-2">▶</div>
-                        <p className="text-xs text-zinc-400">Instagram Reel</p>
-                      </div>
-                    </div>
-                  )}
+  <>
+    {c.thumbnailUrl ? (
+      <div className="relative w-full h-full overflow-hidden">
+        <img
+          src={c.thumbnailUrl}
+          alt={c.title}
+          className="
+            w-full
+            h-full
+            object-cover
+            group-hover:scale-105
+            transition-transform
+            duration-500
+          "
+        />
+
+        {/* Play Overlay */}
+        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+            <span className="text-black text-xl ml-1">▶</span>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-900/30 to-fuchsia-900/30">
+        <div className="text-center">
+          <div className="text-3xl mb-2">▶</div>
+          <p className="text-xs text-zinc-400">Instagram Reel</p>
+        </div>
+      </div>
+    )}
+  </>
+)}
                   {c.type === "website" && (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-sky-900/30 to-cyan-900/30">
                       <div className="text-center">

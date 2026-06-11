@@ -17,6 +17,7 @@ import { Helmet } from "react-helmet-async";
 
 
 
+
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
@@ -33,6 +34,7 @@ interface Work {
   imageUrl?: string;
 
   logoUrl?: string;
+  thumbnailUrl?: string;
 
   instagramUrl?: string;
 
@@ -257,8 +259,8 @@ Our Portfolio | Creative Projects by Growvy
                       className="block"
                     >
                       <img
-                        src={work.imageUrl}
-                        alt=""
+                        src={work.thumbnailUrl}
+                        alt="Tp"
                         className="
             w-full
             h-[420px]

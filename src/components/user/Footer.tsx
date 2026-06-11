@@ -80,7 +80,7 @@ const Footer : React.FC= () => {
         {/* SOCIALS */}
         <div className="flex flex-wrap justify-center gap-8 mt-14">
           <a
-            href="#"
+            href="https://www.instagram.com/growvyofficial/"
             className="text-white/60 hover:text-orange-400 transition"
           >
             Instagram
@@ -108,7 +108,7 @@ const Footer : React.FC= () => {
           </a>
 
           <a
-            href="#"
+            href="https://www.linkedin.com/company/growvy-official/posts/?feedView=all"
             className="text-white/60 hover:text-orange-400 transition"
           >
             LinkedIn
