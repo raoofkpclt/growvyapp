@@ -18,7 +18,7 @@ export default function AutoSwitchSection({ language }: Props) {
   }, []);
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section className="relative py-32 overflow-hidden min-h-[850px]">
       {/* GRID */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -50,7 +50,7 @@ export default function AutoSwitchSection({ language }: Props) {
         "
       >
         {/* IMAGE */}
-        <div className="relative flex justify-center items-center">
+        <div className="relative flex justify-center items-center h-[600px]">
           <div className="absolute w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full" />
 
           <img
@@ -58,25 +58,29 @@ export default function AutoSwitchSection({ language }: Props) {
             src={slides[active].image}
             alt={slides[active][language].title}
             className="
-              relative z-10
-              w-[280px]
-              md:w-[420px]
-              lg:w-[550px]
-              object-contain
-              transition-all
-              duration-700
-              drop-shadow-[0_0_80px_rgba(34,211,238,0.45)]
-            "
+  relative z-10
+  w-[280px]
+  md:w-[420px]
+  lg:w-[550px]
+  h-[500px]
+  object-contain
+  transition-all
+  duration-700
+"
           />
         </div>
 
         {/* TEXT */}
         <div
-          className={`
-            relative z-10
-            ${language === "ar" ? "text-right" : "text-left"}
-          `}
-        >
+  className={`
+    relative z-10
+    min-h-[600px]
+    flex
+    flex-col
+    justify-center
+    ${language === "ar" ? "text-right" : "text-left"}
+  `}
+>
           <p
             className="
               text-orange-400
@@ -92,30 +96,33 @@ export default function AutoSwitchSection({ language }: Props) {
           </p>
 
           <h2
-            key={slides[active][language].title}
-            className="
-              mt-6
-              text-[clamp(3rem,6vw,6rem)]
-              font-black
-              leading-[0.95]
-              tracking-[-0.05em]
-              transition-all duration-500
-            "
-          >
+  key={slides[active][language].title}
+  className="
+    mt-6
+    min-h-[180px]
+    flex items-center
+    text-[clamp(3rem,6vw,6rem)]
+    font-black
+    leading-[0.95]
+    tracking-[-0.05em]
+    transition-all duration-500
+  "
+>
             {slides[active][language].title}
           </h2>
 
           <p
-            key={slides[active][language].desc}
-            className="
-              mt-8
-              text-white/60
-              text-lg
-              leading-[2]
-              max-w-[600px]
-              transition-all duration-500
-            "
-          >
+  key={slides[active][language].desc}
+  className="
+    mt-8
+    min-h-[180px]
+    text-white/60
+    text-lg
+    leading-[2]
+    max-w-[600px]
+    transition-all duration-500
+  "
+>
             {slides[active][language].desc}
           </p>
 
