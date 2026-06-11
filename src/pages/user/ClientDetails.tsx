@@ -257,7 +257,7 @@ const ClientDetails: React.FC = () => {
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

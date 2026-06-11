@@ -734,3 +734,70 @@ export const WORK_CATEGORIES = [
     ar: "المواقع الإلكترونية",
   },
 ];
+
+
+export const footerTranslations = {
+  en: {
+    description:
+      "Creative branding, digital marketing, video production, and web development agency helping brands grow globally.",
+
+    ksaOffice: "KSA Office",
+
+    ksaAddress: [
+      "Al-Zahra",
+      "Jeddah",
+      "Kingdom of Saudi Arabia",
+    ],
+
+    indiaOffice: "India Office",
+
+    indiaAddress: [
+      "Growvy Branding",
+      "La Marshall Chamber",
+      "Adv M Ratna Singh Rd",
+      "Nadakkavu, Kozhikode 673011",
+    ],
+
+    copyright: "All rights reserved.",
+
+    socials: {
+      instagram: "Instagram",
+      facebook: "Facebook",
+      snapchat: "Snapchat",
+      tiktok: "TikTok",
+      linkedin: "LinkedIn",
+    },
+  },
+
+  ar: {
+    description:
+      "وكالة متخصصة في الهوية التجارية والتسويق الرقمي وإنتاج الفيديو وتطوير المواقع، تساعد العلامات التجارية على النمو عالميًا.",
+
+    ksaOffice: "مكتب المملكة العربية السعودية",
+
+    ksaAddress: [
+      "حي الزهراء",
+      "جدة",
+      "المملكة العربية السعودية",
+    ],
+
+    indiaOffice: "مكتب الهند",
+
+    indiaAddress: [
+      "جروفي براندنج",
+      "لا مارشال تشامبر",
+      "شارع إم راتنا سينغ",
+      "ناداكافو، كوزيكود 673011",
+    ],
+
+    copyright: "جميع الحقوق محفوظة.",
+
+    socials: {
+      instagram: "إنستغرام",
+      facebook: "فيسبوك",
+      snapchat: "سناب شات",
+      tiktok: "تيك توك",
+      linkedin: "لينكدإن",
+    },
+  },
+};

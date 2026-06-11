@@ -206,7 +206,7 @@ About Growvy | Creative Digital Agency
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

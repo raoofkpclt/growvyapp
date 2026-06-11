@@ -373,7 +373,7 @@ Contact Growvy | Start Your Next Project
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

@@ -190,7 +190,7 @@ Our Clients | Brands That Trust Growvy
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

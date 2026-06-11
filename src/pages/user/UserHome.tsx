@@ -1098,7 +1098,7 @@ const UserHome: React.FC = () => {
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

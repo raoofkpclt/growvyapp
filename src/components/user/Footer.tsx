@@ -2,8 +2,16 @@ import React from "react";
 import logo from "../../../public/img/logo-1.png";
 import HomeNav from "../../components/user/Modal/HomeNav";
 import { Link } from "react-router-dom";
+import { footerTranslations } from "../../constant/Constant";
 
-const Footer : React.FC= () => {
+
+interface Props {
+  language: "en" | "ar";
+}
+
+const Footer: React.FC<Props> = ({ language }) => {
+  const t = footerTranslations[language];
+  
   return (
     <footer className="relative overflow-hidden border-t border-white/10 px-[5%] py-24">
       {/* Glow Effects */}
@@ -23,26 +31,26 @@ const Footer : React.FC= () => {
         </div>
 
         <p className="text-white/60 leading-[1.9] mt-6 max-w-[700px]">
-          Creative branding, digital marketing, video production, and web
-          development agency helping brands grow globally.
-        </p>
+  {t.description}
+</p>
 
         {/* NAVIGATION */}
-        <HomeNav language="en" />
+        <HomeNav language={language} />
 
         {/* KSA OFFICE */}
         <div className="mt-16">
           <h3 className="text-2xl font-bold mb-4 text-orange-400">
-            KSA Office
-          </h3>
+  {t.ksaOffice}
+</h3>
 
           <p className="text-white/60 leading-[1.9]">
-            Al-Zahra
-            <br />
-            Jiddah
-            <br />
-            Kingdom of Saudi Arabia
-          </p>
+  {t.ksaAddress.map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      <br />
+    </React.Fragment>
+  ))}
+</p>
         </div>
         {/* EMAIL */}
         <a
@@ -55,18 +63,17 @@ const Footer : React.FC= () => {
         {/* INDIA OFFICE */}
         <div className="mt-14">
           <h3 className="text-2xl font-bold mb-4 text-yellow-400">
-            India Office
-          </h3>
+  {t.indiaOffice}
+</h3>
 
           <p className="text-white/60 leading-[1.9]">
-            Growvy Branding
-            <br />
-            La Marshall Chamber
-            <br />
-            Adv M Ratna Singh Rd
-            <br />
-            Nadakkavu, Kozhikode 673011
-          </p>
+  {t.indiaAddress.map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      <br />
+    </React.Fragment>
+  ))}
+</p>
         </div>
 
         {/* EMAIL */}
@@ -83,42 +90,42 @@ const Footer : React.FC= () => {
             href="https://www.instagram.com/growvyofficial/"
             className="text-white/60 hover:text-orange-400 transition"
           >
-            Instagram
+            {t.socials.instagram}
           </a>
 
           <a
-            href="#"
+            href="https://www.facebook.com/profile.php?id=61577232283332"
             className="text-white/60 hover:text-orange-400 transition"
           >
-            Facebook
+            {t.socials.facebook}
           </a>
 
           <a
-            href="#"
+            href="https://snapchat.com/t/gofCpgys"
             className="text-white/60 hover:text-orange-400 transition"
           >
-            Snapchat
+            {t.socials.snapchat}
           </a>
 
           <a
-            href="#"
+            href="https://www.tiktok.com/@growvy.ksa?_r=1&_t=ZS-977VwOkJb0b"
             className="text-white/60 hover:text-orange-400 transition"
           >
-            TikTok
+            {t.socials.tiktok}
           </a>
 
           <a
             href="https://www.linkedin.com/company/growvy-official/posts/?feedView=all"
             className="text-white/60 hover:text-orange-400 transition"
           >
-            LinkedIn
+            {t.socials.linkedin}
           </a>
         </div>
 
         {/* COPYRIGHT */}
         <div className="mt-16 pt-8 border-t border-white/10 w-full">
           <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} Growvy. All rights reserved.
+            © {new Date().getFullYear()} Growvy. {t.copyright}
           </p>
         </div>
       </div>

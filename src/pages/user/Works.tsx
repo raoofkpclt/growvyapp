@@ -292,7 +292,7 @@ Our Portfolio | Creative Projects by Growvy
 
       {/* FOOTER */}
 
-      <Footer />
+      <Footer language={language} />
     </div>
   );
 };

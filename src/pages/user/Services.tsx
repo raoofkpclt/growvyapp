@@ -285,7 +285,7 @@ Digital Marketing Services | Growvy
 
       {/* FOOTER */}
 
-      <Footer />
+     <Footer language={language} />
     </div>
   );
 };
