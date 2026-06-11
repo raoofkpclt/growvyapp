@@ -4,6 +4,10 @@ import { translations } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
 
+import { Helmet } from "react-helmet-async";
+
+
+
 // ─────────────────────────────────────────────
 
 const Contact : React.FC= () => {
@@ -20,6 +24,21 @@ const Contact : React.FC= () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+
+      <Helmet>
+  <title>
+Contact Growvy | Start Your Next Project
+</title>
+
+<meta
+  name="description"
+  content="Get in touch with Growvy for branding, marketing, website development, and creative business solutions."
+/>
+  <meta
+    name="keywords"
+    content="digital marketing, branding, web development, social media management"
+  />
+</Helmet>
       {/* GRID BACKGROUND */}
 
       <div

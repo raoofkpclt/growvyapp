@@ -15,6 +15,10 @@ import Footer from "../../components/user/Footer";
 
 import { useLanguage } from "../../context/LanguageContext";
 
+
+
+
+
 // ─────────────────────────────────────────────
 
 const ClientDetails: React.FC = () => {

@@ -11,6 +11,12 @@ import Nav from "../../components/user/Modal/Nav";
 import { translations, WORK_CATEGORIES } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
+
+import { Helmet } from "react-helmet-async";
+
+
+
+
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
@@ -89,6 +95,23 @@ const Works : React.FC= () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+
+      <Helmet>
+  <title>
+Our Portfolio | Creative Projects by Growvy
+</title>
+
+<meta
+  name="description"
+  content="View our portfolio showcasing branding, website design, marketing campaigns, and creative projects delivered for clients."
+/>
+  <meta
+    name="keywords"
+    content="digital marketing, branding, web development, social media management"
+  />
+</Helmet>
+
+
       {/* GRID BACKGROUND */}
 
       <div

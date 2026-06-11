@@ -8,6 +8,10 @@ import {
 } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 
+import { Helmet } from "react-helmet-async";
+
+
+
 // ─────────────────────────────────────────────
 
 const Services : React.FC= () => {
@@ -24,6 +28,21 @@ const Services : React.FC= () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+
+      <Helmet>
+  <title>
+Digital Marketing Services | Growvy
+</title>
+
+<meta
+  name="description"
+  content="Explore Growvy's services including branding, social media management, web development, content creation, and digital marketing."
+/>
+  <meta
+    name="keywords"
+    content="digital marketing, branding, web development, social media management"
+  />
+</Helmet>
       {/* GRID BACKGROUND */}
 
       <div

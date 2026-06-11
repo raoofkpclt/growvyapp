@@ -12,6 +12,11 @@ import type { Client } from "../../utils/types/Types";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
 
+import { Helmet } from "react-helmet-async";
+
+
+
+
 // ─────────────────────────────────────────────
 
 const Clients : React.FC= () => {
@@ -55,6 +60,21 @@ const Clients : React.FC= () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+
+      <Helmet>
+  <title>
+Our Clients | Brands That Trust Growvy
+</title>
+
+<meta
+  name="description"
+  content="Discover the businesses and brands that trust Growvy for branding, marketing, and web development solutions."
+/>
+  <meta
+    name="keywords"
+    content="digital marketing, branding, web development, social media management"
+  />
+</Helmet>
       {/* GRID BACKGROUND */}
 
       <div

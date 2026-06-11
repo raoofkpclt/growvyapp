@@ -11,6 +11,7 @@ import FAQSection from "../../components/user/FAQSection";
 import { useLanguage } from "../../context/LanguageContext";
 import unoImg from "../../../public/img/vectors/7.png";
 
+import { Helmet } from "react-helmet-async";
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -54,40 +55,40 @@ const UserHome: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
-const positionRef = useRef(0);
-const animationRef = useRef(0);
+  const positionRef = useRef(0);
+  const animationRef = useRef(0);
 
-useEffect(() => {
-  if (clients.length === 0) return;
+  useEffect(() => {
+    if (clients.length === 0) return;
 
-  const startAnimation = () => {
-    const el = marqueeRef.current;
-    if (!el) return;
+    const startAnimation = () => {
+      const el = marqueeRef.current;
+      if (!el) return;
 
-    const singleWidth = el.scrollWidth / 4;
+      const singleWidth = el.scrollWidth / 4;
 
-    const animate = () => {
-      positionRef.current -= 0.5;
+      const animate = () => {
+        positionRef.current -= 0.5;
 
-      if (Math.abs(positionRef.current) >= singleWidth) {
-        positionRef.current = 0;
-      }
+        if (Math.abs(positionRef.current) >= singleWidth) {
+          positionRef.current = 0;
+        }
 
-      el.style.transform = `translateX(${positionRef.current}px)`;
+        el.style.transform = `translateX(${positionRef.current}px)`;
+
+        animationRef.current = requestAnimationFrame(animate);
+      };
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animationRef.current = requestAnimationFrame(animate);
-  };
+    const timer = setTimeout(startAnimation, 1000);
 
-  const timer = setTimeout(startAnimation, 1000);
-
-  return () => {
-    clearTimeout(timer);
-    cancelAnimationFrame(animationRef.current);
-  };
-}, [clients]);
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(animationRef.current);
+    };
+  }, [clients]);
   // ─────────────────────────────────────────────
 
   useEffect(() => {
@@ -101,38 +102,32 @@ useEffect(() => {
   }, []);
 
   // ─────────────────────────────────────────────
-useEffect(() => {
-  console.log("clients updated", clients);
-}, [clients]);
+  useEffect(() => {
+    console.log("clients updated", clients);
+  }, [clients]);
   useEffect(() => {
     (async () => {
       try {
         const snap = await getDocs(collection(db, "clients"));
-console.log("snap",snap.docs)
+        console.log("snap", snap.docs);
         if (!snap.empty) {
-          
           setClients(
-            
             snap.docs.map(
               (d) =>
-                
-                (
-                  
-                  {
-                    
+                ({
                   id: d.id,
                   ...d.data(),
                 }) as Client,
             ),
           );
-          console.log("clients",clients)
+          console.log("clients", clients);
         }
       } catch {
         console.log("error");
-      }finally {
-  setClientsLoading(false);
-  setAppLoading(false)
-}
+      } finally {
+        setClientsLoading(false);
+        setAppLoading(false);
+      }
 
       try {
         const snap = await getDocs(collection(db, "works"));
@@ -170,33 +165,31 @@ console.log("snap",snap.docs)
         console.log("error");
       }
     })();
-
-    
   }, []);
 
   if (appLoading) {
-  return (
-    <div className="fixed inset-0 bg-[#081120] flex items-center justify-center">
-      <div className="relative w-28 h-28">
-        {/* Outer Ring */}
-        <div className="absolute inset-0 rounded-full border-[8px] border-orange-500/20" />
+    return (
+      <div className="fixed inset-0 bg-[#081120] flex items-center justify-center">
+        <div className="relative w-28 h-28">
+          {/* Outer Ring */}
+          <div className="absolute inset-0 rounded-full border-[8px] border-orange-500/20" />
 
-        {/* Animated Ring */}
-        <div className="absolute inset-0 rounded-full border-[8px] border-transparent border-t-orange-500 border-r-yellow-400 animate-spin" />
+          {/* Animated Ring */}
+          <div className="absolute inset-0 rounded-full border-[8px] border-transparent border-t-orange-500 border-r-yellow-400 animate-spin" />
 
-        {/* Inner Glow */}
-        <div className="absolute inset-4 rounded-full bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-lg" />
+          {/* Inner Glow */}
+          <div className="absolute inset-4 rounded-full bg-gradient-to-r from-orange-500/20 to-yellow-400/20 blur-lg" />
 
-        {/* Center Logo */}
-        <img
-          src="/img/logo-1.png"
-          alt="Growvy"
-          className="absolute inset-0 m-auto w-14 h-14 object-contain"
-        />
+          {/* Center Logo */}
+          <img
+            src="/img/logo-1.png"
+            alt="Growvy"
+            className="absolute inset-0 m-auto w-14 h-14 object-contain"
+          />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div
@@ -205,6 +198,35 @@ console.log("snap",snap.docs)
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+      <Helmet>
+        <title>Growvy | Branding Beyond Design</title>
+
+        <meta
+          name="description"
+          content="Growvy helps businesses grow through branding, digital marketing, SEO, content marketing, and web development."
+        />
+        <meta
+          name="keywords"
+          content="digital marketing, branding, web development, social media management"
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Growvy",
+            url: "https://www.growvyofficial.com",
+            logo: "https://www.growvyofficial.com/img/logo-1.png",
+            description:
+              "Growvy is a branding, digital marketing, web development, and creative agency helping businesses grow through strategy and performance marketing.",
+            telephone: "+919074769643",
+            email: "info@growvyofficial.com",
+            sameAs: [
+              "https://www.linkedin.com/company/growvy-official/posts/?feedView=all",
+              "https://www.instagram.com/growvyofficial/",
+            ],
+          })}
+        </script>
+      </Helmet>
       {/* GRID */}
 
       <div
@@ -341,26 +363,27 @@ console.log("snap",snap.docs)
 
             {/* VIDEO */}
 
-             <video
-  ref={videoRef}
-  autoPlay
-  muted
-  loop
-  playsInline
-  preload="auto"
-  onLoadedData={() => console.log("Video loaded")}
-  className="h-auto w-auto object-contain"
-  onError={(e) => {
-    const video = e.currentTarget;
-    console.log("Video Error Code:", video.error?.code);
-    console.log("Video Error:", video.error);
-    console.log("object")
-  }}
->
-  <source src="https://growvy-app-new.s3.ap-south-1.amazonaws.com/WhatsApp+Video+2026-05-27+at+15.47.33.mp4" type="video/mp4" />
-</video>
-
- 
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              onLoadedData={() => console.log("Video loaded")}
+              className="h-auto w-auto object-contain"
+              onError={(e) => {
+                const video = e.currentTarget;
+                console.log("Video Error Code:", video.error?.code);
+                console.log("Video Error:", video.error);
+                console.log("object");
+              }}
+            >
+              <source
+                src="https://growvy-app-new.s3.ap-south-1.amazonaws.com/WhatsApp+Video+2026-05-27+at+15.47.33.mp4"
+                type="video/mp4"
+              />
+            </video>
 
             {/* DARK OVERLAY */}
           </div>
@@ -392,34 +415,35 @@ console.log("snap",snap.docs)
         <div className="absolute bottom-[-100px] right-[20%] w-[300px] h-[300px] bg-blue-500/10 blur-[160px] rounded-full" />
 
         {/* MARQUEE */}
-       {/* MARQUEE */}
-<div className="relative z-20 overflow-hidden">
-  <div
-    ref={marqueeRef}
-    className="flex items-center gap-24 w-max"
-    style={{ willChange: "transform" }}
-  >
-    
-    {[...clients, ...clients, ...clients, ...clients].map((client, index) => (
-      <div
-        key={`${client.id}-${index}`}
-        className="flex items-center justify-center shrink-0"
-      >
-        
-        {client.profileImage ? (
-          <img
-            src={client.profileImage}
-            alt={client.name}
-            className="h-20 md:h-26 w-auto object-contain rounded-xl grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
-          />
-        ) : (
-          <span className="text-white text-2xl font-bold">{client.name}</span>
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-
+        {/* MARQUEE */}
+        <div className="relative z-20 overflow-hidden">
+          <div
+            ref={marqueeRef}
+            className="flex items-center gap-24 w-max"
+            style={{ willChange: "transform" }}
+          >
+            {[...clients, ...clients, ...clients, ...clients].map(
+              (client, index) => (
+                <div
+                  key={`${client.id}-${index}`}
+                  className="flex items-center justify-center shrink-0"
+                >
+                  {client.profileImage ? (
+                    <img
+                      src={client.profileImage}
+                      alt={client.name}
+                      className="h-20 md:h-26 w-auto object-contain rounded-xl grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+                    />
+                  ) : (
+                    <span className="text-white text-2xl font-bold">
+                      {client.name}
+                    </span>
+                  )}
+                </div>
+              ),
+            )}
+          </div>
+        </div>
       </section>
       <section className="relative min-h-screen overflow-hidden bg-[#081120]">
         {/* 3D BACKGROUND */}
@@ -894,22 +918,22 @@ console.log("snap",snap.docs)
         </div>
 
         <div className="max-w-6xl mx-auto">
-  {clientsLoading ? (
-    <div className="flex justify-center items-center py-32">
-      <div className="relative w-20 h-20">
-        {/* Orange Ring */}
-        <div
-          className="
+          {clientsLoading ? (
+            <div className="flex justify-center items-center py-32">
+              <div className="relative w-20 h-20">
+                {/* Orange Ring */}
+                <div
+                  className="
             absolute inset-0
             rounded-full
             border-[6px]
             border-orange-500/20
           "
-        />
+                />
 
-        {/* Animated Ring */}
-        <div
-          className="
+                {/* Animated Ring */}
+                <div
+                  className="
             absolute inset-0
             rounded-full
             border-[6px]
@@ -918,11 +942,11 @@ console.log("snap",snap.docs)
             border-r-yellow-400
             animate-spin
           "
-        />
+                />
 
-        {/* Glow */}
-        <div
-          className="
+                {/* Glow */}
+                <div
+                  className="
             absolute inset-2
             rounded-full
             bg-gradient-to-r
@@ -930,23 +954,23 @@ console.log("snap",snap.docs)
             to-yellow-400/20
             blur-md
           "
-        />
-      </div>
-    </div>
-  ) : (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
-      {clients.slice(0, 12).map((client) => (
-        <div
-          key={client.id}
-          className={`
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
+              {clients.slice(0, 12).map((client) => (
+                <div
+                  key={client.id}
+                  className={`
             flex items-center justify-center h-24
             ${startAnimation ? "logo-reveal" : ""}
           `}
-        >
-          <img
-            src={client.profileImage}
-            alt={client.name}
-            className="
+                >
+                  <img
+                    src={client.profileImage}
+                    alt={client.name}
+                    className="
               h-28 md:h-32 lg:h-36
               w-auto
               object-contain
@@ -959,12 +983,12 @@ console.log("snap",snap.docs)
               transition-all
               duration-500
             "
-          />
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
       </section>
 
       {/* CONTACT */}

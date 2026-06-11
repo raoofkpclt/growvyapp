@@ -4,6 +4,10 @@ import { translations, values } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
 
+import { Helmet } from "react-helmet-async";
+
+
+
 const About: React.FC = () => {
   const { language, changeLanguage } = useLanguage();
 
@@ -16,6 +20,21 @@ const About: React.FC = () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
+
+      <Helmet>
+  <title>
+About Growvy | Creative Digital Agency
+</title>
+
+<meta
+  name="description"
+  content="Learn about Growvy, our mission, creative team, and how we help businesses grow through innovative digital solutions."
+/>
+  <meta
+    name="keywords"
+    content="digital marketing, branding, web development, social media management"
+  />
+</Helmet>
       {/* GRID BACKGROUND */}
 
       <div
