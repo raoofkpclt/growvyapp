@@ -935,7 +935,7 @@ console.log("snap",snap.docs)
     </div>
   ) : (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
-      {clients.slice(0, 12).map((client, index) => (
+      {clients.slice(0, 12).map((client) => (
         <div
           key={client.id}
           className={`
