@@ -61,6 +61,18 @@ const UserHome: React.FC = () => {
   const [contactType, setContactType] = useState<"call" | "whatsapp" | null>(null);
 
   useEffect(() => {
+  if (contactType) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [contactType]);
+
+  useEffect(() => {
     if (clients.length === 0) return;
 
     const startAnimation = () => {
