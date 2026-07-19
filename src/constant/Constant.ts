@@ -359,7 +359,7 @@ export const translations = {
 
     ourStory: "قصتنا",
 
-    storyTitle1: "اللحظة التي",
+    storyTitle1: "اللحظة التي ",
     storyTitle2: "صنعت علامة تجارية",
 
     storyDesc1:

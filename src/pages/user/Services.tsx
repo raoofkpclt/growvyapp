@@ -80,7 +80,7 @@ Digital Marketing Services | Growvy
             <div className="w-10 h-px bg-yellow-400" />
           </div>
 
-          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
+          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {language === "en" ? "The process" : "الرحلة"}
 
             <br />
@@ -127,7 +127,7 @@ Digital Marketing Services | Growvy
               <div className="w-10 h-px bg-yellow-400" /> */}
             </div>
 
-            <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+            <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
               {t.servicesPageTitle1}
               <span className="block text-orange-400">
                 {t.servicesPageTitle2}

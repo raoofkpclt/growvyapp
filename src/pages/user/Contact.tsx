@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Nav from "../../components/user/Modal/Nav";
 import { translations } from "../../constant/Constant";
 import Footer from "../../components/user/Footer";
@@ -12,6 +12,7 @@ import { Helmet } from "react-helmet-async";
 
 const Contact : React.FC= () => {
   const { language, changeLanguage } = useLanguage();
+  const [contactType, setContactType] = useState<"call" | "whatsapp" | null>(null);
 
   const t = translations[language];
 
@@ -76,15 +77,17 @@ Contact Growvy | Start Your Next Project
             <div className="w-10 h-px bg-yellow-400" />
           </div>
 
-          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
+          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[1.2] tracking-[-0.05em]">
             {language === "en" ? "Let's Build" : "لنصنع"}
 
             <br />
+            
 
             <span className="text-orange-400">
               {language === "en" ? "Something Great" : "شيئًا رائعًا"}
             </span>
           </h1>
+          
 
           <p className="max-w-[750px] mx-auto mt-8 text-white/60 text-lg leading-[2]">
             {language === "en"
@@ -107,76 +110,73 @@ Contact Growvy | Start Your Next Project
 
         {/* BUTTONS */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-16">
-          {/* CALL */}
-          <a
-            href="tel:+919074769643"
-            className="
-      group
-      inline-flex
-      items-center
-      gap-3
-      px-8
-      py-4
-      rounded-full
-      border
-      border-orange-400/40
-      bg-white/5
-      backdrop-blur-xl
-      text-white
-      text-lg
-      font-semibold
-      shadow-[0_0_25px_rgba(251,146,60,0.2)]
-      hover:border-orange-400
-      hover:bg-orange-500/10
-      hover:shadow-[0_0_40px_rgba(251,146,60,0.4)]
-      hover:scale-105
-      transition-all
-      duration-300
-    "
-          >
-            <span>{t.callUs}</span>
+             {/* CALL */}
+<button
+  onClick={() => setContactType("call")}
+  className="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white text-lg font-semibold shadow-[0_0_25px_rgba(251,146,60,0.2)] hover:border-orange-400 hover:bg-orange-500/10 hover:shadow-[0_0_40px_rgba(251,146,60,0.4)] hover:scale-105 transition-all duration-300"
+>
+  <span>{t.callUs}</span>
+  <span className="group-hover:translate-x-1 transition-transform">→</span>
+</button>
 
-            <span className="group-hover:translate-x-1 transition-transform duration-300">
-              →
-            </span>
-          </a>
+{/* WHATSAPP */}
+<button
+  onClick={() => setContactType("whatsapp")}
+  className="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white text-lg font-semibold shadow-[0_0_25px_rgba(251,146,60,0.2)] hover:border-orange-400 hover:bg-orange-500/10 hover:shadow-[0_0_40px_rgba(251,146,60,0.4)] hover:scale-105 transition-all duration-300"
+>
+  <span>{t.whatsappUs}</span>
+  <span className="group-hover:translate-x-1 transition-transform">→</span>
+</button>
 
-          {/* WHATSAPP */}
-          <a
-            href="https://wa.me/919074769643"
-            target="_blank"
-            rel="noreferrer"
-            className="
-      group
-      inline-flex
-      items-center
-      gap-3
-      px-8
-      py-4
-      rounded-full
-      border
-      border-orange-400/40
-      bg-white/5
-      backdrop-blur-xl
-      text-white
-      text-lg
-      font-semibold
-      shadow-[0_0_25px_rgba(251,146,60,0.2)]
-      hover:border-orange-400
-      hover:bg-orange-500/10
-      hover:shadow-[0_0_40px_rgba(251,146,60,0.4)]
-      hover:scale-105
-      transition-all
-      duration-300
-    "
-          >
-            <span>{t.whatsappUs}</span>
+{contactType && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="w-[340px] rounded-3xl bg-[#111827] border border-white/10 p-6">
+      <h3 className="text-2xl font-bold text-white text-center">
+        Select Country
+      </h3>
 
-            <span className="group-hover:translate-x-1 transition-transform duration-300">
-              →
-            </span>
-          </a>
-        </div>
+      <p className="text-white/60 text-center mt-2 mb-6">
+        Choose the contact number
+      </p>
+
+      <div className="space-y-4">
+        {/* INDIA */}
+        <a
+          href={
+            contactType === "call"
+              ? "tel:+919074769643"
+              : "https://wa.me/919074769643"
+          }
+          className="flex items-center justify-between rounded-xl bg-white/5 hover:bg-orange-500/20 border border-white/10 p-4 transition"
+        >
+          <span className="text-white text-lg">🇮🇳 India</span>
+          <span className="text-orange-400">→</span>
+        </a>
+
+        {/* KSA */}
+        <a
+          href={
+            contactType === "call"
+              ? "tel:+966597780455"
+              : "https://wa.me/966597780455"
+          }
+          className="flex items-center justify-between rounded-xl bg-white/5 hover:bg-orange-500/20 border border-white/10 p-4 transition"
+        >
+          <span className="text-white text-lg">🇸🇦 Saudi Arabia</span>
+          <span className="text-orange-400">→</span>
+        </a>
+      </div>
+
+      <button
+        onClick={() => setContactType(null)}
+        className="w-full mt-6 rounded-xl bg-white/10 py-3 text-white hover:bg-white/20 transition"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+          </div>
       </section>
 
       {/* MAP / EXTRA SECTION */}

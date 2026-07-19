@@ -72,7 +72,7 @@ About Growvy | Creative Digital Agency
           </div>
 
           {/* HEADING */}
-          <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
+          <h1 className="text-[clamp(3.5rem,8vw,7rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.aboutHeroTitle1}
             <br />
 

@@ -151,7 +151,7 @@ Our Portfolio | Creative Projects by Growvy
             <div className="w-10 h-px bg-yellow-400" />
           </div>
 
-          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[0.9] tracking-[-0.05em]">
+          <h1 className="text-[clamp(3rem,8vw,7rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.portfolioTitle1}
             <br />
 

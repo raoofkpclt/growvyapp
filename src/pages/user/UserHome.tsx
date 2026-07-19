@@ -58,6 +58,8 @@ const UserHome: React.FC = () => {
   const positionRef = useRef(0);
   const animationRef = useRef(0);
 
+  const [contactType, setContactType] = useState<"call" | "whatsapp" | null>(null);
+
   useEffect(() => {
     if (clients.length === 0) return;
 
@@ -463,7 +465,7 @@ const UserHome: React.FC = () => {
           </div>
 
           {/* TITLE */}
-          <h1 className="text-[clamp(3rem,9vw,8rem)] font-black leading-[0.95] tracking-[-0.05em] text-white">
+          <h1 className="text-[clamp(3rem,9vw,8rem)] font-black leading-[1.05] tracking-[-0.05em] text-white">
             {t.heroTitle1}
             <br />
             <span className="text-orange-400">{t.heroTitle2}</span>
@@ -550,14 +552,16 @@ const UserHome: React.FC = () => {
             className="
     text-[clamp(2rem,8vw,8rem)]
     font-black
-    leading-[0.85]
+    leading-[1.05]
     tracking-[-0.08em]
     text-white
     uppercase
     drop-shadow-[0_0_60px_rgba(34,211,238,0.45)]
+    
   "
           >
             {t.brandingTagline1}
+            
             <span className="block text-orange-400">{t.brandingTagline2}</span>
           </h2>
         </div>
@@ -599,7 +603,7 @@ const UserHome: React.FC = () => {
           <SectionLabel>{t.whoWeAre}</SectionLabel>
 
           {/* TITLE */}
-          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.aboutTitle1}
             <br />
             <span className="text-orange-400">{t.aboutTitle2}</span>
@@ -663,7 +667,7 @@ const UserHome: React.FC = () => {
         <div className="relative z-10">
           <SectionLabel>{t.whatWeDo}</SectionLabel>
 
-          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.creativeDigital}
             <span className="block text-orange-400">{t.solutions}</span>
           </h2>
@@ -737,7 +741,7 @@ const UserHome: React.FC = () => {
         <SectionLabel>{t.nav.works}</SectionLabel>
 
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
-          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.worksTitle1}
             <span className="block text-orange-400">{t.worksTitle2}</span>
           </h2>
@@ -851,7 +855,7 @@ const UserHome: React.FC = () => {
           <SectionLabel>{t.whyChooseGrowvy}</SectionLabel>
 
           <div className="max-w-[900px]">
-            <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+            <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
               {t.whyTitle1}
               <span className="block text-orange-400">{t.whyTitle2}</span>
             </h2>
@@ -1003,7 +1007,7 @@ const UserHome: React.FC = () => {
           <SectionLabel>{t.nav.contact}</SectionLabel>
 
           {/* HEADING */}
-          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[0.95] tracking-[-0.05em]">
+          <h2 className="text-[clamp(3rem,7vw,6rem)] font-black leading-[1.05] tracking-[-0.05em]">
             {t.contactTitle1}
             <span className="block text-orange-400">{t.contactTitle2}</span>
           </h2>
@@ -1019,76 +1023,75 @@ const UserHome: React.FC = () => {
 
           {/* BUTTONS */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-16">
-            {/* CALL */}
-            <a
-              href="tel:+919074769643"
-              className="
-      group
-      inline-flex
-      items-center
-      gap-3
-      px-8
-      py-4
-      rounded-full
-      border
-      border-orange-400/40
-      bg-white/5
-      backdrop-blur-xl
-      text-white
-      text-lg
-      font-semibold
-      shadow-[0_0_25px_rgba(251,146,60,0.2)]
-      hover:border-orange-400
-      hover:bg-orange-500/10
-      hover:shadow-[0_0_40px_rgba(251,146,60,0.4)]
-      hover:scale-105
-      transition-all
-      duration-300
-    "
-            >
-              <span>{t.callUs}</span>
+             {/* CALL */}
+<button
+  onClick={() => setContactType("call")}
+  className="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white text-lg font-semibold shadow-[0_0_25px_rgba(251,146,60,0.2)] hover:border-orange-400 hover:bg-orange-500/10 hover:shadow-[0_0_40px_rgba(251,146,60,0.4)] hover:scale-105 transition-all duration-300"
+>
+  <span>{t.callUs}</span>
+  <span className="group-hover:translate-x-1 transition-transform">→</span>
+</button>
 
-              <span className="group-hover:translate-x-1 transition-transform duration-300">
-                →
-              </span>
-            </a>
+{/* WHATSAPP */}
+<button
+  onClick={() => setContactType("whatsapp")}
+  className="group inline-flex items-center gap-3 px-8 py-4 rounded-full border border-orange-400/40 bg-white/5 backdrop-blur-xl text-white text-lg font-semibold shadow-[0_0_25px_rgba(251,146,60,0.2)] hover:border-orange-400 hover:bg-orange-500/10 hover:shadow-[0_0_40px_rgba(251,146,60,0.4)] hover:scale-105 transition-all duration-300"
+>
+  <span>{t.whatsappUs}</span>
+  <span className="group-hover:translate-x-1 transition-transform">→</span>
+</button>
 
-            {/* WHATSAPP */}
-            <a
-              href="https://wa.me/919074769643"
-              target="_blank"
-              rel="noreferrer"
-              className="
-      group
-      inline-flex
-      items-center
-      gap-3
-      px-8
-      py-4
-      rounded-full
-      border
-      border-orange-400/40
-      bg-white/5
-      backdrop-blur-xl
-      text-white
-      text-lg
-      font-semibold
-      shadow-[0_0_25px_rgba(251,146,60,0.2)]
-      hover:border-orange-400
-      hover:bg-orange-500/10
-      hover:shadow-[0_0_40px_rgba(251,146,60,0.4)]
-      hover:scale-105
-      transition-all
-      duration-300
-    "
-            >
-              <span>{t.whatsappUs}</span>
+{contactType && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="w-[340px] rounded-3xl bg-[#111827] border border-white/10 p-6">
+      <h3 className="text-2xl font-bold text-white text-center">
+        Select Country
+      </h3>
 
-              <span className="group-hover:translate-x-1 transition-transform duration-300">
-                →
-              </span>
-            </a>
+      <p className="text-white/60 text-center mt-2 mb-6">
+        Choose the contact number
+      </p>
+
+      <div className="space-y-4">
+        {/* INDIA */}
+        <a
+          href={
+            contactType === "call"
+              ? "tel:+919074769643"
+              : "https://wa.me/919074769643"
+          }
+          className="flex items-center justify-between rounded-xl bg-white/5 hover:bg-orange-500/20 border border-white/10 p-4 transition"
+        >
+          <span className="text-white text-lg">🇮🇳 India</span>
+          <span className="text-orange-400">→</span>
+        </a>
+
+        {/* KSA */}
+        <a
+          href={
+            contactType === "call"
+              ? "tel:+966597780455"
+              : "https://wa.me/966597780455"
+          }
+          className="flex items-center justify-between rounded-xl bg-white/5 hover:bg-orange-500/20 border border-white/10 p-4 transition"
+        >
+          <span className="text-white text-lg">🇸🇦 Saudi Arabia</span>
+          <span className="text-orange-400">→</span>
+        </a>
+      </div>
+
+      <button
+        onClick={() => setContactType(null)}
+        className="w-full mt-6 rounded-xl bg-white/10 py-3 text-white hover:bg-white/20 transition"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
           </div>
+
+         
         </div>
       </section>
 
