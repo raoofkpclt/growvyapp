@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCreatives, deleteCreative } from "../../service/workService";
 import type { Creative, Client } from "../../utils/types/Types";
 import AddCreativeModal from "./Modal/AddCreativeModal";
+import ReelPreview from "../admin/Modal/ReelPreview";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase/firebase";
 
@@ -23,7 +24,8 @@ const WorkManagement: React.FC = () => {
         : creatives.filter((c) => c.type === workFilter);
 
   useEffect(() => {
-    console.log(loadingClients,)
+    console.log(loadingClients);
+
     const fetchClients = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "clients"));
@@ -43,7 +45,6 @@ const WorkManagement: React.FC = () => {
 
     const fetchCreatives = async () => {
       const data = await getCreatives();
-
       setCreatives(data);
     };
 
@@ -60,7 +61,6 @@ const WorkManagement: React.FC = () => {
 
     try {
       await deleteCreative(id);
-
       setCreatives((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.log(error);
@@ -71,6 +71,7 @@ const WorkManagement: React.FC = () => {
   return (
     <div>
       <div className="animate-fade-in space-y-6">
+        {/* Filters + Upload */}
         <div className="flex flex-wrap items-center gap-3 justify-between">
           <div className="flex gap-2 flex-wrap">
             {[
@@ -86,12 +87,17 @@ const WorkManagement: React.FC = () => {
               <button
                 key={f.val}
                 onClick={() => setWorkFilter(f.val)}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${workFilter === f.val ? "bg-violet-500/15 border-violet-500/30 text-violet-300" : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"}`}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                  workFilter === f.val
+                    ? "bg-violet-500/15 border-violet-500/30 text-violet-300"
+                    : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
+                }`}
               >
                 {f.label}
               </button>
             ))}
           </div>
+
           <button
             onClick={() => setShowAddCreative(true)}
             className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
@@ -100,9 +106,11 @@ const WorkManagement: React.FC = () => {
           </button>
         </div>
 
+        {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredCreatives.map((c) => {
             const owner = clients.find((cl) => cl.id === c.clientId);
+
             return (
               <div
                 key={c.id}
@@ -117,40 +125,9 @@ const WorkManagement: React.FC = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   )}
-                  {c.type === "reel" && (
-  <>
-    {c.thumbnailUrl ? (
-      <div className="relative w-full h-full overflow-hidden">
-        <img
-          src={c.thumbnailUrl}
-          alt={c.title}
-          className="
-            w-full
-            h-full
-            object-cover
-            group-hover:scale-105
-            transition-transform
-            duration-500
-          "
-        />
 
-        {/* Play Overlay */}
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-          <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-            <span className="text-black text-xl ml-1">▶</span>
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-900/30 to-fuchsia-900/30">
-        <div className="text-center">
-          <div className="text-3xl mb-2">▶</div>
-          <p className="text-xs text-zinc-400">Instagram Reel</p>
-        </div>
-      </div>
-    )}
-  </>
-)}
+                  {c.type === "reel" && <ReelPreview creative={c} />}
+
                   {c.type === "website" && (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-sky-900/30 to-cyan-900/30">
                       <div className="text-center">
@@ -159,21 +136,24 @@ const WorkManagement: React.FC = () => {
                       </div>
                     </div>
                   )}
+
                   <span
-                    className={`absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full border
-                          ${c.type === "poster" ? "bg-violet-500/20 text-violet-300 border-violet-500/30" : ""}
-                          ${c.type === "reel" ? "bg-pink-500/20 text-pink-300 border-pink-500/30" : ""}
-                          ${c.type === "website" ? "bg-sky-500/20 text-sky-300 border-sky-500/30" : ""}
-                        `}
+                    className={`absolute top-2 right-2 z-10 text-[10px] font-semibold px-2 py-0.5 rounded-full border
+                      ${c.type === "poster" ? "bg-violet-500/20 text-violet-300 border-violet-500/30" : ""}
+                      ${c.type === "reel" ? "bg-pink-500/20 text-pink-300 border-pink-500/30" : ""}
+                      ${c.type === "website" ? "bg-sky-500/20 text-sky-300 border-sky-500/30" : ""}
+                    `}
                   >
                     {c.type}
                   </span>
                 </div>
 
+                {/* Details */}
                 <div className="p-4">
                   <p className="text-sm text-white font-medium truncate">
                     {c.title}
                   </p>
+
                   <div className="flex items-center gap-2 mt-1.5">
                     {owner && (
                       <img
@@ -185,27 +165,12 @@ const WorkManagement: React.FC = () => {
                     <p className="text-xs text-zinc-500 truncate">
                       {owner?.name}
                     </p>
-                    <button
-                      onClick={() => handleDelete(c.id!)}
-                      className="
-    flex
-    items-center
-    justify-center
-    gap-2
-    w-full
-    py-2
-    rounded-xl
-    bg-red-500/10
-    text-red-400
-    hover:bg-red-500/20
-    transition-all
-  "
-                    >
-                      🗑 Delete
-                    </button>
                   </div>
+
                   <p className="text-xs text-zinc-700 mt-1">{c.uploadedAt}</p>
-                  <div className="mt-3 flex gap-2">
+
+                  {/* Links */}
+                  <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                     {c.type === "reel" && c.instagramUrl && (
                       <a
                         href={c.instagramUrl}
@@ -216,6 +181,18 @@ const WorkManagement: React.FC = () => {
                         View on Instagram
                       </a>
                     )}
+
+                    {c.type === "reel" && c.videoUrl && (
+                      <a
+                        href={c.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-violet-400 hover:text-violet-300 underline truncate"
+                      >
+                        Watch Video
+                      </a>
+                    )}
+
                     {c.type === "website" && c.websiteUrl && (
                       <a
                         href={c.websiteUrl}
@@ -227,6 +204,14 @@ const WorkManagement: React.FC = () => {
                       </a>
                     )}
                   </div>
+
+                  {/* Delete */}
+                  <button
+                    onClick={() => handleDelete(c.id!)}
+                    className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
+                  >
+                    🗑 Delete
+                  </button>
                 </div>
               </div>
             );
@@ -240,12 +225,12 @@ const WorkManagement: React.FC = () => {
           )}
         </div>
       </div>
+
       {showAddCreative && (
         <AddCreativeModal
           onClose={() => setShowAddCreative(false)}
           onSave={(newCreative) => {
             setCreatives((prev) => [newCreative, ...prev]);
-
             setShowAddCreative(false);
           }}
           clients={clients}

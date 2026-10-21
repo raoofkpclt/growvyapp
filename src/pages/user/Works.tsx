@@ -1,6 +1,6 @@
 // src/pages/user/Works.tsx
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { collection, getDocs } from "firebase/firestore";
 
@@ -13,10 +13,6 @@ import Footer from "../../components/user/Footer";
 import { useLanguage } from "../../context/LanguageContext";
 
 import { Helmet } from "react-helmet-async";
-
-
-
-
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -36,6 +32,8 @@ interface Work {
   logoUrl?: string;
   thumbnailUrl?: string;
 
+  videoUrl?: string;
+
   instagramUrl?: string;
 
   websiteUrl?: string;
@@ -44,8 +42,133 @@ interface Work {
 }
 
 // ─────────────────────────────────────────────
+// REEL CARD
+// - thumbnail  -> shown first, card height = thumbnail's original ratio
+// - no thumb   -> the video itself is shown (first frame), original ratio
+// - hover      -> video loads and autoplays (muted, looped)
+// - touch      -> tap toggles playback
+// ─────────────────────────────────────────────
 
-const Works : React.FC= () => {
+const ReelCard: React.FC<{ work: Work }> = ({ work }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [load, setLoad] = useState(false); // true after first hover
+  const [hovering, setHovering] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  const hasVideo = !!work.videoUrl;
+  const hasThumb = !!work.thumbnailUrl;
+
+  // Without a thumbnail the video element is always mounted (to show frame 1)
+  const mountVideo = hasVideo && (load || !hasThumb);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    if (hovering && ready) {
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+      v.currentTime = hasThumb ? 0 : 0.001;
+    }
+  }, [hovering, ready, hasThumb]);
+
+  const start = () => {
+    if (!hasVideo) return;
+    setLoad(true);
+    setHovering(true);
+  };
+
+  const stop = () => setHovering(false);
+
+  const isTouch = () => window.matchMedia("(hover: none)").matches;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (hasVideo && isTouch()) {
+      e.preventDefault();
+      setLoad(true);
+      setHovering((h) => !h);
+      return;
+    }
+    // desktop click -> Instagram (if there is a link)
+    if (!work.instagramUrl) e.preventDefault();
+  };
+
+  const showSpinner = hovering && mountVideo && !ready;
+  const showVideo = hovering && ready;
+
+  const content = (
+    <div className="relative w-full bg-black overflow-hidden">
+      {/* Base layer: thumbnail or video's first frame (sets the ratio) */}
+      {hasThumb ? (
+        <img
+          src={work.thumbnailUrl}
+          alt={work.title || "Reel"}
+          className="block w-full h-auto"
+        />
+      ) : hasVideo ? null : (
+        <div className="w-full aspect-[9/16] flex items-center justify-center bg-white/5 text-white/40 text-sm">
+          Reel
+        </div>
+      )}
+
+      {mountVideo && (
+        <video
+          ref={videoRef}
+          src={hasThumb ? work.videoUrl : `${work.videoUrl}#t=0.001`}
+          muted
+          loop
+          playsInline
+          preload={hasThumb ? "auto" : "metadata"}
+          onCanPlay={() => setReady(true)}
+          onError={() => setReady(false)}
+          className={
+            hasThumb
+              ? `absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+                  showVideo ? "opacity-100" : "opacity-0"
+                }`
+              : "block w-full h-auto"
+          }
+        />
+      )}
+
+      {/* Play icon (idle) */}
+      {hasVideo && !hovering && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+            <span className="text-black text-2xl ml-1">▶</span>
+          </div>
+        </div>
+      )}
+
+      {/* Spinner while buffering */}
+      {showSpinner && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center pointer-events-none">
+          <div className="w-10 h-10 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <a
+      href={work.instagramUrl || undefined}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block"
+      onMouseEnter={start}
+      onMouseLeave={stop}
+      onClick={handleClick}
+    >
+      {content}
+    </a>
+  );
+};
+
+// ─────────────────────────────────────────────
+
+const Works: React.FC = () => {
   const { language, changeLanguage } = useLanguage();
 
   const [works, setWorks] = useState<Work[]>([]);
@@ -97,22 +220,18 @@ const Works : React.FC= () => {
         language === "ar" ? "font-[Cairo]" : "font-sans"
       }`}
     >
-
       <Helmet>
-  <title>
-Our Portfolio | Creative Projects by Growvy
-</title>
+        <title>Our Portfolio | Creative Projects by Growvy</title>
 
-<meta
-  name="description"
-  content="View our portfolio showcasing branding, website design, marketing campaigns, and creative projects delivered for clients."
-/>
-  <meta
-    name="keywords"
-    content="digital marketing, branding, web development, social media management"
-  />
-</Helmet>
-
+        <meta
+          name="description"
+          content="View our portfolio showcasing branding, website design, marketing campaigns, and creative projects delivered for clients."
+        />
+        <meta
+          name="keywords"
+          content="digital marketing, branding, web development, social media management"
+        />
+      </Helmet>
 
       {/* GRID BACKGROUND */}
 
@@ -193,7 +312,7 @@ Our Portfolio | Creative Projects by Growvy
         </div>
       </section>
 
-      {/* WORKS GRID */}
+      {/* WORKS GRID (masonry: every card keeps its original ratio) */}
 
       <section className="px-[5%] pb-32">
         <div className="max-w-[1600px] mx-auto">
@@ -206,21 +325,23 @@ Our Portfolio | Creative Projects by Growvy
               <h2 className="text-4xl font-black">No Works Found</h2>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="columns-1 sm:columns-2 lg:columns-3 gap-8">
               {filteredWorks.map((work) => (
                 <div
                   key={work.firestoreId}
                   className="
-      group
-      overflow-hidden
-      rounded-[30px]
-      bg-white/5
-      border
-      border-white/10
-      hover:border-orange-400/30
-      transition-all
-      duration-500
-    "
+                    mb-8
+                    break-inside-avoid
+                    group
+                    overflow-hidden
+                    rounded-[30px]
+                    bg-white/5
+                    border
+                    border-white/10
+                    hover:border-orange-400/30
+                    transition-all
+                    duration-500
+                  "
                 >
                   {/* WEBSITE */}
                   {work.type === "website" ? (
@@ -229,58 +350,36 @@ Our Portfolio | Creative Projects by Growvy
                       target="_blank"
                       rel="noopener noreferrer"
                       className="
-    h-[420px]
-    bg-white
-    flex
-    items-center
-    justify-center
-    p-12
-  "
+                        h-[420px]
+                        bg-white
+                        flex
+                        items-center
+                        justify-center
+                        p-12
+                      "
                     >
                       <img
                         src={work.logoUrl}
                         alt=""
                         className="
-      w-[85%]
-      h-[85%]
-      object-contain
-      transition-all
-      duration-700
-      group-hover:scale-105
-    "
+                          w-[85%]
+                          h-[85%]
+                          object-contain
+                          transition-all
+                          duration-700
+                          group-hover:scale-105
+                        "
                       />
                     </a>
                   ) : work.type === "reel" ? (
                     /* REEL */
-                    <a
-                      href={work.instagramUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      <img
-                        src={work.thumbnailUrl}
-                        alt="Tp"
-                        className="
-            w-full
-            h-[420px]
-            object-cover
-            transition-all
-            duration-500
-            group-hover:scale-[1.02]
-          "
-                      />
-                    </a>
+                    <ReelCard work={work} />
                   ) : (
                     /* POSTER */
                     <img
                       src={work.imageUrl}
-                      alt=""
-                      className="
-          w-full
-          h-auto
-          block
-        "
+                      alt={work.title || ""}
+                      className="w-full h-auto block"
                     />
                   )}
                 </div>

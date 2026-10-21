@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal, Field } from "./Modal";
 import type { Client, Creative } from "../../../utils/types/Types";
 import { addCreative } from "../../../service/workService";
@@ -19,10 +19,24 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
     type: "poster" as Creative["type"],
     title: "",
     imageUrl: "",
-    thumbnailUrl:"",
+    thumbnailUrl: "",
     instagramUrl: "",
     websiteUrl: "",
   });
+  const [reelVideo, setReelVideo] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+
+  // local preview of the selected video
+  const videoPreview = useMemo(
+    () => (reelVideo ? URL.createObjectURL(reelVideo) : ""),
+    [reelVideo],
+  );
+  useEffect(() => {
+    return () => {
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
+    };
+  }, [videoPreview]);
 
   const handleAddCreative = async () => {
     try {
@@ -69,17 +83,33 @@ const AddCreativeModal = ({ onClose, onSave, clients }: Props) => {
       // =========================
       // REEL
       // =========================
-      else if (creativeForm.type === "reel") {
-        if (!reelThumbnail) {
-  alert("Select reel thumbnail");
-  return;
-}
+      // else if (creativeForm.type === "reel") {
+      //   if (!reelThumbnail) {
+      //     alert("Select reel thumbnail");
+      //     return;
+      //   }
 
-savedCreative = await addCreative(
-  creativeData,
-  reelThumbnail
-);
-setReelThumbnail(null);
+      //   savedCreative = await addCreative(creativeData, reelThumbnail);
+      //   setReelThumbnail(null);
+      // }
+      else if (creativeForm.type === "reel") {
+        if (!reelVideo && !creativeForm.instagramUrl) {
+          alert("Upload a reel video or add an Instagram URL");
+          return;
+        }
+
+        if (reelVideo && !reelVideo.type.startsWith("video/")) {
+          alert("Please select a valid video file");
+          return;
+        }
+
+        setUploading(true);
+        setUploadProgress(0);
+
+        savedCreative = await addCreative(creativeData, reelThumbnail, {
+          video: reelVideo,
+          onProgress: setUploadProgress,
+        });
       }
 
       // =========================
@@ -104,13 +134,16 @@ setReelThumbnail(null);
         type: "poster",
         title: "",
         imageUrl: "",
-        thumbnailUrl:"",
+        thumbnailUrl: "",
         instagramUrl: "",
         websiteUrl: "",
       });
 
       setPosterFile(null);
       setWebsiteLogo(null);
+      setReelThumbnail(null);
+      setReelVideo(null);
+      setUploadProgress(0);
 
       alert("Creative Added");
 
@@ -223,6 +256,41 @@ setReelThumbnail(null);
             }
             placeholder="https://www.instagram.com/reel/..."
           />
+        )}
+
+        {creativeForm.type === "reel" && (
+          <div className="space-y-4">
+            <Field
+              label="Instagram Reel URL"
+              value={creativeForm.instagramUrl}
+              onChange={(e) =>
+                setCreativeForm((p) => ({
+                  ...p,
+                  instagramUrl: e.target.value,
+                }))
+              }
+              placeholder="https://www.instagram.com/reel/..."
+            />
+
+            <div>
+              <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
+                Reel Thumbnail
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setReelThumbnail(e.target.files?.[0] || null)}
+                className="w-full mt-2"
+              />
+
+              {reelThumbnail && (
+                <p className="text-xs text-zinc-500 mt-1">
+                  Selected: {reelThumbnail.name}
+                </p>
+              )}
+            </div>
+          </div>
         )} */}
 
         {creativeForm.type === "reel" && (
@@ -231,30 +299,66 @@ setReelThumbnail(null);
       label="Instagram Reel URL"
       value={creativeForm.instagramUrl}
       onChange={(e) =>
-        setCreativeForm((p) => ({
-          ...p,
-          instagramUrl: e.target.value,
-        }))
+        setCreativeForm((p) => ({ ...p, instagramUrl: e.target.value }))
       }
       placeholder="https://www.instagram.com/reel/..."
     />
 
+    {/* Video upload */}
     <div>
       <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
-        Reel Thumbnail
+        Reel Video
       </label>
-
       <input
         type="file"
-        accept="image/*"
-        onChange={(e) => setReelThumbnail(e.target.files?.[0] || null)}
+        accept="video/*"
+        disabled={uploading}
+        onChange={(e) => setReelVideo(e.target.files?.[0] || null)}
         className="w-full mt-2"
       />
 
-      {reelThumbnail && (
+      {reelVideo && (
         <p className="text-xs text-zinc-500 mt-1">
-          Selected: {reelThumbnail.name}
+          {reelVideo.name} · {(reelVideo.size / (1024 * 1024)).toFixed(1)} MB
         </p>
+      )}
+
+      {videoPreview && (
+        <video
+          src={videoPreview}
+          controls
+          preload="metadata"
+          className="mt-3 w-full max-h-64 rounded-xl bg-black"
+        />
+      )}
+
+      {uploading && (
+        <div className="mt-3">
+          <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full bg-violet-500 transition-all"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">{uploadProgress}% uploaded</p>
+        </div>
+      )}
+    </div>
+
+    {/* Thumbnail */}
+    <div>
+      <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
+        Reel Thumbnail (optional)
+      </label>
+      <input
+        type="file"
+        accept="image/*"
+        disabled={uploading}
+        onChange={(e) => setReelThumbnail(e.target.files?.[0] || null)}
+        className="w-full mt-2"
+      />
+      {reelThumbnail && (
+        <p className="text-xs text-zinc-500 mt-1">Selected: {reelThumbnail.name}</p>
       )}
     </div>
   </div>
@@ -301,7 +405,7 @@ setReelThumbnail(null);
 
         {/* Buttons */}
         <div className="flex gap-3 pt-1">
-          <button
+          {/* <button
             onClick={onClose}
             className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
           >
@@ -313,6 +417,22 @@ setReelThumbnail(null);
             className="flex-1 py-2.5 rounded-xl text-sm bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors"
           >
             Save Creative
+          </button> */}
+
+          <button
+            onClick={onClose}
+            disabled={uploading}
+            className="... disabled:opacity-40"
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleAddCreative}
+            disabled={uploading}
+            className="flex-1 py-2.5 rounded-xl text-sm bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors disabled:opacity-50"
+          >
+            {uploading ? `Uploading… ${uploadProgress}%` : "Save Creative"}
           </button>
         </div>
       </div>

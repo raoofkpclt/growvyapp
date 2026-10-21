@@ -5,6 +5,7 @@ import { auth } from "../../config/firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import ClientManagement from "../../components/admin/ClientManagement";
 import WorkManagement from "../../components/admin/WorkManagement";
+import BillsManagement from "../../components/admin/BillsManagement";
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({
@@ -117,7 +118,7 @@ const TextAreaField = ({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Home : React.FC= () => {
-  const [tab, setTab] = useState<"dashboard" | "clients" | "work">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "clients" | "work"|"bills">("dashboard");
   const [clients, setClients] = useState<Client[]>([]);
   const [creatives, setCreatives] = useState<Creative[]>([]);
   const [showEditClient, setShowEditClient] = useState<Client | null>(null);
@@ -164,11 +165,12 @@ const Home : React.FC= () => {
 
   const trafficData = [40, 65, 50, 80, 55, 90, 70, 88, 60, 95, 72, 85];
 
-  const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: "⬡" },
-    { id: "clients", label: "Clients", icon: "◈" },
-    { id: "work", label: "Work", icon: "◧" },
-  ];
+const navItems = [
+  { id: "dashboard", label: "Dashboard", icon: "⬡" },
+  { id: "clients", label: "Clients", icon: "◈" },
+  { id: "work", label: "Work", icon: "◧" },
+  { id: "bills", label: "Bills", icon: "▤" },
+];
 
   const handleLogout = async () => {
     try {
@@ -503,6 +505,8 @@ const Home : React.FC= () => {
 
           {/* ══ WORK ══ */}
           {tab === "work" && <WorkManagement />}
+          {/* ══ BILLS ══ */}
+          {tab === "bills" && <BillsManagement />}
         </div>
       </main>
 

@@ -928,10 +928,16 @@ const UserHome: React.FC = () => {
         <div className="text-center mb-16">
           <SectionLabel>{t.trustedBy}</SectionLabel>
 
-          <h2 className="text-5xl font-black text-black mt-4">
+          {/* <h2 className="text-5xl font-black text-black mt-4">
             {t.trustedByTitle1}
-            <span className="block text-orange-400">{t.trustedByTitle2}</span>
-          </h2>
+            <span className="block text-orange-400 mt-3">{t.trustedByTitle2}</span>
+          </h2> */}
+          <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-black text-black leading-tight tracking-tight">
+  {t.trustedByTitle1}
+  <span className="block text-orange-400 mt-1.5 sm:mt-2 md:mt-3">
+    {t.trustedByTitle2}
+  </span>
+</h2>
         </div>
 
         <div className="max-w-6xl mx-auto">

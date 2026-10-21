@@ -8,4 +8,7 @@ export const s3 = new S3Client({
     accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY!,
     secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY!,
   },
+  requestChecksumCalculation: "WHEN_REQUIRED",
+  responseChecksumValidation: "WHEN_REQUIRED",
+
 });

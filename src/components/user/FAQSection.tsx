@@ -38,7 +38,7 @@ const FAQSection = ({ language }: Props) => {
         <div className="flex flex-col gap-6">
           {FAQ_DATA.map((item, index) => (
             <div key={index} className="border-b border-white/10 pb-6">
-              <button
+              {/* <button
                 onClick={() => toggleFAQ(index)}
                 className="w-full flex items-center justify-between text-left"
               >
@@ -51,7 +51,24 @@ const FAQSection = ({ language }: Props) => {
                     active === index ? "rotate-180" : ""
                   }`}
                 />
-              </button>
+              </button> */}
+
+              <button
+  onClick={() => toggleFAQ(index)}
+  className={`w-full flex items-center justify-between gap-4 ${
+    language === "ar" ? "text-right" : "text-left"
+  }`}
+>
+  <h3 className="text-xl md:text-2xl font-semibold flex-1">
+    {item[language].question}
+  </h3>
+
+  <ChevronDown
+    className={`shrink-0 transition duration-300 ${
+      active === index ? "rotate-180" : ""
+    }`}
+  />
+</button>
 
               <div
                 className={`overflow-hidden transition-all duration-500 ${

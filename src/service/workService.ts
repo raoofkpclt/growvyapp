@@ -65,54 +65,113 @@ import { uploadFile } from "../utils/uploadFile";
 //   }
 // };
 
+// export const addCreative = async (
+//   creative: Creative,
+//   file?: File | null
+// ) => {
+//   try {
+//     let imageUrl = "";
+//     let logoUrl = "";
+//     let thumbnailUrl = "";
+
+//     // POSTER
+//     if (creative.type === "poster" && file) {
+//       imageUrl = await uploadFile(file);
+//     }
+
+//     // REEL THUMBNAIL
+//     if (creative.type === "reel" && file) {
+//       thumbnailUrl = await uploadFile(file);
+//     }
+
+//     // WEBSITE LOGO
+//     if (creative.type === "website" && file) {
+//       logoUrl = await uploadFile(file);
+//     }
+
+//     const creativeData = {
+//       clientId: creative.clientId || "",
+//       type: creative.type || "",
+//       title: creative.title || "",
+
+//       imageUrl,
+//       thumbnailUrl,
+//       logoUrl,
+
+//       instagramUrl: creative.instagramUrl || "",
+//       websiteUrl: creative.websiteUrl || "",
+
+//       uploadedAt: new Date().toISOString(),
+//     };
+
+//     const docRef = await addDoc(
+//       collection(db, "creatives"),
+//       creativeData
+//     );
+
+//     return {
+//       ...creativeData,
+//       id: docRef.id,
+//     };
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// };
+
+
+interface AddCreativeOptions {
+  video?: File | null;
+  onProgress?: (percent: number) => void;
+}
+
 export const addCreative = async (
   creative: Creative,
-  file?: File | null
+  file?: File | null,
+  options: AddCreativeOptions = {},
 ) => {
   try {
     let imageUrl = "";
     let logoUrl = "";
     let thumbnailUrl = "";
+    let videoUrl = "";
 
-    // POSTER
     if (creative.type === "poster" && file) {
       imageUrl = await uploadFile(file);
     }
 
-    // REEL THUMBNAIL
-    if (creative.type === "reel" && file) {
-      thumbnailUrl = await uploadFile(file);
-    }
-
-    // WEBSITE LOGO
     if (creative.type === "website" && file) {
       logoUrl = await uploadFile(file);
+    }
+
+    if (creative.type === "reel") {
+      // thumbnail + video upload in parallel
+      const [thumb, video] = await Promise.all([
+        file ? uploadFile(file) : Promise.resolve(""),
+        options.video
+          ? uploadFile(options.video, options.onProgress)
+          : Promise.resolve(""),
+      ]);
+      thumbnailUrl = thumb;
+      videoUrl = video;
     }
 
     const creativeData = {
       clientId: creative.clientId || "",
       type: creative.type || "",
       title: creative.title || "",
-
       imageUrl,
       thumbnailUrl,
       logoUrl,
-
+      videoUrl,
       instagramUrl: creative.instagramUrl || "",
       websiteUrl: creative.websiteUrl || "",
-
       uploadedAt: new Date().toISOString(),
     };
 
-    const docRef = await addDoc(
-      collection(db, "creatives"),
-      creativeData
-    );
+    const docRef = await addDoc(collection(db, "creatives"), creativeData);
 
-    return {
-      ...creativeData,
-      id: docRef.id,
-    };
+    return { ...creativeData, id: docRef.id };
   } catch (error) {
     console.log(error);
     throw error;
