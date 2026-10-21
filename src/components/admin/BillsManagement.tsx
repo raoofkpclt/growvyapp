@@ -245,7 +245,8 @@ const BillsManagement: React.FC = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowEditBill({ ...bill })}
-                      className="flex-1 text-xs py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition-colors"
+                      className="flex-1 text-xs py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition-colors "
+                      disabled
                     >
                       Edit
                     </button>
@@ -253,7 +254,7 @@ const BillsManagement: React.FC = () => {
                       onClick={() => setDeleteBillId(bill.firestoreId || null)}
                       className="px-3 text-xs py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
                     >
-                      ✕
+                      Delete 
                     </button>
                   </div>
 
