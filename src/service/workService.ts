@@ -10,7 +10,7 @@ import { db } from "../config/firebase/firebase";
 
 import type { Creative } from "../utils/types/Types";
 
-import { uploadFile } from "../utils/uploadFile";
+import { uploadFile ,uploadVideo} from "../utils/uploadFile";
 
 // export const addCreative = async (creative: Creative, file?: File | null) => {
 //   try {
@@ -146,12 +146,18 @@ export const addCreative = async (
 
     if (creative.type === "reel") {
       // thumbnail + video upload in parallel
+      // const [thumb, video] = await Promise.all([
+      //   file ? uploadFile(file) : Promise.resolve(""),
+      //   options.video
+      //     ? uploadFile(options.video, options.onProgress)
+      //     : Promise.resolve(""),
+      // ]);
       const [thumb, video] = await Promise.all([
-        file ? uploadFile(file) : Promise.resolve(""),
-        options.video
-          ? uploadFile(options.video, options.onProgress)
-          : Promise.resolve(""),
-      ]);
+  file ? uploadFile(file) : Promise.resolve(""),
+  options.video
+    ? uploadVideo(options.video, options.onProgress) // <-- uploadVideo, not uploadFile
+    : Promise.resolve(""),
+]);
       thumbnailUrl = thumb;
       videoUrl = video;
     }

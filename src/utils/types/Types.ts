@@ -73,4 +73,6 @@ export interface Bill {
   clientAddress?: string;
   clientPhone?: string;
   projectRef?: string;
+  pdfKey?: string;
+  pdfUrl?: string;
 }
