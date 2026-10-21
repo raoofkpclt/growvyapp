@@ -1,11 +1,11 @@
 import React, { forwardRef } from "react";
 import type { BillItem, BillDocType } from "../../../utils/types/Types";
 // TODO: point this to your real logo file (png/svg in src/assets)
-// import logo from "../../../../public/img/logo-2.png";
+import logo from "../../../assets/Logo-2.png";
 import { formatAmount, formatMoney, numToWords } from "../../../utils/currency";
 import type { CurrencyCode } from "../../../utils/currency";
 
-const logo = "/img/logo-2.png";
+// const logo = "/img/logo-2.png";
 
 // keep old imports working (if any file imports numToWords from here)
 export { numToWords };
