@@ -427,10 +427,10 @@ const CashBookTab: React.FC<{
                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
                     </td>
                     <td className={`${td} text-right`}>
-                      <button onClick={() => setEditing(t)} className="text-violet-300 hover:text-violet-200 mr-3">
+                      <button disabled onClick={() => setEditing(t)} className="text-violet-300 hover:text-violet-200 mr-3">
                         Edit
                       </button>
-                      <button onClick={() => setDeleteTarget(t)} className="text-red-400 hover:text-red-300">
+                      <button disabled onClick={() => setDeleteTarget(t)} className="text-red-400 hover:text-red-300">
                         Delete
                       </button>
                     </td>
