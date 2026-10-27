@@ -1,4 +1,4 @@
-import type { AccountCategory, AccountRegion, AccountTransaction, MajorHead } from "./types/Types";
+import type { AccountCategory, AccountRegion, AccountTransaction, MajorHead } from "../utils/types/Types";
 
 /* ---------- dropdown lists (same as the Excel validations) ---------- */
 export const REGIONS: AccountRegion[] = ["India", "Saudi Arabia"];
