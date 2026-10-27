@@ -12,6 +12,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import unoImg from "../../../public/img/vectors/7.png";
 
 import { Helmet } from "react-helmet-async";
+import GoogleReviews from "../../components/user/GoogleReviews";
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -1013,6 +1014,11 @@ const UserHome: React.FC = () => {
           )}
         </div>
       </section>
+      
+      {/* google review */}
+         
+        <GoogleReviews/>
+
 
       {/* CONTACT */}
 

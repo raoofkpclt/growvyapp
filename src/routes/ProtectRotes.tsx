@@ -88,7 +88,7 @@ const ProtectRoutes = () => {
 
         {/* LOGO */}
         <img
-          src="/public/img/logo-1.png" // replace with your logo path
+          src="/img/logo-1.png" // replace with your logo path
           alt="Growvy"
           className="
             w-28
