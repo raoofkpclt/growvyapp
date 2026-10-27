@@ -29,6 +29,10 @@ const fmtDate = (d: string) => {
 
 const hasPdf = (b: Bill) => !!(b.pdfKey || b.pdfUrl);
 
+// billing period only exists on monthly / custom invoices (older bills have none)
+const getPeriod = (b: Bill) =>
+  b.docType === "invoice" ? b.billingPeriod : undefined;
+
 const BillsManagement: React.FC = () => {
   const [bills, setBills] = useState<Bill[]>([]);
   const [showAddBill, setShowAddBill] = useState(false);
@@ -98,12 +102,16 @@ const BillsManagement: React.FC = () => {
   const visibleBills = bills
     .filter((bill) => {
       if (docFilter !== "all" && bill.docType !== docFilter) return false;
-      if (
-        search &&
-        !bill.clientName.toLowerCase().includes(search.toLowerCase()) &&
-        !bill.billNo.toLowerCase().includes(search.toLowerCase())
-      )
-        return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const periodText = getPeriod(bill)?.label.toLowerCase() ?? "";
+        if (
+          !bill.clientName.toLowerCase().includes(q) &&
+          !bill.billNo.toLowerCase().includes(q) &&
+          !periodText.includes(q) // search by "october 2026" etc.
+        )
+          return false;
+      }
       return true;
     })
     .sort((a, b) => b.createdAt - a.createdAt); // last entered first
@@ -140,7 +148,7 @@ const BillsManagement: React.FC = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search bill no. or client…"
+              placeholder="Search bill no., client or period…"
               className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors w-56"
             />
             <button
@@ -167,6 +175,7 @@ const BillsManagement: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {visibleBills.map((bill) => {
             const pdfReady = hasPdf(bill);
+            const period = getPeriod(bill);
             return (
               <div
                 key={bill.id}
@@ -174,7 +183,7 @@ const BillsManagement: React.FC = () => {
               >
                 {/* Header strip */}
                 <div
-                  className={`h-20 relative overflow-hidden flex items-center px-5 ${
+                  className={`h-20 relative overflow-hidden flex items-center gap-2 px-5 ${
                     bill.docType === "invoice"
                       ? "bg-gradient-to-br from-violet-600/25 to-violet-900/5"
                       : "bg-gradient-to-br from-sky-600/25 to-sky-900/5"
@@ -189,6 +198,14 @@ const BillsManagement: React.FC = () => {
                   >
                     {bill.docType === "invoice" ? "Invoice" : "Cash Receipt"}
                   </span>
+
+                  {/* Monthly / Custom period tag */}
+                  {period && (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-amber-500/15 text-amber-300 border-amber-500/30">
+                      {period.type === "monthly" ? "Monthly" : "Period"}
+                    </span>
+                  )}
+
                   <span
                     className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full border capitalize ${
                       STATUS_STYLES[bill.status] ||
@@ -207,9 +224,20 @@ const BillsManagement: React.FC = () => {
                   <h3 className="text-white font-semibold text-sm">
                     {bill.clientName}
                   </h3>
-                  <p className="text-xs text-zinc-500 mb-3">
+                  <p className="text-xs text-zinc-500 mb-1">
                     {bill.service} &middot; {fmtDate(bill.date)}
                   </p>
+
+                  {/* Billing period (monthly / custom invoices only) */}
+                  {period ? (
+                    <p className="text-xs text-violet-300 mb-3">
+                      <span className="text-zinc-500">Period: </span>
+                      {period.label}
+                    </p>
+                  ) : (
+                    <div className="mb-2" />
+                  )}
+
                   <p className="text-2xl font-bold text-white mb-4">
                     {formatMoney(bill.amount, bill.currency)}
                   </p>

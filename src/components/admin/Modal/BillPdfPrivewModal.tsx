@@ -43,6 +43,9 @@ const BillPdfPreviewModal: React.FC<Props> = ({ bill, onClose }) => {
   const btn =
     "text-xs px-3 py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors";
 
+  // billing period label (monthly / custom invoices only; older bills have none)
+  const periodLabel = bill.docType === "invoice" ? bill.billingPeriod?.label : undefined;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-6"
@@ -57,7 +60,10 @@ const BillPdfPreviewModal: React.FC<Props> = ({ bill, onClose }) => {
             <h3 className="text-white font-semibold text-sm truncate">
               {bill.docType === "invoice" ? "Invoice" : "Receipt"} · {bill.billNo}
             </h3>
-            <p className="text-xs text-zinc-500 truncate">{bill.clientName}</p>
+            <p className="text-xs text-zinc-500 truncate">
+              {bill.clientName}
+              {periodLabel && <span className="text-violet-300"> · {periodLabel}</span>}
+            </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button className={btn} disabled={!blob} onClick={() => blob && downloadBlob(blob, pdfFileName(bill))}>

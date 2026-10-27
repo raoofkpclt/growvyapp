@@ -46,6 +46,9 @@ export interface BillPreviewData {
   receivedTowards: string;
   againstInvoiceNo?: string;
   currency: CurrencyCode;
+  // billing period (invoices only)
+  periodType?: "none" | "monthly" | "custom";
+  periodLabel?: string; // e.g. "October 2026" or "01 Oct 2026 – 31 Dec 2026"
 }
 
 /* ---------- helpers ---------- */
@@ -107,6 +110,7 @@ const BillPreview = forwardRef<HTMLDivElement, { data: BillPreviewData }>(({ dat
   const kindColor =
     data.invoiceKind === "Advance" ? C.yellow : data.invoiceKind === "Balance" ? C.orange : C.ok;
   const words = numToWords(isInvoice ? t.balance : data.receiptAmount, data.currency);
+  const showPeriod = isInvoice && data.periodType !== "none" && !!data.periodLabel;
 
   return (
     <div
@@ -155,7 +159,7 @@ const BillPreview = forwardRef<HTMLDivElement, { data: BillPreviewData }>(({ dat
       <hr style={{ border: "none", borderTop: `1px solid ${C.line}`, margin: "20px 0" }} />
 
       {/* bill to */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 22 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: showPeriod ? 14 : 22 }}>
         <div>
           <div style={label}>{isInvoice ? "Bill To" : "Received From"}</div>
           <div style={{ fontWeight: 700, fontSize: 14.5, marginBottom: 3 }}>
@@ -185,6 +189,24 @@ const BillPreview = forwardRef<HTMLDivElement, { data: BillPreviewData }>(({ dat
           </div>
         </div>
       </div>
+
+      {/* billing period (monthly / custom invoices only) */}
+      {showPeriod && (
+        <div
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            marginBottom: 22, padding: "9px 12px", background: "#F7F8FA",
+            borderLeft: `3px solid ${C.blue}`, borderRadius: "0 6px 6px 0",
+          }}
+        >
+          <div style={{ ...label, marginBottom: 0, color: C.blue }}>
+            {data.periodType === "monthly" ? "Monthly Invoice" : "Billing Period"}
+          </div>
+          <div style={{ fontFamily: mono, fontSize: 12.5, fontWeight: 700, color: C.ink }}>
+            {data.periodLabel}
+          </div>
+        </div>
+      )}
 
       {isInvoice ? (
         <>

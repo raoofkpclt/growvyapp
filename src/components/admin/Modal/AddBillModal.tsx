@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import type { Bill, BillItem, BillDocType, BillStatus } from "../../../utils/types/Types";
+import type {
+  Bill,
+  BillItem,
+  BillDocType,
+  BillStatus,
+  BillingPeriod,
+  BillingPeriodType,
+} from "../../../utils/types/Types";
 import type { Client } from "../../../utils/types/Types";
 import { addBill } from "../../../service/billService";
 import { getClients } from "../../../service/clientService";
@@ -19,6 +26,12 @@ const SERVICE_OPTIONS = [
   "Other",
 ];
 
+const PERIOD_OPTIONS: { value: BillingPeriodType; label: string }[] = [
+  { value: "none", label: "One-time" },
+  { value: "monthly", label: "Monthly" },
+  { value: "custom", label: "Custom Period" },
+];
+
 const inputCls =
   "bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors w-full";
 const labelCls =
@@ -27,6 +40,32 @@ const labelCls =
 const PAPER_W = 794; // A4 width in px
 const PAPER_H = 1123;
 const PREVIEW_SCALE = 0.5;
+
+/* ---------- billing period helpers ---------- */
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** "2026-10-01" -> "01 Oct 2026" */
+const fmtDate = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+/** "2026-10" -> first/last day + "October 2026" */
+const monthRange = (ym: string) => {
+  const [y, m] = ym.split("-").map(Number);
+  const lastDay = new Date(y, m, 0).getDate();
+  return {
+    from: `${ym}-01`,
+    to: `${ym}-${pad(lastDay)}`,
+    label: new Date(y, m - 1, 1).toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    }),
+  };
+};
 
 interface Props {
   onClose: () => void;
@@ -57,6 +96,12 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
   const [gstPercent, setGstPercent] = useState(0);
   const [advanceReceived, setAdvanceReceived] = useState(0);
 
+  // invoice billing period (one-time / monthly / custom range)
+  const [periodType, setPeriodType] = useState<BillingPeriodType>("none");
+  const [periodMonth, setPeriodMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+  const [periodFrom, setPeriodFrom] = useState("");
+  const [periodTo, setPeriodTo] = useState("");
+
   // receipt-only
   const [receiptAmount, setReceiptAmount] = useState(0);
   const [paymentMode, setPaymentMode] = useState("UPI");
@@ -84,6 +129,35 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
 
   const { subtotal, total, balance: balanceDue } = calcTotals(items, discount, gstPercent, advanceReceived);
 
+  // Resolved billing period (undefined for one-time invoices / receipts)
+  const billingPeriod: BillingPeriod | undefined = useMemo(() => {
+    if (docType !== "invoice") return undefined;
+
+    if (periodType === "monthly" && periodMonth) {
+      const { from, to, label } = monthRange(periodMonth);
+      return { type: "monthly", from, to, label };
+    }
+
+    if (periodType === "custom" && periodFrom && periodTo && periodTo >= periodFrom) {
+      return {
+        type: "custom",
+        from: periodFrom,
+        to: periodTo,
+        label: `${fmtDate(periodFrom)} – ${fmtDate(periodTo)}`,
+      };
+    }
+
+    return undefined;
+  }, [docType, periodType, periodMonth, periodFrom, periodTo]);
+
+  const periodError =
+    docType === "invoice" && periodType === "custom" && periodFrom && periodTo && periodTo < periodFrom
+      ? "End date must be on or after the start date."
+      : "";
+
+  // a monthly/custom invoice needs a complete, valid period
+  const periodValid = docType !== "invoice" || periodType === "none" || !!billingPeriod;
+
   const finalBillNo = useMemo(
     () => billNo || `GRW-${new Date().getFullYear()}-${String(Date.now()).slice(-5)}`,
     // keep generated number stable while the modal is open
@@ -95,9 +169,12 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
     docType, billNo: finalBillNo, date, dueDate, invoiceKind, clientName, clientAddress,
     clientPhone, projectRef, service, items, discount, gstPercent, advanceReceived,
     receiptAmount, paymentMode, receivedTowards, againstInvoiceNo, currency,
+    periodType: docType === "invoice" ? periodType : "none",
+    periodLabel: billingPeriod?.label,
   };
 
-  const isValid = clientName.trim() && !(docType === "receipt" && receiptAmount <= 0);
+  const isValid =
+    clientName.trim() && !(docType === "receipt" && receiptAmount <= 0) && periodValid;
 
   // render the preview to a PDF once; reused for download + S3 upload
   const makePdf = async () => {
@@ -134,7 +211,17 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
 
     const payload: Omit<Bill, "id" | "firestoreId"> =
       docType === "invoice"
-        ? { ...base, dueDate, invoiceKind, items, discount, gstPercent, advanceReceived }
+        ? {
+            ...base,
+            dueDate,
+            invoiceKind,
+            items,
+            discount,
+            gstPercent,
+            advanceReceived,
+            // only include when set (Firestore rejects `undefined` values)
+            ...(billingPeriod ? { billingPeriod } : {}),
+          }
         : { ...base, paymentMode, receivedTowards, againstInvoiceNo };
 
     try {
@@ -230,20 +317,87 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
             </div>
 
             {docType === "invoice" && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>Invoice Type</label>
-                  <select className={inputCls} value={invoiceKind} onChange={(e) => setInvoiceKind(e.target.value as any)}>
-                    <option className="bg-[#0f1117]">Advance</option>
-                    <option className="bg-[#0f1117]">Balance</option>
-                    <option className="bg-[#0f1117]">Full Payment</option>
-                  </select>
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelCls}>Invoice Type</label>
+                    <select className={inputCls} value={invoiceKind} onChange={(e) => setInvoiceKind(e.target.value as any)}>
+                      <option className="bg-[#0f1117]">Advance</option>
+                      <option className="bg-[#0f1117]">Balance</option>
+                      <option className="bg-[#0f1117]">Full Payment</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelCls}>Due Date</label>
+                    <input type="date" className={inputCls} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                  </div>
                 </div>
+
+                {/* ---------- Billing period ---------- */}
                 <div>
-                  <label className={labelCls}>Due Date</label>
-                  <input type="date" className={inputCls} value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+                  <label className={labelCls}>Billing Period</label>
+                  <div className="flex gap-2">
+                    {PERIOD_OPTIONS.map((o) => (
+                      <button
+                        key={o.value}
+                        type="button"
+                        onClick={() => setPeriodType(o.value)}
+                        className={`flex-1 text-xs py-2 rounded-lg border transition-all font-medium ${
+                          periodType === o.value
+                            ? "bg-violet-600/20 text-violet-200 border-violet-500/60"
+                            : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {periodType === "monthly" && (
+                    <div className="mt-3">
+                      <label className={labelCls}>Month</label>
+                      <input
+                        type="month"
+                        className={inputCls}
+                        value={periodMonth}
+                        onChange={(e) => setPeriodMonth(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {periodType === "custom" && (
+                    <div className="mt-3 grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>From</label>
+                        <input
+                          type="date"
+                          className={inputCls}
+                          value={periodFrom}
+                          onChange={(e) => setPeriodFrom(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelCls}>To</label>
+                        <input
+                          type="date"
+                          className={inputCls}
+                          min={periodFrom || undefined}
+                          value={periodTo}
+                          onChange={(e) => setPeriodTo(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {periodError && <p className="mt-2 text-xs text-red-400">{periodError}</p>}
+
+                  {billingPeriod && (
+                    <p className="mt-2 text-xs text-violet-300">
+                      Period shown on invoice: <span className="font-semibold">{billingPeriod.label}</span>
+                    </p>
+                  )}
                 </div>
-              </div>
+              </>
             )}
 
             <div className="grid grid-cols-2 gap-3">
