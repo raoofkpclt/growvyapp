@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getCreatives, deleteCreative } from "../../service/workService";
 import type { Creative, Client } from "../../utils/types/Types";
 import AddCreativeModal from "./Modal/AddCreativeModal";
+import DeleteConfirmModal from "./Modal/DeleteConfirmModal"; // adjust path if your modal lives elsewhere
 import ReelPreview from "../admin/Modal/ReelPreview";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase/firebase";
@@ -13,6 +14,9 @@ const WorkManagement: React.FC = () => {
   const [showAddCreative, setShowAddCreative] = useState(false);
   const [workFilter, setWorkFilter] = useState<string>("all");
   const [loadingClients, setLoadingClients] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<Creative | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   const filteredCreatives =
     workFilter === "all"
@@ -52,25 +56,35 @@ const WorkManagement: React.FC = () => {
     fetchClients();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this work?",
-    );
-
-    if (!confirmDelete) return;
+  const handleDelete = async () => {
+    if (!deleteTarget?.id) return;
 
     try {
-      await deleteCreative(id);
-      setCreatives((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.log(error);
-      alert("Failed to delete work");
+      setDeleting(true);
+      setError("");
+      await deleteCreative(deleteTarget.id);
+      setCreatives((prev) => prev.filter((item) => item.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (e) {
+      console.log(e);
+      setError("Failed to delete work. Please try again.");
+    } finally {
+      setDeleting(false);
     }
   };
 
   return (
     <div>
       <div className="animate-fade-in space-y-6">
+        {error && (
+          <div className="flex items-center justify-between gap-3 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
+            <span>{error}</span>
+            <button onClick={() => setError("")} className="text-red-300/70 hover:text-red-200 text-base leading-none">
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Filters + Upload */}
         <div className="flex flex-wrap items-center gap-3 justify-between">
           <div className="flex gap-2 flex-wrap">
@@ -207,7 +221,7 @@ const WorkManagement: React.FC = () => {
 
                   {/* Delete */}
                   <button
-                    onClick={() => handleDelete(c.id!)}
+                    onClick={() => setDeleteTarget(c)}
                     className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
                   >
                     🗑 Delete
@@ -234,6 +248,14 @@ const WorkManagement: React.FC = () => {
             setShowAddCreative(false);
           }}
           clients={clients}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmModal
+          loading={deleting}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
         />
       )}
     </div>

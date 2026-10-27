@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import ClientManagement from "../../components/admin/ClientManagement";
 import WorkManagement from "../../components/admin/WorkManagement";
 import BillsManagement from "../../components/admin/BillsManagement";
+import AccountManagement from "../../components/admin/AccountManagement";
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({
@@ -118,7 +119,7 @@ const TextAreaField = ({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Home : React.FC= () => {
-  const [tab, setTab] = useState<"dashboard" | "clients" | "work"|"bills">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "clients" | "work"|"bills"|"accounts">("dashboard");
   const [clients, setClients] = useState<Client[]>([]);
   const [creatives, setCreatives] = useState<Creative[]>([]);
   const [showEditClient, setShowEditClient] = useState<Client | null>(null);
@@ -170,6 +171,7 @@ const navItems = [
   { id: "clients", label: "Clients", icon: "◈" },
   { id: "work", label: "Work", icon: "◧" },
   { id: "bills", label: "Bills", icon: "▤" },
+  { id: "accounts", label: "Accounts", icon: "◉" },
 ];
 
   const handleLogout = async () => {
@@ -507,6 +509,7 @@ const navItems = [
           {tab === "work" && <WorkManagement />}
           {/* ══ BILLS ══ */}
           {tab === "bills" && <BillsManagement />}
+          {tab === "accounts" && <AccountManagement />}
         </div>
       </main>
 

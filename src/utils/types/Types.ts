@@ -87,3 +87,42 @@ export interface Bill {
   pdfKey?: string;
   pdfUrl?: string;
 }
+
+
+
+export type MajorHead = "Assets" | "Liabilities" | "Equity" | "Income" | "Expenses";
+export type AccountRegion = "India" | "Saudi Arabia";
+ 
+// One row of the "Chart of Accounts" sheet
+export interface AccountCategory {
+  firestoreId?: string;
+  id: string;
+  code: string; // CA01, EX05 ...
+  name: string;
+  majorHead: MajorHead;
+  type: string; // Current Asset, Fixed Asset, Expense ...
+  notes: string;
+}
+ 
+// One row of the "Transactions" (cash book) sheet
+export interface AccountTransaction {
+  firestoreId?: string;
+  id: string;
+  date: string; // YYYY-MM-DD
+  voucherNo: string;
+  description: string;
+  category: string; // category name from the chart of accounts
+  serviceCategory: string; // "Client / Service Category" column
+  region: AccountRegion;
+  paymentMode: string;
+  income: number;
+  expense: number;
+  createdAt: number;
+}
+ 
+// "Balance Sheet" sheet: manual balances keyed by category code
+export interface BalanceSheetData {
+  asOf: string; // YYYY-MM-DD
+  values: Record<string, number>;
+}
+ 
