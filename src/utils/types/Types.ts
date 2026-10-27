@@ -35,6 +35,16 @@ export interface Creative {
 export type BillDocType = "invoice" | "receipt";
 export type BillStatus = "paid" | "pending" | "overdue";
 
+// billing period for invoices: one-time (none), a whole month, or a custom date range
+export type BillingPeriodType = "none" | "monthly" | "custom";
+
+export interface BillingPeriod {
+  type: "monthly" | "custom";
+  from: string;   // YYYY-MM-DD
+  to: string;     // YYYY-MM-DD
+  label: string;  // "October 2026" or "01 Oct 2026 – 31 Dec 2026"
+}
+
 export interface BillItem {
   id: string;
   description: string;
@@ -61,6 +71,7 @@ export interface Bill {
   discount?: number;
   gstPercent?: number;
   advanceReceived?: number;
+  billingPeriod?: BillingPeriod; // monthly / custom invoices only
 
   // receipt-only
   paymentMode?: string;
