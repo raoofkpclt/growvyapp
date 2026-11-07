@@ -238,7 +238,7 @@ const CashBookTab: React.FC<{
   const fileRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  useLockBodyScroll(adding || !!editing || !!deleteTarget);
+  // useLockBodyScroll(adding || !!editing || !!deleteTarget);
 
   const byName = useMemo(() => new Map(chart.map((c) => [c.name, c])), [chart]);
   const rows = useMemo(() => withRunningBalance(txns), [txns]); // oldest -> newest, with running balance
@@ -1303,7 +1303,7 @@ const ChartTab: React.FC<{
   );
   const [deleting, setDeleting] = useState(false);
 
-  useLockBodyScroll(!!deleteTarget);
+  // useLockBodyScroll(!!deleteTarget);
 
   const usedNames = useMemo(() => new Set(txns.map((t) => t.category)), [txns]);
 
@@ -1522,19 +1522,19 @@ const ChartTab: React.FC<{
 
 export default AccountsManagement;
 
-export const useLockBodyScroll = (locked: boolean) => {
-  useEffect(() => {
-    if (!locked) return;
-    const prevOverflow = document.body.style.overflow;
-    const prevPadding = document.body.style.paddingRight;
-    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+// export const useLockBodyScroll = (locked: boolean) => {
+//   useEffect(() => {
+//     if (!locked) return;
+//     const prevOverflow = document.body.style.overflow;
+//     const prevPadding = document.body.style.paddingRight;
+//     const scrollbar = window.innerWidth - document.documentElement.clientWidth;
 
-    document.body.style.overflow = "hidden";
-    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`; // stops the page jumping sideways
+//     document.body.style.overflow = "hidden";
+//     if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`; // stops the page jumping sideways
 
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.paddingRight = prevPadding;
-    };
-  }, [locked]);
-};
+//     return () => {
+//       document.body.style.overflow = prevOverflow;
+//       document.body.style.paddingRight = prevPadding;
+//     };
+//   }, [locked]);
+// };

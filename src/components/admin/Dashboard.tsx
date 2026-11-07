@@ -32,12 +32,20 @@ const compact = (n: number) =>
 const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
 const card = "bg-[#0f1117] border border-white/5 rounded-2xl";
+
+// text-base on mobile (16px) stops iOS Safari zooming into inputs
 const inputCls =
-  "bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-violet-500/60 transition-colors";
+  "bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 sm:py-2 text-base sm:text-xs text-white focus:outline-none focus:border-violet-500/60 transition-colors min-w-0";
 const th = "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-medium whitespace-nowrap";
 const thR = th + " text-right";
 const td = "px-3 py-2 text-xs text-zinc-300 whitespace-nowrap";
 const tdR = td + " text-right font-mono";
+
+// scrolls sideways on small screens without showing a scrollbar
+const noScrollbar = "overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
+// first column of the wide month tables (scrolls with the table, not sticky)
+const catCol = "min-w-[140px] sm:min-w-[180px] whitespace-normal sm:whitespace-nowrap";
 
 const niceMax = (v: number) => {
   if (v <= 0) return 1;
@@ -70,18 +78,18 @@ const Kpi: React.FC<{ label: string; value: string; tone: string; footer: React.
   tone,
   footer,
 }) => (
-  <div className={`${card} p-5`}>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-    <p className={`text-2xl font-bold mt-1.5 tracking-tight ${tone}`}>{value}</p>
-    <div className="mt-2 text-[11px] text-zinc-500 min-h-[16px]">{footer}</div>
+  <div className={`${card} p-4 sm:p-5 min-w-0`}>
+    <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
+    <p className={`text-lg sm:text-2xl font-bold mt-1 sm:mt-1.5 tracking-tight truncate ${tone}`}>{value}</p>
+    <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-zinc-500 sm:min-h-[16px] break-words">{footer}</div>
   </div>
 );
 
 const SmallStat: React.FC<{ label: string; value: string; footer: React.ReactNode }> = ({ label, value, footer }) => (
-  <div className={`${card} px-5 py-4`}>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-    <p className="text-xl font-bold text-white mt-1">{value}</p>
-    <div className="mt-1 text-[11px] text-zinc-500">{footer}</div>
+  <div className={`${card} px-4 sm:px-5 py-3 sm:py-4 min-w-0`}>
+    <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
+    <p className="text-lg sm:text-xl font-bold text-white mt-1">{value}</p>
+    <div className="mt-1 text-[10px] sm:text-[11px] text-zinc-500 break-words">{footer}</div>
   </div>
 );
 
@@ -91,11 +99,11 @@ const Panel: React.FC<{
   right?: React.ReactNode;
   children: React.ReactNode;
 }> = ({ title, subtitle, right, children }) => (
-  <div className={`${card} p-5`}>
-    <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
-      <div>
+  <div className={`${card} p-4 sm:p-5 min-w-0`}>
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+      <div className="min-w-0">
         <p className="text-sm font-semibold text-white">{title}</p>
-        {subtitle && <p className="text-xs text-zinc-600 mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-zinc-600 mt-0.5 break-words">{subtitle}</p>}
       </div>
       {right}
     </div>
@@ -118,11 +126,11 @@ const CategoryList: React.FC<{ rows: Line[]; total: number; color: string; total
   const max = Math.max(...rows.map((r) => Math.abs(r.amount))) || 1;
   return (
     <div>
-      <div className="max-h-[420px] overflow-y-auto pr-1 space-y-3">
+      <div className="max-h-[380px] sm:max-h-[420px] overflow-y-auto pr-1 space-y-3">
         {rows.map((r) => (
           <div key={r.code}>
             <div className="flex justify-between gap-3 mb-1">
-              <span className="text-xs text-zinc-300 truncate">{r.category}</span>
+              <span className="text-xs text-zinc-300 min-w-0 break-words">{r.category}</span>
               <span className="text-xs text-zinc-400 font-mono whitespace-nowrap">
                 {formatAmount(r.amount, ACCOUNTS_CURRENCY)}
                 <span className="text-zinc-600 ml-2 inline-block w-9 text-right">
@@ -139,7 +147,7 @@ const CategoryList: React.FC<{ rows: Line[]; total: number; color: string; total
           </div>
         ))}
       </div>
-      <div className="flex justify-between pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
+      <div className="flex justify-between gap-3 pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
         <span>{totalLabel}</span>
         <span className="font-mono">{money(total)}</span>
       </div>
@@ -147,7 +155,9 @@ const CategoryList: React.FC<{ rows: Line[]; total: number; color: string; total
   );
 };
 
-/* ---------- Income vs Expense: grouped bars + net line ---------- */
+/* ---------- Income vs Expense: grouped bars + net line ----------
+   On phones the chart keeps a readable minimum width and scrolls sideways;
+   tap a month to see its numbers (hover works on desktop). */
 const IncomeExpenseChart: React.FC<{ data: MonthPoint[] }> = ({ data }) => {
   const [hover, setHover] = useState<number | null>(null);
   const W = 720;
@@ -176,59 +186,93 @@ const IncomeExpenseChart: React.FC<{ data: MonthPoint[] }> = ({ data }) => {
   const tipX = hover === null ? 0 : Math.min(Math.max(cx(hover) - tipW / 2, padL), W - padR - tipW);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" onMouseLeave={() => setHover(null)}>
-      {ticks.map((t) => (
-        <g key={t}>
-          <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} stroke="rgba(255,255,255,0.05)" />
-          <text x={padL - 8} y={y(t) + 3} textAnchor="end" fontSize="10" fill="#71717a">
-            {compact(t)}
-          </text>
-        </g>
-      ))}
-      {minV < 0 && <line x1={padL} x2={W - padR} y1={y(0)} y2={y(0)} stroke="rgba(255,255,255,0.15)" />}
+    <div>
+      <p className="sm:hidden text-[11px] text-zinc-600 mb-2">Swipe sideways · tap a month for details</p>
+      <div className="overflow-x-auto overscroll-x-contain">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="w-full min-w-[600px] h-auto"
+          onMouseLeave={() => setHover(null)}
+        >
+          {ticks.map((t) => (
+            <g key={t}>
+              <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} stroke="rgba(255,255,255,0.05)" />
+              <text x={padL - 8} y={y(t) + 3} textAnchor="end" fontSize="10" fill="#71717a">
+                {compact(t)}
+              </text>
+            </g>
+          ))}
+          {minV < 0 && <line x1={padL} x2={W - padR} y1={y(0)} y2={y(0)} stroke="rgba(255,255,255,0.15)" />}
 
-      {data.map((d, i) => (
-        <g key={d.label}>
-          {hover === i && <rect x={padL + group * i} y={padT} width={group} height={innerH} fill="rgba(255,255,255,0.03)" />}
-          <rect x={cx(i) - bw - 1.5} y={y(d.income)} width={bw} height={Math.max(y(0) - y(d.income), 0)} rx="3" fill="#10b981" />
-          <rect x={cx(i) + 1.5} y={y(d.expense)} width={bw} height={Math.max(y(0) - y(d.expense), 0)} rx="3" fill="#f87171" />
-          <text x={cx(i)} y={H - 9} textAnchor="middle" fontSize="10" fill="#71717a">
-            {d.label}
-          </text>
-          <rect
-            x={padL + group * i}
-            y={padT}
-            width={group}
-            height={innerH + padB}
-            fill="transparent"
-            onMouseEnter={() => setHover(i)}
-          />
-        </g>
-      ))}
+          {data.map((d, i) => (
+            <g key={d.label}>
+              {hover === i && (
+                <rect x={padL + group * i} y={padT} width={group} height={innerH} fill="rgba(255,255,255,0.03)" />
+              )}
+              <rect
+                x={cx(i) - bw - 1.5}
+                y={y(d.income)}
+                width={bw}
+                height={Math.max(y(0) - y(d.income), 0)}
+                rx="3"
+                fill="#10b981"
+              />
+              <rect
+                x={cx(i) + 1.5}
+                y={y(d.expense)}
+                width={bw}
+                height={Math.max(y(0) - y(d.expense), 0)}
+                rx="3"
+                fill="#f87171"
+              />
+              <text x={cx(i)} y={H - 9} textAnchor="middle" fontSize="10" fill="#71717a">
+                {d.label}
+              </text>
+              <rect
+                x={padL + group * i}
+                y={padT}
+                width={group}
+                height={innerH + padB}
+                fill="transparent"
+                onMouseEnter={() => setHover(i)}
+                onClick={() => setHover(i)}
+              />
+            </g>
+          ))}
 
-      <polyline points={netPts} fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinejoin="round" />
-      {data.map((d, i) => (
-        <circle key={d.label} cx={cx(i)} cy={y(d.net)} r={hover === i ? 4 : 2.5} fill="#0f1117" stroke="#8b5cf6" strokeWidth="2" />
-      ))}
+          <polyline points={netPts} fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinejoin="round" />
+          {data.map((d, i) => (
+            <circle
+              key={d.label}
+              cx={cx(i)}
+              cy={y(d.net)}
+              r={hover === i ? 4 : 2.5}
+              fill="#0f1117"
+              stroke="#8b5cf6"
+              strokeWidth="2"
+            />
+          ))}
 
-      {hover !== null && (
-        <g pointerEvents="none">
-          <rect x={tipX} y={padT} width={tipW} height={66} rx="8" fill="#171923" stroke="rgba(255,255,255,0.12)" />
-          <text x={tipX + 10} y={padT + 16} fontSize="10" fill="#a1a1aa" fontWeight="600">
-            {data[hover].label}
-          </text>
-          <text x={tipX + 10} y={padT + 32} fontSize="10" fill="#34d399">
-            Income  {compact(data[hover].income)}
-          </text>
-          <text x={tipX + 10} y={padT + 45} fontSize="10" fill="#f87171">
-            Expense  {compact(data[hover].expense)}
-          </text>
-          <text x={tipX + 10} y={padT + 58} fontSize="10" fill="#a78bfa">
-            Net  {compact(data[hover].net)}
-          </text>
-        </g>
-      )}
-    </svg>
+          {hover !== null && (
+            <g pointerEvents="none">
+              <rect x={tipX} y={padT} width={tipW} height={66} rx="8" fill="#171923" stroke="rgba(255,255,255,0.12)" />
+              <text x={tipX + 10} y={padT + 16} fontSize="10" fill="#a1a1aa" fontWeight="600">
+                {data[hover].label}
+              </text>
+              <text x={tipX + 10} y={padT + 32} fontSize="10" fill="#34d399">
+                Income  {compact(data[hover].income)}
+              </text>
+              <text x={tipX + 10} y={padT + 45} fontSize="10" fill="#f87171">
+                Expense  {compact(data[hover].expense)}
+              </text>
+              <text x={tipX + 10} y={padT + 58} fontSize="10" fill="#a78bfa">
+                Net  {compact(data[hover].net)}
+              </text>
+            </g>
+          )}
+        </svg>
+      </div>
+    </div>
   );
 };
 
@@ -421,10 +465,10 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-10 w-72 rounded-xl bg-white/5" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="h-10 w-full sm:w-72 rounded-xl bg-white/5" />
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl bg-white/5" />
+            <div key={i} className="h-24 sm:h-28 rounded-2xl bg-white/5" />
           ))}
         </div>
         <div className="h-80 rounded-2xl bg-white/5" />
@@ -450,7 +494,7 @@ const Dashboard: React.FC = () => {
         )}
         {visible.map((r) => (
           <tr key={r.code} className="hover:bg-white/[0.02]">
-            <td className={`${td} sticky left-0 bg-[#0f1117]`}>{r.category}</td>
+            <td className={`${td} ${catCol}`}>{r.category}</td>
             {r.months.map((v, i) => (
               <td key={i} className={`${tdR} ${v === 0 ? "text-zinc-700" : ""}`}>
                 {amt(v)}
@@ -460,7 +504,7 @@ const Dashboard: React.FC = () => {
           </tr>
         ))}
         <tr className="bg-orange-500/10">
-          <td className={`${td} sticky left-0 bg-[#1a1410] font-semibold ${tone}`}>Total {label}</td>
+          <td className={`${td} ${catCol} font-semibold ${tone}`}>Total {label}</td>
           {byMonth.map((v, i) => (
             <td key={i} className={`${tdR} font-semibold ${tone}`}>
               {amt(v)}
@@ -473,20 +517,27 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6 min-w-0">
       {/* Header + period */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white">Business Overview</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">Accounts for {periodLabel}</p>
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Accounts for {periodLabel} ·{" "}
+            <button onClick={load} className="text-violet-300 hover:text-violet-200 transition-colors">
+              ↻ Refresh
+            </button>
+          </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
+          {/* presets: one swipeable row on mobile */}
+          <div className={`flex gap-1 p-1 rounded-xl bg-white/5 border border-white/10 max-w-full ${noScrollbar}`}>
             {PRESETS.map((p) => (
               <button
                 key={p.id}
                 onClick={() => setPreset(p.id)}
-                className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
+                className={`text-xs px-3 py-2 sm:py-1.5 rounded-lg transition-all whitespace-nowrap flex-shrink-0 ${
                   preset === p.id ? "bg-violet-600 text-white" : "text-zinc-400 hover:text-white"
                 }`}
               >
@@ -494,29 +545,41 @@ const Dashboard: React.FC = () => {
               </button>
             ))}
           </div>
-          <input type="date" className={inputCls} value={range.from} onChange={(e) => pickFrom(e.target.value)} />
-          <span className="text-xs text-zinc-600">to</span>
-          <input type="date" className={inputCls} min={range.from} value={range.to} onChange={(e) => pickTo(e.target.value)} />
-          <button
-            onClick={load}
-            className="text-xs px-3 py-2 rounded-xl border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
-          >
-            Refresh
-          </button>
+
+          {/* dates: side by side on mobile */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            <input
+              type="date"
+              className={`${inputCls} w-full sm:w-auto`}
+              value={range.from}
+              onChange={(e) => pickFrom(e.target.value)}
+            />
+            <span className="hidden sm:inline text-xs text-zinc-600">to</span>
+            <input
+              type="date"
+              className={`${inputCls} w-full sm:w-auto`}
+              min={range.from}
+              value={range.to}
+              onChange={(e) => pickTo(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
       {error && (
         <div className="flex items-center justify-between gap-3 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2.5">
           <span>{error}</span>
-          <button onClick={() => setError("")} className="text-amber-300/70 hover:text-amber-200 text-base leading-none">
+          <button
+            onClick={() => setError("")}
+            className="text-amber-300/70 hover:text-amber-200 text-xl leading-none px-1"
+          >
             ×
           </button>
         </div>
       )}
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         <Kpi
           label="Total Revenue"
           value={money(st.totalIncome)}
@@ -548,7 +611,7 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <SmallStat
           label="Total Clients"
           value={String(clients.length)}
@@ -576,7 +639,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {(st.otherIn > 0 || st.otherOut > 0) && (
-        <p className="text-xs text-zinc-500 -mt-3">
+        <p className="text-xs text-zinc-500 -mt-2 sm:-mt-3">
           Not counted above: asset, liability &amp; equity entries in this period — money in{" "}
           <span className="text-zinc-300">{money(st.otherIn)}</span>, money out{" "}
           <span className="text-zinc-300">{money(st.otherOut)}</span>.
@@ -599,7 +662,7 @@ const Dashboard: React.FC = () => {
                 <button
                   key={b}
                   onClick={() => switchBasis(b)}
-                  className={`text-xs px-3 py-1 rounded-lg transition-all ${
+                  className={`text-xs px-3 py-1.5 sm:py-1 rounded-lg transition-all whitespace-nowrap ${
                     basis === b ? "bg-violet-600 text-white" : "text-zinc-400 hover:text-white"
                   }`}
                 >
@@ -617,11 +680,18 @@ const Dashboard: React.FC = () => {
           </div>
         }
       >
+        {/* legend for phones (the desktop legend is hidden there) */}
+        <div className="sm:hidden flex items-center gap-4 text-[11px] text-zinc-500 mb-3">
+          <span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Income</span>
+          <span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm bg-red-400" /> Expense</span>
+          <span className="flex items-center gap-1.5"><i className="w-3 h-0.5 bg-violet-500" /> Net</span>
+        </div>
+
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-2">
+          <div className="xl:col-span-2 min-w-0">
             <IncomeExpenseChart data={monthPoints} />
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-w-0">
             <table className="w-full">
               <thead className="border-b border-white/5">
                 <tr>
@@ -661,41 +731,46 @@ const Dashboard: React.FC = () => {
         right={
           <button
             onClick={() => setShowMatrix((v) => !v)}
-            className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
+            className="self-start text-xs px-3 py-2 sm:py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 transition-colors"
           >
             {showMatrix ? "Hide" : "Show"}
           </button>
         }
       >
         {showMatrix && (
-          <div className="overflow-x-auto -mx-5 px-5">
-            <table className="w-full">
-              <thead className="border-b border-white/5">
-                <tr>
-                  <th className={`${th} sticky left-0 bg-[#0f1117]`}>Category</th>
-                  {monthly.labels.map((m) => (
-                    <th key={m} className={thR}>
-                      {m}
-                    </th>
-                  ))}
-                  <th className={thR}>Total</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {renderMatrix("Income", monthly.income, monthly.incomeByMonth, "text-emerald-300")}
-                {renderMatrix("Expense", monthly.expense, monthly.expenseByMonth, "text-red-300")}
-                <tr className="bg-white/[0.04]">
-                  <td className={`${td} sticky left-0 bg-[#15171f] font-semibold text-white`}>Net (Income − Expense)</td>
-                  {monthly.netByMonth.map((v, i) => (
-                    <td key={i} className={`${tdR} font-semibold ${v < 0 ? "text-red-300" : "text-white"}`}>
-                      {amt(v)}
+          <>
+            <p className="sm:hidden text-[11px] text-zinc-600 mb-2">Swipe sideways to see all months →</p>
+            <div className="overflow-x-auto overscroll-x-contain -mx-4 px-4 sm:-mx-5 sm:px-5">
+              <table className="w-full">
+                <thead className="border-b border-white/5">
+                  <tr>
+                    <th className={`${th} ${catCol}`}>Category</th>
+                    {monthly.labels.map((m) => (
+                      <th key={m} className={thR}>
+                        {m}
+                      </th>
+                    ))}
+                    <th className={thR}>Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {renderMatrix("Income", monthly.income, monthly.incomeByMonth, "text-emerald-300")}
+                  {renderMatrix("Expense", monthly.expense, monthly.expenseByMonth, "text-red-300")}
+                  <tr className="bg-white/[0.04]">
+                    <td className={`${td} ${catCol} font-semibold text-white`}>
+                      Net (Income − Expense)
                     </td>
-                  ))}
-                  <td className={`${tdR} font-semibold text-white`}>{amt(sum(monthly.netByMonth))}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    {monthly.netByMonth.map((v, i) => (
+                      <td key={i} className={`${tdR} font-semibold ${v < 0 ? "text-red-300" : "text-white"}`}>
+                        {amt(v)}
+                      </td>
+                    ))}
+                    <td className={`${tdR} font-semibold text-white`}>{amt(sum(monthly.netByMonth))}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </Panel>
 
@@ -708,16 +783,16 @@ const Dashboard: React.FC = () => {
           <Empty text="No asset balances saved yet. Enter them in Accounts → Balance Sheet and they will appear here." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 min-w-0">
               <CategoryList rows={assetRows} total={bsTotals.assets} color="#0ea5e9" totalLabel="Total Assets" />
             </div>
             <div className="space-y-3 content-start">
               <div className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3">
                 <p className="text-[10px] uppercase tracking-wider text-zinc-500">Liabilities &amp; Equity</p>
-                <p className="text-lg font-bold text-white mt-0.5">{money(bsTotals.liabilitiesEquity)}</p>
+                <p className="text-lg font-bold text-white mt-0.5 break-words">{money(bsTotals.liabilitiesEquity)}</p>
               </div>
               <div
-                className={`rounded-xl px-4 py-3 text-xs border ${
+                className={`rounded-xl px-4 py-3 text-xs border break-words ${
                   Math.abs(bsTotals.diff) < 0.005
                     ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
                     : "bg-red-500/10 border-red-500/20 text-red-300"

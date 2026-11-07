@@ -1,39 +1,57 @@
 import React from "react";
+import ModalShell, { modalBtn } from "./ModalShell";
 
 interface Props {
   loading?: boolean;
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-const DeleteConfirmModal: React.FC<Props> = ({ loading = false, onClose, onConfirm }) => (
-  // items-start + pt-* = modal sits at the top centre of the screen
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm px-4 pt-6 sm:pt-10">
-    <div className="bg-[#0f1117] border border-white/10 rounded-xl w-full max-w-sm shadow-2xl animate-fade-in">
-      <div className="px-4 py-3 border-b border-white/5">
-        <h3 className="text-white font-semibold text-sm">Delete this item?</h3>
-      </div>
-      <div className="px-4 py-3">
-        <p className="text-xs text-zinc-400">This action cannot be undone.</p>
-      </div>
-      <div className="flex gap-2 px-4 py-3 border-t border-white/5">
-        <button
-          onClick={onClose}
-          disabled={loading}
-          className="flex-1 py-2 rounded-lg text-xs text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors"
-        >
+const DeleteConfirmModal: React.FC<Props> = ({
+  loading = false,
+  title = "Delete this item?",
+  message = "This action cannot be undone.",
+  confirmLabel = "Delete",
+  onClose,
+  onConfirm,
+}) => (
+  <ModalShell
+    title={title}
+    size="sm"
+    busy={loading}
+    onClose={onClose}
+    footer={
+      <>
+        <button onClick={onClose} disabled={loading} className={modalBtn.ghost}>
           Cancel
         </button>
-        <button
-          onClick={onConfirm}
-          disabled={loading}
-          className="flex-1 py-2 rounded-lg text-xs bg-red-600 hover:bg-red-500 disabled:opacity-40 text-white font-medium transition-colors"
-        >
-          {loading ? "Deleting..." : "Delete"}
+        <button onClick={onConfirm} disabled={loading} className={modalBtn.danger}>
+          {loading ? "Deleting..." : confirmLabel}
         </button>
+      </>
+    }
+  >
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+        <svg
+          viewBox="0 0 24 24"
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5" />
+        </svg>
       </div>
+      <p className="text-sm text-zinc-400 leading-relaxed pt-2">{message}</p>
     </div>
-  </div>
+  </ModalShell>
 );
 
 export default DeleteConfirmModal;

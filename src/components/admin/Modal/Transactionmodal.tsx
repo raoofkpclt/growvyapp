@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import type { AccountCategory, AccountRegion, AccountTransaction } from "../../../utils/types/Types";
 import { addTransaction, updateTransaction } from "../../../service/Accountservice";
 import { MAJOR_HEADS, PAYMENT_MODES, REGIONS, SERVICE_CATEGORIES, toIso } from "../../../service/Accounts";
+import ModalShell, { modalBtn } from "./ModalShell";
 
-// text-base on mobile (16px) stops iOS from zooming into inputs; text-xs on desktop
+// text-base on mobile (16px) stops iOS from zooming into inputs
 const inputCls =
-  "bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-base sm:text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors w-full min-w-0";
-const labelCls = "text-[11px] text-zinc-400 font-medium uppercase tracking-wider mb-1 block";
+  "bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-base sm:text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/30 transition-colors w-full min-w-0";
+const labelCls = "text-[11px] text-zinc-400 font-medium uppercase tracking-wider mb-1.5 block";
 
 interface Props {
   transaction?: AccountTransaction; // present = edit mode
@@ -22,7 +23,10 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
   const [flow, setFlow] = useState<"income" | "expense">(
     transaction && transaction.income > 0 ? "income" : "expense",
   );
-  const [amount, setAmount] = useState(transaction ? transaction.income || transaction.expense : 0);
+  // amount is kept as text so typing "0.5" works naturally
+  const [amountText, setAmountText] = useState(
+    transaction ? String(transaction.income || transaction.expense) : "",
+  );
   const [category, setCategory] = useState(transaction?.category ?? "");
   const [serviceCategory, setServiceCategory] = useState(
     transaction?.serviceCategory ?? SERVICE_CATEGORIES[SERVICE_CATEGORIES.length - 1],
@@ -32,6 +36,7 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const amount = parseFloat(amountText) || 0;
   const selected = chart.find((c) => c.name === category);
   const isValid = !!date && amount > 0 && !!category;
 
@@ -73,150 +78,145 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
   };
 
   return (
-    // same structure as the original: modal sits at the top centre of the screen
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm px-3 sm:px-4 pt-4 sm:pt-10 overflow-y-auto">
-      <div className="bg-[#0f1117] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl max-h-[85vh] flex flex-col animate-fade-in">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 flex-shrink-0">
-          <h3 className="text-white font-semibold text-sm">
-            {transaction ? "Edit Transaction" : "Add Transaction"}
-          </h3>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none px-1"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="px-4 py-3 overflow-y-auto space-y-3">
-          {/* Income / Expense */}
-          <div className="flex gap-2">
-            {(["income", "expense"] as const).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setFlow(f)}
-                className={`flex-1 text-xs py-2.5 sm:py-1.5 rounded-lg border transition-all font-medium ${
-                  flow === f
-                    ? f === "income"
-                      ? "bg-emerald-600/20 text-emerald-300 border-emerald-500/50"
-                      : "bg-red-600/20 text-red-300 border-red-500/50"
-                    : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
-                }`}
-              >
-                {f === "income" ? "Income / Receipt" : "Expense / Payment"}
-              </button>
-            ))}
-          </div>
-
-          {/* mobile: Date + Voucher on one row, Amount full width · desktop: 3 columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <div>
-              <label className={labelCls}>Date</label>
-              <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div>
-              <label className={labelCls}>Voucher No.</label>
-              <input className={inputCls} placeholder="Optional" value={voucherNo} onChange={(e) => setVoucherNo(e.target.value)} />
-            </div>
-            <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Amount</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                className={inputCls}
-                value={amount}
-                onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className={labelCls}>Description</label>
-            <input
-              className={inputCls}
-              placeholder="e.g. manha sofa mall social media service charge"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className={labelCls}>Category</label>
-            <select className={inputCls} value={category} onChange={(e) => handleCategory(e.target.value)}>
-              <option value="" className="bg-[#0f1117]">Select category…</option>
-              {category && !selected && (
-                <option value={category} className="bg-[#0f1117]">{category} (not in chart)</option>
-              )}
-              {MAJOR_HEADS.map((h) => (
-                <optgroup key={h} label={h} className="bg-[#0f1117]">
-                  {chart
-                    .filter((c) => c.majorHead === h)
-                    .map((c) => (
-                      <option key={c.id} value={c.name} className="bg-[#0f1117]">
-                        {c.name}
-                      </option>
-                    ))}
-                </optgroup>
-              ))}
-            </select>
-            {selected && (
-              <p className="mt-1 text-[11px] text-zinc-500">
-                Major Head: <span className="text-violet-300">{selected.majorHead}</span> · Account Type:{" "}
-                <span className="text-violet-300">{selected.type}</span>
-              </p>
-            )}
-          </div>
-
-          {/* mobile: Service full width, Region + Mode side by side · desktop: 3 columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <div className="col-span-2 sm:col-span-1">
-              <label className={labelCls}>Client / Service</label>
-              <select className={inputCls} value={serviceCategory} onChange={(e) => setServiceCategory(e.target.value)}>
-                {SERVICE_CATEGORIES.map((s) => (
-                  <option key={s} className="bg-[#0f1117]">{s}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Region</label>
-              <select className={inputCls} value={region} onChange={(e) => setRegion(e.target.value as AccountRegion)}>
-                {REGIONS.map((r) => (
-                  <option key={r} className="bg-[#0f1117]">{r}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Payment Mode</label>
-              <select className={inputCls} value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
-                {PAYMENT_MODES.map((m) => (
-                  <option key={m} className="bg-[#0f1117]">{m}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {error && <p className="text-xs text-red-400">{error}</p>}
-        </div>
-
-        <div className="flex gap-2 px-4 py-3 border-t border-white/5 flex-shrink-0">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2.5 sm:py-2 rounded-lg text-sm sm:text-xs text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
-          >
+    <ModalShell
+      title={transaction ? "Edit Transaction" : "Add Transaction"}
+      subtitle="Record income or expense in the cash book"
+      size="lg"
+      busy={saving}
+      closeOnBackdrop={false}
+      onClose={onClose}
+      footer={
+        <>
+          <button onClick={onClose} disabled={saving} className={modalBtn.ghost}>
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !isValid}
-            className="flex-1 py-2.5 sm:py-2 rounded-lg text-sm sm:text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-medium transition-colors"
+            className={modalBtn.primary}
           >
             {saving ? "Saving..." : transaction ? "Save Changes" : "Add Transaction"}
           </button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        {/* Income / Expense */}
+        <div className="grid grid-cols-2 gap-2">
+          {(["income", "expense"] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFlow(f)}
+              className={`text-xs sm:text-sm py-2.5 rounded-xl border transition-all font-medium ${
+                flow === f
+                  ? f === "income"
+                    ? "bg-emerald-600/20 text-emerald-300 border-emerald-500/50"
+                    : "bg-red-600/20 text-red-300 border-red-500/50"
+                  : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
+              }`}
+            >
+              {f === "income" ? "Income / Receipt" : "Expense / Payment"}
+            </button>
+          ))}
         </div>
+
+        {/* mobile: Date + Voucher on one row, Amount full width · desktop: 3 columns */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div>
+            <label className={labelCls}>Date</label>
+            <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div>
+            <label className={labelCls}>Voucher No.</label>
+            <input className={inputCls} placeholder="Optional" value={voucherNo} onChange={(e) => setVoucherNo(e.target.value)} />
+          </div>
+          <div className="col-span-2 sm:col-span-1">
+            <label className={labelCls}>Amount</label>
+            <input
+              type="text"
+              inputMode="decimal"
+              className={inputCls}
+              placeholder="0"
+              value={amountText}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => setAmountText(e.target.value.replace(/[^0-9.]/g, ""))}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelCls}>Description</label>
+          <input
+            className={inputCls}
+            placeholder="e.g. manha sofa mall social media service charge"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className={labelCls}>Category</label>
+          <select className={inputCls} value={category} onChange={(e) => handleCategory(e.target.value)}>
+            <option value="" className="bg-[#0f1117]">Select category…</option>
+            {category && !selected && (
+              <option value={category} className="bg-[#0f1117]">{category} (not in chart)</option>
+            )}
+            {MAJOR_HEADS.map((h) => (
+              <optgroup key={h} label={h} className="bg-[#0f1117]">
+                {chart
+                  .filter((c) => c.majorHead === h)
+                  .map((c) => (
+                    <option key={c.id} value={c.name} className="bg-[#0f1117]">
+                      {c.name}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+          {selected && (
+            <p className="mt-1.5 text-[11px] text-zinc-500">
+              Major Head: <span className="text-violet-300">{selected.majorHead}</span> · Account Type:{" "}
+              <span className="text-violet-300">{selected.type}</span>
+            </p>
+          )}
+        </div>
+
+        {/* mobile: Service full width, Region + Mode side by side · desktop: 3 columns */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="col-span-2 sm:col-span-1">
+            <label className={labelCls}>Client / Service</label>
+            <select className={inputCls} value={serviceCategory} onChange={(e) => setServiceCategory(e.target.value)}>
+              {SERVICE_CATEGORIES.map((s) => (
+                <option key={s} className="bg-[#0f1117]">{s}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Region</label>
+            <select className={inputCls} value={region} onChange={(e) => setRegion(e.target.value as AccountRegion)}>
+              {REGIONS.map((r) => (
+                <option key={r} className="bg-[#0f1117]">{r}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Payment Mode</label>
+            <select className={inputCls} value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)}>
+              {PAYMENT_MODES.map((m) => (
+                <option key={m} className="bg-[#0f1117]">{m}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {error && (
+          <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+            {error}
+          </p>
+        )}
       </div>
-    </div>
+    </ModalShell>
   );
 };
 
