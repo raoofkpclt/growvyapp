@@ -3,8 +3,9 @@ import type { AccountCategory, AccountRegion, AccountTransaction } from "../../.
 import { addTransaction, updateTransaction } from "../../../service/Accountservice";
 import { MAJOR_HEADS, PAYMENT_MODES, REGIONS, SERVICE_CATEGORIES, toIso } from "../../../service/Accounts";
 
+// text-base on mobile (16px) stops iOS from zooming into inputs; text-xs on desktop
 const inputCls =
-  "bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors w-full";
+  "bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-base sm:text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors w-full min-w-0";
 const labelCls = "text-[11px] text-zinc-400 font-medium uppercase tracking-wider mb-1 block";
 
 interface Props {
@@ -72,14 +73,18 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
   };
 
   return (
-    // items-start + pt-* = modal sits at the top centre of the screen
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm px-4 pt-6 sm:pt-10 overflow-y-auto">
+    // same structure as the original: modal sits at the top centre of the screen
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm px-3 sm:px-4 pt-4 sm:pt-10 overflow-y-auto">
       <div className="bg-[#0f1117] border border-white/10 rounded-xl w-full max-w-lg shadow-2xl max-h-[85vh] flex flex-col animate-fade-in">
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 flex-shrink-0">
           <h3 className="text-white font-semibold text-sm">
             {transaction ? "Edit Transaction" : "Add Transaction"}
           </h3>
-          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors text-xl leading-none">
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none px-1"
+          >
             ×
           </button>
         </div>
@@ -90,8 +95,9 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
             {(["income", "expense"] as const).map((f) => (
               <button
                 key={f}
+                type="button"
                 onClick={() => setFlow(f)}
-                className={`flex-1 text-xs py-1.5 rounded-lg border transition-all font-medium ${
+                className={`flex-1 text-xs py-2.5 sm:py-1.5 rounded-lg border transition-all font-medium ${
                   flow === f
                     ? f === "income"
                       ? "bg-emerald-600/20 text-emerald-300 border-emerald-500/50"
@@ -104,7 +110,8 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          {/* mobile: Date + Voucher on one row, Amount full width · desktop: 3 columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <div>
               <label className={labelCls}>Date</label>
               <input type="date" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
@@ -113,10 +120,11 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
               <label className={labelCls}>Voucher No.</label>
               <input className={inputCls} placeholder="Optional" value={voucherNo} onChange={(e) => setVoucherNo(e.target.value)} />
             </div>
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <label className={labelCls}>Amount</label>
               <input
                 type="number"
+                inputMode="decimal"
                 className={inputCls}
                 value={amount}
                 onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
@@ -161,8 +169,9 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <div>
+          {/* mobile: Service full width, Region + Mode side by side · desktop: 3 columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="col-span-2 sm:col-span-1">
               <label className={labelCls}>Client / Service</label>
               <select className={inputCls} value={serviceCategory} onChange={(e) => setServiceCategory(e.target.value)}>
                 {SERVICE_CATEGORIES.map((s) => (
@@ -194,14 +203,14 @@ const TransactionModal: React.FC<Props> = ({ transaction, chart, onClose, onSave
         <div className="flex gap-2 px-4 py-3 border-t border-white/5 flex-shrink-0">
           <button
             onClick={onClose}
-            className="flex-1 py-2 rounded-lg text-xs text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
+            className="flex-1 py-2.5 sm:py-2 rounded-lg text-sm sm:text-xs text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !isValid}
-            className="flex-1 py-2 rounded-lg text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-medium transition-colors"
+            className="flex-1 py-2.5 sm:py-2 rounded-lg text-sm sm:text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-medium transition-colors"
           >
             {saving ? "Saving..." : transaction ? "Save Changes" : "Add Transaction"}
           </button>

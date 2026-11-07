@@ -57,29 +57,36 @@ const money = (n: number) => formatMoney(n, ACCOUNTS_CURRENCY);
 const amt = (n: number) => (n === 0 ? "—" : formatAmount(n, ACCOUNTS_CURRENCY));
 
 const card = "bg-[#0f1117] border border-white/5 rounded-2xl";
+
+// text-base on mobile (16px) stops iOS Safari zooming into inputs
 const inputCls =
-  "bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors";
+  "bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 sm:py-2 text-base sm:text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors min-w-0";
 const btnGhost =
-  "text-xs px-3 py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors";
+  "text-xs px-3 py-2.5 sm:py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors";
 const btnPrimary =
-  "flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors";
+  "flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2.5 sm:py-2 rounded-xl transition-colors";
 const th =
   "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-medium whitespace-nowrap";
 const thR = th + " text-right";
 const td = "px-3 py-2.5 text-xs text-zinc-300 whitespace-nowrap";
 const tdR = td + " text-right font-mono";
 
+// hides the scrollbar on horizontally-scrolling strips (tabs, presets)
+const noScrollbar =
+  "overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
 const StatCard: React.FC<{
   label: string;
   value: string;
   tone?: "green" | "red" | "violet";
-}> = ({ label, value, tone = "violet" }) => (
-  <div className={`${card} px-5 py-4`}>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">
+  className?: string;
+}> = ({ label, value, tone = "violet", className = "" }) => (
+  <div className={`${card} px-4 sm:px-5 py-3 sm:py-4 min-w-0 ${className}`}>
+    <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-zinc-500 mb-1">
       {label}
     </p>
     <p
-      className={`text-xl font-bold ${
+      className={`text-base sm:text-xl font-bold truncate ${
         tone === "green"
           ? "text-emerald-400"
           : tone === "red"
@@ -134,13 +141,16 @@ const AccountsManagement: React.FC = () => {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
-      <div className="flex gap-2 flex-wrap">
+    <div className="animate-fade-in space-y-5 sm:space-y-6 min-w-0">
+      {/* tabs: one scrollable row on mobile, wraps on desktop */}
+      <div
+        className={`flex gap-2 sm:flex-wrap pb-1 sm:pb-0 ${noScrollbar} sm:overflow-visible`}
+      >
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+            className={`text-xs px-3.5 sm:px-3 py-2 sm:py-1.5 rounded-lg border transition-all whitespace-nowrap flex-shrink-0 ${
               tab === t.id
                 ? "bg-violet-600 text-white border-violet-500"
                 : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
@@ -156,7 +166,7 @@ const AccountsManagement: React.FC = () => {
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="text-red-300/70 hover:text-red-200 text-base leading-none"
+            className="text-red-300/70 hover:text-red-200 text-xl leading-none px-1"
           >
             ×
           </button>
@@ -165,7 +175,7 @@ const AccountsManagement: React.FC = () => {
 
       {!loading && chart.length === 0 && (
         <div
-          className={`${card} p-5 flex items-center justify-between gap-4 flex-wrap`}
+          className={`${card} p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4`}
         >
           <p className="text-sm text-zinc-300">
             No chart of accounts yet. Load the {`53`} default categories from
@@ -360,18 +370,37 @@ const CashBookTab: React.FC<{
     }
   };
 
+  const rowActions = (t: AccountTransaction) => (
+    <>
+      <button
+        onClick={() => setEditing(t)}
+        className="text-violet-300 hover:text-violet-200 text-xs px-3 py-2 md:px-0 md:py-0 md:mr-3 rounded-lg md:rounded-none bg-violet-500/10 md:bg-transparent"
+      >
+        Edit
+      </button>
+      <button
+        onClick={() => setDeleteTarget(t)}
+        className="text-red-400 hover:text-red-300 text-xs px-3 py-2 md:px-0 md:py-0 rounded-lg md:rounded-none bg-red-500/10 md:bg-transparent"
+      >
+        Delete
+      </button>
+    </>
+  );
+
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2 flex-wrap">
+    <div className="space-y-4 sm:space-y-5">
+      {/* ---------- toolbar ---------- */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        {/* filters */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center sm:flex-wrap gap-2">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search description, category, voucher…"
-            className={`${inputCls} w-64`}
+            className={`${inputCls} col-span-2 w-full sm:w-64`}
           />
           <select
-            className={inputCls}
+            className={`${inputCls} w-full sm:w-auto`}
             value={month}
             onChange={(e) => setMonth(e.target.value)}
           >
@@ -385,7 +414,7 @@ const CashBookTab: React.FC<{
             ))}
           </select>
           <select
-            className={inputCls}
+            className={`${inputCls} w-full sm:w-auto`}
             value={region}
             onChange={(e) => setRegion(e.target.value)}
           >
@@ -399,7 +428,7 @@ const CashBookTab: React.FC<{
             ))}
           </select>
           <select
-            className={inputCls}
+            className={`${inputCls} col-span-2 sm:col-span-1 w-full sm:w-auto`}
             value={flow}
             onChange={(e) =>
               setFlow(e.target.value as "all" | "income" | "expense")
@@ -417,7 +446,8 @@ const CashBookTab: React.FC<{
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* actions */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
           <input
             ref={fileRef}
             type="file"
@@ -445,7 +475,10 @@ const CashBookTab: React.FC<{
           >
             Export Excel
           </button>
-          <button onClick={() => setAdding(true)} className={btnPrimary}>
+          <button
+            onClick={() => setAdding(true)}
+            className={`${btnPrimary} col-span-2 sm:col-span-1`}
+          >
             <span className="text-base leading-none">+</span> Add Transaction
           </button>
         </div>
@@ -456,25 +489,96 @@ const CashBookTab: React.FC<{
           <span>{message}</span>
           <button
             onClick={() => setMessage("")}
-            className="text-violet-200/70 hover:text-white text-base leading-none"
+            className="text-violet-200/70 hover:text-white text-xl leading-none px-1"
           >
             ×
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* totals: Income + Expense side by side on mobile, Net full width */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <StatCard label="Total Income" value={money(tot.income)} tone="green" />
         <StatCard label="Total Expense" value={money(tot.expense)} tone="red" />
         <StatCard
           label="Net"
           value={money(tot.net)}
           tone={tot.net >= 0 ? "green" : "red"}
+          className="col-span-2 sm:col-span-1"
         />
       </div>
 
       <div ref={tableRef} className={`${card} overflow-hidden scroll-mt-4`}>
-        <div className="overflow-x-auto">
+        {/* ---------- MOBILE: card list ---------- */}
+        <div className="md:hidden divide-y divide-white/5">
+          {pageRows.map((t) => {
+            const c = byName.get(t.category);
+            const isIncome = t.income > 0;
+            return (
+              <div key={t.id} className="p-4 space-y-2.5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] text-zinc-500">
+                      {fmtDate(t.date)}
+                      {t.voucherNo ? ` · ${t.voucherNo}` : ""}
+                    </p>
+                    <p className="text-sm text-white break-words mt-0.5">
+                      {t.description || "—"}
+                    </p>
+                  </div>
+                  <p
+                    className={`text-sm font-mono font-semibold whitespace-nowrap ${
+                      isIncome ? "text-emerald-400" : "text-red-400"
+                    }`}
+                  >
+                    {isIncome ? "+" : "−"}{" "}
+                    {formatAmount(
+                      isIncome ? t.income : t.expense,
+                      ACCOUNTS_CURRENCY,
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-zinc-200">{t.category || "—"}</p>
+                  {c && (
+                    <p className="text-[10px] text-zinc-500">
+                      {c.majorHead} · {c.type}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {[t.serviceCategory, t.region, t.paymentMode]
+                    .filter(Boolean)
+                    .map((x, i) => (
+                      <span
+                        key={i}
+                        className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-400"
+                      >
+                        {x}
+                      </span>
+                    ))}
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <p className="text-[11px] text-zinc-500">
+                    Balance{" "}
+                    <span
+                      className={`font-mono ${t.balance < 0 ? "text-red-300" : "text-zinc-200"}`}
+                    >
+                      {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
+                    </span>
+                  </p>
+                  <div className="flex items-center gap-2">{rowActions(t)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ---------- DESKTOP / TABLET: table ---------- */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="border-b border-white/5">
               <tr>
@@ -526,28 +630,14 @@ const CashBookTab: React.FC<{
                     >
                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
                     </td>
-                    <td className={`${td} text-right`}>
-                      <button
-                        disabled
-                        onClick={() => setEditing(t)}
-                        className="text-violet-300 hover:text-violet-200 mr-3"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        disabled
-                        onClick={() => setDeleteTarget(t)}
-                        className="text-red-400 hover:text-red-300"
-                      >
-                        Delete
-                      </button>
-                    </td>
+                    <td className={`${td} text-right`}>{rowActions(t)}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
+
         {filtered.length === 0 && (
           <p className="text-center text-sm text-zinc-600 py-8">
             No transactions match this view.
@@ -556,13 +646,35 @@ const CashBookTab: React.FC<{
 
         {filtered.length > PAGE_SIZE && (
           <div className="flex items-center justify-between gap-3 flex-wrap px-4 py-3 border-t border-white/5">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 hidden sm:block">
               Showing {startIdx + 1}–
               {Math.min(startIdx + PAGE_SIZE, filtered.length)} of{" "}
               {filtered.length}
             </p>
 
-            <div className="flex items-center gap-1.5 flex-wrap">
+            {/* mobile: Prev · Page x / y · Next */}
+            <div className="flex sm:hidden items-center justify-between gap-2 w-full">
+              <button
+                className={btnGhost}
+                disabled={currentPage === 1}
+                onClick={() => goTo(currentPage - 1)}
+              >
+                ‹ Prev
+              </button>
+              <span className="text-xs text-zinc-400">
+                Page {currentPage} / {totalPages}
+              </span>
+              <button
+                className={btnGhost}
+                disabled={currentPage === totalPages}
+                onClick={() => goTo(currentPage + 1)}
+              >
+                Next ›
+              </button>
+            </div>
+
+            {/* desktop: full pager */}
+            <div className="hidden sm:flex items-center gap-1.5 flex-wrap">
               <button
                 className={btnGhost}
                 disabled={currentPage === 1}
@@ -673,6 +785,9 @@ const MonthlySummaryTab: React.FC<{
   );
   const sumAll = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
+  // sticky first column: narrower on mobile so more months are visible
+  const stickyTd = "sticky left-0 z-10 min-w-[130px] sm:min-w-[180px] whitespace-normal sm:whitespace-nowrap";
+
   const sectionRow = (label: string) => (
     <tr className="bg-white/[0.03]">
       <td
@@ -686,7 +801,7 @@ const MonthlySummaryTab: React.FC<{
 
   const totalRow = (label: string, values: number[], tone = "text-white") => (
     <tr className="bg-orange-500/10">
-      <td className={`${td} sticky left-0 bg-[#1a1410] font-semibold ${tone}`}>
+      <td className={`${td} ${stickyTd} bg-[#1a1410] font-semibold ${tone}`}>
         {label}
       </td>
       {values.map((v, i) => (
@@ -701,7 +816,7 @@ const MonthlySummaryTab: React.FC<{
   const lines = (rows: typeof s.income) =>
     rows.map((r) => (
       <tr key={r.code} className="hover:bg-white/[0.02]">
-        <td className={`${td} sticky left-0 bg-[#0f1117]`}>{r.category}</td>
+        <td className={`${td} ${stickyTd} bg-[#0f1117]`}>{r.category}</td>
         {r.months.map((v, i) => (
           <td key={i} className={`${tdR} ${v === 0 ? "text-zinc-600" : ""}`}>
             {amt(v)}
@@ -712,7 +827,7 @@ const MonthlySummaryTab: React.FC<{
     ));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <div className="flex items-center gap-3">
         <label className="text-xs text-zinc-500">Year</label>
         <select
@@ -728,12 +843,16 @@ const MonthlySummaryTab: React.FC<{
         </select>
       </div>
 
+      <p className="sm:hidden text-[11px] text-zinc-500">
+        Swipe sideways to see all months →
+      </p>
+
       <div className={`${card} overflow-hidden`}>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overscroll-x-contain">
           <table className="w-full">
             <thead className="border-b border-white/5">
               <tr>
-                <th className={`${th} sticky left-0 bg-[#0f1117]`}>Category</th>
+                <th className={`${th} ${stickyTd} bg-[#0f1117]`}>Category</th>
                 {MONTHS.map((m) => (
                   <th key={m} className={thR}>
                     {m}
@@ -767,37 +886,42 @@ const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({
 }) => (
   <div className={`${card} overflow-hidden`}>
     <p className="px-4 pt-4 pb-2 text-xs font-semibold text-white">{title}</p>
-    <table className="w-full">
-      <thead className="border-b border-white/5">
-        <tr>
-          <th className={th}>Name</th>
-          <th className={thR}>Income</th>
-          <th className={thR}>Expense</th>
-          <th className={thR}>Net</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-white/5">
-        {rows.map((r) => (
-          <tr key={r.label}>
-            <td className={td}>{r.label}</td>
-            <td className={`${tdR} text-emerald-400`}>{amt(r.income)}</td>
-            <td className={`${tdR} text-red-400`}>{amt(r.expense)}</td>
-            <td
-              className={`${tdR} ${r.net < 0 ? "text-red-300" : "text-zinc-200"}`}
-            >
-              {formatAmount(r.net, ACCOUNTS_CURRENCY)}
-            </td>
-          </tr>
-        ))}
-        {rows.length === 0 && (
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="border-b border-white/5">
           <tr>
-            <td colSpan={4} className="text-center text-xs text-zinc-600 py-5">
-              No data in this period.
-            </td>
+            <th className={th}>Name</th>
+            <th className={thR}>Income</th>
+            <th className={thR}>Expense</th>
+            <th className={thR}>Net</th>
           </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-white/5">
+          {rows.map((r) => (
+            <tr key={r.label}>
+              <td className={`${td} whitespace-normal`}>{r.label}</td>
+              <td className={`${tdR} text-emerald-400`}>{amt(r.income)}</td>
+              <td className={`${tdR} text-red-400`}>{amt(r.expense)}</td>
+              <td
+                className={`${tdR} ${r.net < 0 ? "text-red-300" : "text-zinc-200"}`}
+              >
+                {formatAmount(r.net, ACCOUNTS_CURRENCY)}
+              </td>
+            </tr>
+          ))}
+          {rows.length === 0 && (
+            <tr>
+              <td
+                colSpan={4}
+                className="text-center text-xs text-zinc-600 py-5"
+              >
+                No data in this period.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   </div>
 );
 
@@ -854,7 +978,9 @@ const StatementTab: React.FC<{
   );
   const totalRow = (label: string, value: number, tone = "text-white") => (
     <tr className="bg-orange-500/10">
-      <td className={`${td} px-4 font-semibold ${tone}`}>{label}</td>
+      <td className={`${td} px-4 font-semibold whitespace-normal ${tone}`}>
+        {label}
+      </td>
       <td className={`${tdR} px-4 font-semibold ${tone}`}>
         {formatAmount(value, ACCOUNTS_CURRENCY)}
       </td>
@@ -862,35 +988,68 @@ const StatementTab: React.FC<{
   );
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-3 flex-wrap">
-        <label className="text-xs text-zinc-500">From</label>
-        <input
-          type="date"
-          className={inputCls}
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-        />
-        <label className="text-xs text-zinc-500">To</label>
-        <input
-          type="date"
-          className={inputCls}
-          min={from}
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-        />
-        <button className={btnGhost} onClick={() => preset("month")}>
-          This month
-        </button>
-        <button className={btnGhost} onClick={() => preset("last")}>
-          Last month
-        </button>
-        <button className={btnGhost} onClick={() => preset("fy")}>
-          This FY (Apr–Mar)
-        </button>
+    <div className="space-y-4 sm:space-y-5">
+      {/* date range */}
+      <div className="space-y-2.5">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 sm:gap-3 sm:flex-wrap">
+          <div className="min-w-0">
+            <label className="text-[11px] text-zinc-500 block mb-1 sm:hidden">
+              From
+            </label>
+            <div className="flex items-center gap-3">
+              <label className="hidden sm:block text-xs text-zinc-500">
+                From
+              </label>
+              <input
+                type="date"
+                className={`${inputCls} w-full`}
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="min-w-0">
+            <label className="text-[11px] text-zinc-500 block mb-1 sm:hidden">
+              To
+            </label>
+            <div className="flex items-center gap-3">
+              <label className="hidden sm:block text-xs text-zinc-500">
+                To
+              </label>
+              <input
+                type="date"
+                className={`${inputCls} w-full`}
+                min={from}
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={`flex gap-2 ${noScrollbar} sm:overflow-visible`}>
+          <button
+            className={`${btnGhost} whitespace-nowrap`}
+            onClick={() => preset("month")}
+          >
+            This month
+          </button>
+          <button
+            className={`${btnGhost} whitespace-nowrap`}
+            onClick={() => preset("last")}
+          >
+            Last month
+          </button>
+          <button
+            className={`${btnGhost} whitespace-nowrap`}
+            onClick={() => preset("fy")}
+          >
+            This FY (Apr–Mar)
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <StatCard
           label="Total Income"
           value={money(st.totalIncome)}
@@ -905,6 +1064,7 @@ const StatementTab: React.FC<{
           label={st.net >= 0 ? "Net Profit" : "Net Loss"}
           value={money(st.net)}
           tone={st.net >= 0 ? "green" : "red"}
+          className="col-span-2 sm:col-span-1"
         />
       </div>
 
@@ -920,7 +1080,7 @@ const StatementTab: React.FC<{
             {section("Income")}
             {st.income.map((l) => (
               <tr key={l.code}>
-                <td className={`${td} px-4`}>{l.category}</td>
+                <td className={`${td} px-4 whitespace-normal`}>{l.category}</td>
                 <td
                   className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
                 >
@@ -932,7 +1092,7 @@ const StatementTab: React.FC<{
             {section("Expense")}
             {st.expense.map((l) => (
               <tr key={l.code}>
-                <td className={`${td} px-4`}>{l.category}</td>
+                <td className={`${td} px-4 whitespace-normal`}>{l.category}</td>
                 <td
                   className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
                 >
@@ -961,7 +1121,7 @@ const StatementTab: React.FC<{
         </p>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         <BreakdownTable title="By Region" rows={byRegion} />
         <BreakdownTable title="By Client / Service Category" rows={byService} />
       </div>
@@ -1040,14 +1200,17 @@ const BalanceSheetTab: React.FC<{
       key={c.code}
       className="flex items-center justify-between gap-3 py-1.5"
     >
-      <span className="text-xs text-zinc-300">{c.name}</span>
+      <span className="text-xs text-zinc-300 min-w-0 break-words">
+        {c.name}
+      </span>
       <input
         type="text"
         inputMode="decimal"
         value={draft[c.code] ?? ""}
         placeholder="0"
+        onFocus={(e) => e.target.select()}
         onChange={(e) => setDraft((p) => ({ ...p, [c.code]: e.target.value }))}
-        className={`${inputCls} w-36 text-right font-mono text-sky-300`}
+        className={`${inputCls} w-28 sm:w-36 flex-shrink-0 text-right font-mono text-sky-300`}
       />
     </div>
   );
@@ -1060,13 +1223,13 @@ const BalanceSheetTab: React.FC<{
     );
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
+    <div className="space-y-4 sm:space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <label className="text-xs text-zinc-500">As of</label>
           <input
             type="date"
-            className={inputCls}
+            className={`${inputCls} flex-1 sm:flex-none`}
             value={asOf}
             onChange={(e) => setAsOf(e.target.value)}
           />
@@ -1078,11 +1241,11 @@ const BalanceSheetTab: React.FC<{
 
       {msg && <p className="text-xs text-violet-300">{msg}</p>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className={`${card} p-5`}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+        <div className={`${card} p-4 sm:p-5`}>
           <p className="text-sm font-semibold text-white mb-2">Assets</p>
           {assets.map(field)}
-          <div className="flex justify-between pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
+          <div className="flex justify-between gap-3 pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
             <span>Total Assets</span>
             <span className="font-mono">{money(t.assets)}</span>
           </div>
@@ -1093,12 +1256,12 @@ const BalanceSheetTab: React.FC<{
           </p>
         </div>
 
-        <div className={`${card} p-5`}>
+        <div className={`${card} p-4 sm:p-5`}>
           <p className="text-sm font-semibold text-white mb-2">
             Liabilities &amp; Equity
           </p>
           {le.map(field)}
-          <div className="flex justify-between pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
+          <div className="flex justify-between gap-3 pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
             <span>Total Liabilities &amp; Equity</span>
             <span className="font-mono">{money(t.liabilitiesEquity)}</span>
           </div>
@@ -1106,7 +1269,7 @@ const BalanceSheetTab: React.FC<{
       </div>
 
       <div
-        className={`rounded-xl px-4 py-3 text-sm border ${
+        className={`rounded-xl px-4 py-3 text-sm border break-words ${
           Math.abs(t.diff) < 0.005
             ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
             : "bg-red-500/10 border-red-500/20 text-red-300"
@@ -1139,6 +1302,8 @@ const ChartTab: React.FC<{
     null,
   );
   const [deleting, setDeleting] = useState(false);
+
+  useLockBodyScroll(!!deleteTarget);
 
   const usedNames = useMemo(() => new Set(txns.map((t) => t.category)), [txns]);
 
@@ -1196,24 +1361,24 @@ const ChartTab: React.FC<{
   };
 
   return (
-    <div className="space-y-5">
-      <div className={`${card} p-5`}>
+    <div className="space-y-4 sm:space-y-5">
+      <div className={`${card} p-4 sm:p-5`}>
         <p className="text-sm font-semibold text-white mb-3">Add category</p>
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 sm:gap-3">
           <input
-            className={inputCls}
+            className={`${inputCls} w-full`}
             placeholder="Code (EX19)"
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
           <input
-            className={`${inputCls} col-span-2`}
+            className={`${inputCls} w-full col-span-2 lg:col-span-2 order-last sm:order-none`}
             placeholder="Category name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <select
-            className={inputCls}
+            className={`${inputCls} w-full`}
             value={majorHead}
             onChange={(e) => changeHead(e.target.value as MajorHead)}
           >
@@ -1224,7 +1389,7 @@ const ChartTab: React.FC<{
             ))}
           </select>
           <select
-            className={inputCls}
+            className={`${inputCls} w-full col-span-2 lg:col-span-1`}
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
@@ -1235,13 +1400,13 @@ const ChartTab: React.FC<{
             ))}
           </select>
           <input
-            className={inputCls}
+            className={`${inputCls} w-full col-span-2 lg:col-span-1`}
             placeholder="Notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-3 mt-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
           <button
             onClick={handleAdd}
             disabled={saving || !code.trim() || !name.trim()}
@@ -1258,7 +1423,44 @@ const ChartTab: React.FC<{
       </div>
 
       <div className={`${card} overflow-hidden`}>
-        <div className="overflow-x-auto">
+        {/* MOBILE: card list */}
+        <div className="md:hidden divide-y divide-white/5">
+          {chart.map((c) => {
+            const used = usedNames.has(c.name);
+            return (
+              <div
+                key={c.id}
+                className="p-4 flex items-start justify-between gap-3"
+              >
+                <div className="min-w-0">
+                  <p className="text-[11px] font-mono text-zinc-500">
+                    {c.code}
+                  </p>
+                  <p className="text-sm text-zinc-100 break-words">{c.name}</p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5">
+                    {c.majorHead} · {c.type}
+                  </p>
+                  {c.notes && (
+                    <p className="text-[11px] text-zinc-600 mt-1 break-words">
+                      {c.notes}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setDeleteTarget(c)}
+                  disabled={used}
+                  title={used ? "Used by transactions" : "Delete category"}
+                  className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed text-xs px-3 py-2 rounded-lg bg-red-500/10 flex-shrink-0"
+                >
+                  Delete
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* DESKTOP: table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="border-b border-white/5">
               <tr>
