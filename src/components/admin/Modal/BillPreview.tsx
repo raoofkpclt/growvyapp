@@ -2,6 +2,8 @@ import React, { forwardRef } from "react";
 import type { BillItem, BillDocType } from "../../../utils/types/Types";
 // TODO: point this to your real logo file (png/svg in src/assets)
 import logo from "../../../assets/Logo-2.png";
+// company seal (transparent PNG in src/assets)
+import seal from "../../../assets/seal.png";
 import { formatAmount, formatMoney, numToWords } from "../../../utils/currency";
 import type { CurrencyCode } from "../../../utils/currency";
 
@@ -284,16 +286,33 @@ const BillPreview = forwardRef<HTMLDivElement, { data: BillPreviewData }>(({ dat
         </div>
       )}
 
-      {/* signature */}
+      {/* signature + company seal */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 44 }}>
         <div style={{ fontSize: 10.5, color: C.soft, maxWidth: 340, lineHeight: 1.6 }}>
           {isInvoice
             ? "Payment due within 7 days. This is a computer-generated invoice."
             : "This receipt confirms payment received as above. Kept for accounting records."}
         </div>
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", position: "relative", width: 190 }}>
           <div style={{ fontSize: 11.5, fontWeight: 600, marginBottom: 38 }}>For {COMPANY.name}</div>
-          <div style={{ width: 170, borderTop: `1px solid ${C.soft}`, marginBottom: 5 }} />
+
+          {/* company seal (overlaps the signature area like a real stamp) */}
+          <img
+            src={seal}
+            alt="Company seal"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: 14,
+              width: 96,
+              height: 96,
+              transform: "translateX(-50%) rotate(-8deg)",
+              opacity: 0.85,
+              pointerEvents: "none",
+            }}
+          />
+
+          <div style={{ width: 170, borderTop: `1px solid ${C.soft}`, margin: "0 auto 5px" }} />
           <div style={{ fontSize: 11, color: C.soft }}>Authorized Signatory</div>
         </div>
       </div>

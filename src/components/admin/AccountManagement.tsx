@@ -37,7 +37,10 @@ import {
   withRunningBalance,
 } from "../../service/Accounts";
 import type { BreakdownRow } from "../../service/Accounts";
-import { exportTransactionsXlsx, parseTransactionsXlsx } from "../../service/Accountsexcel";
+import {
+  exportTransactionsXlsx,
+  parseTransactionsXlsx,
+} from "../../service/Accountsexcel";
 import { formatAmount, formatMoney } from "../../utils/currency";
 
 /* ---------- shared bits ---------- */
@@ -60,21 +63,28 @@ const btnGhost =
   "text-xs px-3 py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors";
 const btnPrimary =
   "flex items-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors";
-const th = "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-medium whitespace-nowrap";
+const th =
+  "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-medium whitespace-nowrap";
 const thR = th + " text-right";
 const td = "px-3 py-2.5 text-xs text-zinc-300 whitespace-nowrap";
 const tdR = td + " text-right font-mono";
 
-const StatCard: React.FC<{ label: string; value: string; tone?: "green" | "red" | "violet" }> = ({
-  label,
-  value,
-  tone = "violet",
-}) => (
+const StatCard: React.FC<{
+  label: string;
+  value: string;
+  tone?: "green" | "red" | "violet";
+}> = ({ label, value, tone = "violet" }) => (
   <div className={`${card} px-5 py-4`}>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{label}</p>
+    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-1">
+      {label}
+    </p>
     <p
       className={`text-xl font-bold ${
-        tone === "green" ? "text-emerald-400" : tone === "red" ? "text-red-400" : "text-white"
+        tone === "green"
+          ? "text-emerald-400"
+          : tone === "red"
+            ? "text-red-400"
+            : "text-white"
       }`}
     >
       {value}
@@ -96,7 +106,10 @@ const AccountsManagement: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const [t, c] = await Promise.all([getTransactions(), getChartOfAccounts()]);
+        const [t, c] = await Promise.all([
+          getTransactions(),
+          getChartOfAccounts(),
+        ]);
         setTxns(t);
         setChart(c);
       } catch (e) {
@@ -141,32 +154,48 @@ const AccountsManagement: React.FC = () => {
       {error && (
         <div className="flex items-center justify-between gap-3 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
           <span>{error}</span>
-          <button onClick={() => setError("")} className="text-red-300/70 hover:text-red-200 text-base leading-none">
+          <button
+            onClick={() => setError("")}
+            className="text-red-300/70 hover:text-red-200 text-base leading-none"
+          >
             ×
           </button>
         </div>
       )}
 
       {!loading && chart.length === 0 && (
-        <div className={`${card} p-5 flex items-center justify-between gap-4 flex-wrap`}>
+        <div
+          className={`${card} p-5 flex items-center justify-between gap-4 flex-wrap`}
+        >
           <p className="text-sm text-zinc-300">
-            No chart of accounts yet. Load the {`53`} default categories from your Excel sheet to get started.
+            No chart of accounts yet. Load the {`53`} default categories from
+            your Excel sheet to get started.
           </p>
-          <button onClick={handleSeed} disabled={seeding} className={btnPrimary}>
+          <button
+            onClick={handleSeed}
+            disabled={seeding}
+            className={btnPrimary}
+          >
             {seeding ? "Loading..." : "Load default chart"}
           </button>
         </div>
       )}
 
       {loading ? (
-        <p className="text-center text-sm text-zinc-500 py-10">Loading accounts…</p>
+        <p className="text-center text-sm text-zinc-500 py-10">
+          Loading accounts…
+        </p>
       ) : (
         <>
-          {tab === "cashbook" && <CashBookTab txns={txns} setTxns={setTxns} chart={chart} />}
+          {tab === "cashbook" && (
+            <CashBookTab txns={txns} setTxns={setTxns} chart={chart} />
+          )}
           {tab === "summary" && <MonthlySummaryTab txns={txns} chart={chart} />}
           {tab === "statement" && <StatementTab txns={txns} chart={chart} />}
           {tab === "balance" && <BalanceSheetTab txns={txns} chart={chart} />}
-          {tab === "chart" && <ChartTab txns={txns} chart={chart} setChart={setChart} />}
+          {tab === "chart" && (
+            <ChartTab txns={txns} chart={chart} setChart={setChart} />
+          )}
         </>
       )}
     </div>
@@ -189,7 +218,9 @@ const CashBookTab: React.FC<{
   const [flow, setFlow] = useState<"all" | "income" | "expense">("all");
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<AccountTransaction | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<AccountTransaction | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AccountTransaction | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const [importing, setImporting] = useState(false);
@@ -197,13 +228,16 @@ const CashBookTab: React.FC<{
   const fileRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
 
-
   useLockBodyScroll(adding || !!editing || !!deleteTarget);
 
   const byName = useMemo(() => new Map(chart.map((c) => [c.name, c])), [chart]);
   const rows = useMemo(() => withRunningBalance(txns), [txns]); // oldest -> newest, with running balance
   const months = useMemo(
-    () => [...new Set(txns.map((t) => t.date.slice(0, 7)))].filter(Boolean).sort().reverse(),
+    () =>
+      [...new Set(txns.map((t) => t.date.slice(0, 7)))]
+        .filter(Boolean)
+        .sort()
+        .reverse(),
     [txns],
   );
 
@@ -283,7 +317,9 @@ const CashBookTab: React.FC<{
 
       // skip rows that are already saved (same date + description + amounts)
       const existing = new Map<string, number>();
-      txns.forEach((t) => existing.set(txnKey(t), (existing.get(txnKey(t)) ?? 0) + 1));
+      txns.forEach((t) =>
+        existing.set(txnKey(t), (existing.get(txnKey(t)) ?? 0) + 1),
+      );
       const fresh = parsed.rows.filter((r) => {
         const k = txnKey(r);
         const n = existing.get(k) ?? 0;
@@ -295,7 +331,9 @@ const CashBookTab: React.FC<{
       });
 
       if (fresh.length === 0) {
-        setMessage(`Nothing new to import. ${parsed.rows.length} rows are already saved.`);
+        setMessage(
+          `Nothing new to import. ${parsed.rows.length} rows are already saved.`,
+        );
         return;
       }
       const alreadySaved = parsed.rows.length - fresh.length;
@@ -314,7 +352,9 @@ const CashBookTab: React.FC<{
       setMessage(`Imported ${created.length} transactions.`);
     } catch (err) {
       console.log(err);
-      setMessage("Could not read that file. Use the Accounts workbook (.xlsx) with the Transactions sheet.");
+      setMessage(
+        "Could not read that file. Use the Accounts workbook (.xlsx) with the Transactions sheet.",
+      );
     } finally {
       setImporting(false);
     }
@@ -330,34 +370,78 @@ const CashBookTab: React.FC<{
             placeholder="Search description, category, voucher…"
             className={`${inputCls} w-64`}
           />
-          <select className={inputCls} value={month} onChange={(e) => setMonth(e.target.value)}>
-            <option value="all" className="bg-[#0f1117]">All months</option>
+          <select
+            className={inputCls}
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          >
+            <option value="all" className="bg-[#0f1117]">
+              All months
+            </option>
             {months.map((m) => (
-              <option key={m} value={m} className="bg-[#0f1117]">{fmtMonth(m)}</option>
+              <option key={m} value={m} className="bg-[#0f1117]">
+                {fmtMonth(m)}
+              </option>
             ))}
           </select>
-          <select className={inputCls} value={region} onChange={(e) => setRegion(e.target.value)}>
-            <option value="all" className="bg-[#0f1117]">All regions</option>
+          <select
+            className={inputCls}
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+          >
+            <option value="all" className="bg-[#0f1117]">
+              All regions
+            </option>
             {REGIONS.map((r) => (
-              <option key={r} value={r} className="bg-[#0f1117]">{r}</option>
+              <option key={r} value={r} className="bg-[#0f1117]">
+                {r}
+              </option>
             ))}
           </select>
-          <select className={inputCls} value={flow} onChange={(e) => setFlow(e.target.value as "all" | "income" | "expense")}>
-            <option value="all" className="bg-[#0f1117]">Income &amp; Expense</option>
-            <option value="income" className="bg-[#0f1117]">Income only</option>
-            <option value="expense" className="bg-[#0f1117]">Expense only</option>
+          <select
+            className={inputCls}
+            value={flow}
+            onChange={(e) =>
+              setFlow(e.target.value as "all" | "income" | "expense")
+            }
+          >
+            <option value="all" className="bg-[#0f1117]">
+              Income &amp; Expense
+            </option>
+            <option value="income" className="bg-[#0f1117]">
+              Income only
+            </option>
+            <option value="expense" className="bg-[#0f1117]">
+              Expense only
+            </option>
           </select>
         </div>
 
         <div className="flex items-center gap-2">
-          <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
-          <button className={btnGhost} disabled={importing} onClick={() => fileRef.current?.click()}>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".xlsx,.xls"
+            className="hidden"
+            onChange={handleImport}
+          />
+          <button
+            className={btnGhost}
+            disabled={importing}
+            onClick={() => fileRef.current?.click()}
+          >
             {importing ? "Importing…" : "Import Excel"}
           </button>
           <button
             className={btnGhost}
             disabled={filtered.length === 0}
-            onClick={() => exportTransactionsXlsx([...filtered].reverse(), chart, "Growvy_Transactions.xlsx")}
+            onClick={() =>
+              exportTransactionsXlsx(
+                [...filtered].reverse(),
+                chart,
+                "Growvy_Transactions.xlsx",
+              )
+            }
           >
             Export Excel
           </button>
@@ -370,7 +454,10 @@ const CashBookTab: React.FC<{
       {message && (
         <div className="flex items-center justify-between gap-3 text-xs text-violet-200 bg-violet-500/10 border border-violet-500/20 rounded-xl px-4 py-2.5">
           <span>{message}</span>
-          <button onClick={() => setMessage("")} className="text-violet-200/70 hover:text-white text-base leading-none">
+          <button
+            onClick={() => setMessage("")}
+            className="text-violet-200/70 hover:text-white text-base leading-none"
+          >
             ×
           </button>
         </div>
@@ -379,7 +466,11 @@ const CashBookTab: React.FC<{
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Total Income" value={money(tot.income)} tone="green" />
         <StatCard label="Total Expense" value={money(tot.expense)} tone="red" />
-        <StatCard label="Net" value={money(tot.net)} tone={tot.net >= 0 ? "green" : "red"} />
+        <StatCard
+          label="Net"
+          value={money(tot.net)}
+          tone={tot.net >= 0 ? "green" : "red"}
+        />
       </div>
 
       <div ref={tableRef} className={`${card} overflow-hidden scroll-mt-4`}>
@@ -406,8 +497,13 @@ const CashBookTab: React.FC<{
                 return (
                   <tr key={t.id} className="hover:bg-white/[0.02]">
                     <td className={td}>{fmtDate(t.date)}</td>
-                    <td className={`${td} font-mono text-zinc-500`}>{t.voucherNo || "—"}</td>
-                    <td className={`${td} max-w-[260px] truncate`} title={t.description}>
+                    <td className={`${td} font-mono text-zinc-500`}>
+                      {t.voucherNo || "—"}
+                    </td>
+                    <td
+                      className={`${td} max-w-[260px] truncate`}
+                      title={t.description}
+                    >
                       {t.description || "—"}
                     </td>
                     <td className={td}>
@@ -421,16 +517,28 @@ const CashBookTab: React.FC<{
                     <td className={td}>{t.serviceCategory}</td>
                     <td className={td}>{t.region}</td>
                     <td className={td}>{t.paymentMode}</td>
-                    <td className={`${tdR} text-emerald-400`}>{amt(t.income)}</td>
+                    <td className={`${tdR} text-emerald-400`}>
+                      {amt(t.income)}
+                    </td>
                     <td className={`${tdR} text-red-400`}>{amt(t.expense)}</td>
-                    <td className={`${tdR} ${t.balance < 0 ? "text-red-300" : "text-zinc-200"}`}>
+                    <td
+                      className={`${tdR} ${t.balance < 0 ? "text-red-300" : "text-zinc-200"}`}
+                    >
                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
                     </td>
                     <td className={`${td} text-right`}>
-                      <button disabled onClick={() => setEditing(t)} className="text-violet-300 hover:text-violet-200 mr-3">
+                      <button
+                        disabled
+                        onClick={() => setEditing(t)}
+                        className="text-violet-300 hover:text-violet-200 mr-3"
+                      >
                         Edit
                       </button>
-                      <button disabled onClick={() => setDeleteTarget(t)} className="text-red-400 hover:text-red-300">
+                      <button
+                        disabled
+                        onClick={() => setDeleteTarget(t)}
+                        className="text-red-400 hover:text-red-300"
+                      >
                         Delete
                       </button>
                     </td>
@@ -441,26 +549,41 @@ const CashBookTab: React.FC<{
           </table>
         </div>
         {filtered.length === 0 && (
-          <p className="text-center text-sm text-zinc-600 py-8">No transactions match this view.</p>
+          <p className="text-center text-sm text-zinc-600 py-8">
+            No transactions match this view.
+          </p>
         )}
 
         {filtered.length > PAGE_SIZE && (
           <div className="flex items-center justify-between gap-3 flex-wrap px-4 py-3 border-t border-white/5">
             <p className="text-xs text-zinc-500">
-              Showing {startIdx + 1}–{Math.min(startIdx + PAGE_SIZE, filtered.length)} of {filtered.length}
+              Showing {startIdx + 1}–
+              {Math.min(startIdx + PAGE_SIZE, filtered.length)} of{" "}
+              {filtered.length}
             </p>
 
             <div className="flex items-center gap-1.5 flex-wrap">
-              <button className={btnGhost} disabled={currentPage === 1} onClick={() => goTo(1)}>
+              <button
+                className={btnGhost}
+                disabled={currentPage === 1}
+                onClick={() => goTo(1)}
+              >
                 «
               </button>
-              <button className={btnGhost} disabled={currentPage === 1} onClick={() => goTo(currentPage - 1)}>
+              <button
+                className={btnGhost}
+                disabled={currentPage === 1}
+                onClick={() => goTo(currentPage - 1)}
+              >
                 Prev
               </button>
 
               {pageNumbers.map((p, i) =>
                 p === "..." ? (
-                  <span key={`dots-${i}`} className="px-1 text-xs text-zinc-600">
+                  <span
+                    key={`dots-${i}`}
+                    className="px-1 text-xs text-zinc-600"
+                  >
                     …
                   </span>
                 ) : (
@@ -485,7 +608,11 @@ const CashBookTab: React.FC<{
               >
                 Next
               </button>
-              <button className={btnGhost} disabled={currentPage === totalPages} onClick={() => goTo(totalPages)}>
+              <button
+                className={btnGhost}
+                disabled={currentPage === totalPages}
+                onClick={() => goTo(totalPages)}
+              >
                 »
               </button>
             </div>
@@ -515,7 +642,11 @@ const CashBookTab: React.FC<{
         />
       )}
       {deleteTarget && (
-        <DeleteConfirmModal loading={deleting} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} />
+        <DeleteConfirmModal
+          loading={deleting}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+        />
       )}
     </div>
   );
@@ -524,10 +655,10 @@ const CashBookTab: React.FC<{
 /* =====================================================================
    2. Monthly Summary
    ===================================================================== */
-const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategory[] }> = ({
-  txns,
-  chart,
-}) => {
+const MonthlySummaryTab: React.FC<{
+  txns: AccountTransaction[];
+  chart: AccountCategory[];
+}> = ({ txns, chart }) => {
   const thisYear = new Date().getFullYear();
   const years = useMemo(() => {
     const set = new Set<number>([thisYear]);
@@ -536,12 +667,18 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
   }, [txns, thisYear]);
   const [year, setYear] = useState(years[0] ?? thisYear);
 
-  const s = useMemo(() => monthlySummary(txns, chart, year), [txns, chart, year]);
+  const s = useMemo(
+    () => monthlySummary(txns, chart, year),
+    [txns, chart, year],
+  );
   const sumAll = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
   const sectionRow = (label: string) => (
     <tr className="bg-white/[0.03]">
-      <td colSpan={14} className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300">
+      <td
+        colSpan={14}
+        className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300"
+      >
         {label}
       </td>
     </tr>
@@ -549,9 +686,13 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
 
   const totalRow = (label: string, values: number[], tone = "text-white") => (
     <tr className="bg-orange-500/10">
-      <td className={`${td} sticky left-0 bg-[#1a1410] font-semibold ${tone}`}>{label}</td>
+      <td className={`${td} sticky left-0 bg-[#1a1410] font-semibold ${tone}`}>
+        {label}
+      </td>
       {values.map((v, i) => (
-        <td key={i} className={`${tdR} font-semibold ${tone}`}>{amt(v)}</td>
+        <td key={i} className={`${tdR} font-semibold ${tone}`}>
+          {amt(v)}
+        </td>
       ))}
       <td className={`${tdR} font-semibold ${tone}`}>{amt(sumAll(values))}</td>
     </tr>
@@ -562,7 +703,9 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
       <tr key={r.code} className="hover:bg-white/[0.02]">
         <td className={`${td} sticky left-0 bg-[#0f1117]`}>{r.category}</td>
         {r.months.map((v, i) => (
-          <td key={i} className={`${tdR} ${v === 0 ? "text-zinc-600" : ""}`}>{amt(v)}</td>
+          <td key={i} className={`${tdR} ${v === 0 ? "text-zinc-600" : ""}`}>
+            {amt(v)}
+          </td>
         ))}
         <td className={`${tdR} text-white`}>{amt(r.total)}</td>
       </tr>
@@ -572,9 +715,15 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <label className="text-xs text-zinc-500">Year</label>
-        <select className={inputCls} value={year} onChange={(e) => setYear(Number(e.target.value))}>
+        <select
+          className={inputCls}
+          value={year}
+          onChange={(e) => setYear(Number(e.target.value))}
+        >
           {years.map((y) => (
-            <option key={y} value={y} className="bg-[#0f1117]">{y}</option>
+            <option key={y} value={y} className="bg-[#0f1117]">
+              {y}
+            </option>
           ))}
         </select>
       </div>
@@ -586,7 +735,9 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
               <tr>
                 <th className={`${th} sticky left-0 bg-[#0f1117]`}>Category</th>
                 {MONTHS.map((m) => (
-                  <th key={m} className={thR}>{m}</th>
+                  <th key={m} className={thR}>
+                    {m}
+                  </th>
                 ))}
                 <th className={thR}>Total</th>
               </tr>
@@ -610,7 +761,10 @@ const MonthlySummaryTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCa
 /* =====================================================================
    3. Income & Expense Statement (P&L)
    ===================================================================== */
-const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({ title, rows }) => (
+const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({
+  title,
+  rows,
+}) => (
   <div className={`${card} overflow-hidden`}>
     <p className="px-4 pt-4 pb-2 text-xs font-semibold text-white">{title}</p>
     <table className="w-full">
@@ -628,12 +782,18 @@ const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({ tit
             <td className={td}>{r.label}</td>
             <td className={`${tdR} text-emerald-400`}>{amt(r.income)}</td>
             <td className={`${tdR} text-red-400`}>{amt(r.expense)}</td>
-            <td className={`${tdR} ${r.net < 0 ? "text-red-300" : "text-zinc-200"}`}>{formatAmount(r.net, ACCOUNTS_CURRENCY)}</td>
+            <td
+              className={`${tdR} ${r.net < 0 ? "text-red-300" : "text-zinc-200"}`}
+            >
+              {formatAmount(r.net, ACCOUNTS_CURRENCY)}
+            </td>
           </tr>
         ))}
         {rows.length === 0 && (
           <tr>
-            <td colSpan={4} className="text-center text-xs text-zinc-600 py-5">No data in this period.</td>
+            <td colSpan={4} className="text-center text-xs text-zinc-600 py-5">
+              No data in this period.
+            </td>
           </tr>
         )}
       </tbody>
@@ -641,10 +801,17 @@ const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({ tit
   </div>
 );
 
-const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategory[] }> = ({ txns, chart }) => {
+const StatementTab: React.FC<{
+  txns: AccountTransaction[];
+  chart: AccountCategory[];
+}> = ({ txns, chart }) => {
   const now = new Date();
-  const [from, setFrom] = useState(toIso(new Date(now.getFullYear(), now.getMonth(), 1)));
-  const [to, setTo] = useState(toIso(new Date(now.getFullYear(), now.getMonth() + 1, 0)));
+  const [from, setFrom] = useState(
+    toIso(new Date(now.getFullYear(), now.getMonth(), 1)),
+  );
+  const [to, setTo] = useState(
+    toIso(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+  );
 
   const preset = (k: "month" | "last" | "fy") => {
     const y = now.getFullYear();
@@ -662,13 +829,25 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
     }
   };
 
-  const st = useMemo(() => periodStatement(txns, chart, from, to), [txns, chart, from, to]);
-  const byRegion = useMemo(() => breakdownBy(txns, chart, from, to, "region"), [txns, chart, from, to]);
-  const byService = useMemo(() => breakdownBy(txns, chart, from, to, "serviceCategory"), [txns, chart, from, to]);
+  const st = useMemo(
+    () => periodStatement(txns, chart, from, to),
+    [txns, chart, from, to],
+  );
+  const byRegion = useMemo(
+    () => breakdownBy(txns, chart, from, to, "region"),
+    [txns, chart, from, to],
+  );
+  const byService = useMemo(
+    () => breakdownBy(txns, chart, from, to, "serviceCategory"),
+    [txns, chart, from, to],
+  );
 
   const section = (label: string) => (
     <tr className="bg-white/[0.03]">
-      <td colSpan={2} className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300">
+      <td
+        colSpan={2}
+        className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300"
+      >
         {label}
       </td>
     </tr>
@@ -676,7 +855,9 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
   const totalRow = (label: string, value: number, tone = "text-white") => (
     <tr className="bg-orange-500/10">
       <td className={`${td} px-4 font-semibold ${tone}`}>{label}</td>
-      <td className={`${tdR} px-4 font-semibold ${tone}`}>{formatAmount(value, ACCOUNTS_CURRENCY)}</td>
+      <td className={`${tdR} px-4 font-semibold ${tone}`}>
+        {formatAmount(value, ACCOUNTS_CURRENCY)}
+      </td>
     </tr>
   );
 
@@ -684,17 +865,42 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
     <div className="space-y-5">
       <div className="flex items-center gap-3 flex-wrap">
         <label className="text-xs text-zinc-500">From</label>
-        <input type="date" className={inputCls} value={from} onChange={(e) => setFrom(e.target.value)} />
+        <input
+          type="date"
+          className={inputCls}
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+        />
         <label className="text-xs text-zinc-500">To</label>
-        <input type="date" className={inputCls} min={from} value={to} onChange={(e) => setTo(e.target.value)} />
-        <button className={btnGhost} onClick={() => preset("month")}>This month</button>
-        <button className={btnGhost} onClick={() => preset("last")}>Last month</button>
-        <button className={btnGhost} onClick={() => preset("fy")}>This FY (Apr–Mar)</button>
+        <input
+          type="date"
+          className={inputCls}
+          min={from}
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+        />
+        <button className={btnGhost} onClick={() => preset("month")}>
+          This month
+        </button>
+        <button className={btnGhost} onClick={() => preset("last")}>
+          Last month
+        </button>
+        <button className={btnGhost} onClick={() => preset("fy")}>
+          This FY (Apr–Mar)
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Total Income" value={money(st.totalIncome)} tone="green" />
-        <StatCard label="Total Expense" value={money(st.totalExpense)} tone="red" />
+        <StatCard
+          label="Total Income"
+          value={money(st.totalIncome)}
+          tone="green"
+        />
+        <StatCard
+          label="Total Expense"
+          value={money(st.totalExpense)}
+          tone="red"
+        />
         <StatCard
           label={st.net >= 0 ? "Net Profit" : "Net Loss"}
           value={money(st.net)}
@@ -715,7 +921,11 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
             {st.income.map((l) => (
               <tr key={l.code}>
                 <td className={`${td} px-4`}>{l.category}</td>
-                <td className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}>{amt(l.amount)}</td>
+                <td
+                  className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
+                >
+                  {amt(l.amount)}
+                </td>
               </tr>
             ))}
             {totalRow("Total Income (A)", st.totalIncome, "text-emerald-300")}
@@ -723,21 +933,31 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
             {st.expense.map((l) => (
               <tr key={l.code}>
                 <td className={`${td} px-4`}>{l.category}</td>
-                <td className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}>{amt(l.amount)}</td>
+                <td
+                  className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
+                >
+                  {amt(l.amount)}
+                </td>
               </tr>
             ))}
             {totalRow("Total Expense (B)", st.totalExpense, "text-red-300")}
-            {totalRow("NET PROFIT / (LOSS)  (A − B)", st.net, st.net >= 0 ? "text-emerald-300" : "text-red-300")}
+            {totalRow(
+              "NET PROFIT / (LOSS)  (A − B)",
+              st.net,
+              st.net >= 0 ? "text-emerald-300" : "text-red-300",
+            )}
           </tbody>
         </table>
       </div>
 
       {(st.otherIn > 0 || st.otherOut > 0) && (
         <p className="text-xs text-zinc-500">
-          Not included above: Asset, Liability &amp; Equity entries in this period — money in{" "}
+          Not included above: Asset, Liability &amp; Equity entries in this
+          period — money in{" "}
           <span className="text-zinc-300">{money(st.otherIn)}</span>, money out{" "}
-          <span className="text-zinc-300">{money(st.otherOut)}</span>. Only categories with Major Head
-          Income or Expenses feed this statement, same as the Excel sheet.
+          <span className="text-zinc-300">{money(st.otherOut)}</span>. Only
+          categories with Major Head Income or Expenses feed this statement,
+          same as the Excel sheet.
         </p>
       )}
 
@@ -752,14 +972,15 @@ const StatementTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategor
 /* =====================================================================
    4. Balance Sheet (manual balances, like the Excel sheet)
    ===================================================================== */
-const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCategory[] }> = ({ txns, chart }) => {
+const BalanceSheetTab: React.FC<{
+  txns: AccountTransaction[];
+  chart: AccountCategory[];
+}> = ({ txns, chart }) => {
   const [asOf, setAsOf] = useState(toIso(new Date()));
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
-
-  
 
   useEffect(() => {
     (async () => {
@@ -767,7 +988,11 @@ const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCate
         const data: BalanceSheetData | null = await getBalanceSheet();
         if (data) {
           setAsOf(data.asOf);
-          setDraft(Object.fromEntries(Object.entries(data.values).map(([k, v]) => [k, String(v)])));
+          setDraft(
+            Object.fromEntries(
+              Object.entries(data.values).map(([k, v]) => [k, String(v)]),
+            ),
+          );
         }
       } catch (e) {
         console.log(e);
@@ -778,12 +1003,17 @@ const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCate
   }, []);
 
   const values = useMemo(
-    () => Object.fromEntries(Object.entries(draft).map(([k, v]) => [k, parseFloat(v) || 0])) as Record<string, number>,
+    () =>
+      Object.fromEntries(
+        Object.entries(draft).map(([k, v]) => [k, parseFloat(v) || 0]),
+      ) as Record<string, number>,
     [draft],
   );
   const t = balanceTotals(chart, values);
   const assets = chart.filter((c) => c.majorHead === "Assets");
-  const le = chart.filter((c) => c.majorHead === "Liabilities" || c.majorHead === "Equity");
+  const le = chart.filter(
+    (c) => c.majorHead === "Liabilities" || c.majorHead === "Equity",
+  );
 
   // reference only: cash book net up to the chosen date
   const cashBookNet = useMemo(
@@ -806,7 +1036,10 @@ const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCate
   };
 
   const field = (c: AccountCategory) => (
-    <div key={c.code} className="flex items-center justify-between gap-3 py-1.5">
+    <div
+      key={c.code}
+      className="flex items-center justify-between gap-3 py-1.5"
+    >
       <span className="text-xs text-zinc-300">{c.name}</span>
       <input
         type="text"
@@ -819,14 +1052,24 @@ const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCate
     </div>
   );
 
-  if (loading) return <p className="text-center text-sm text-zinc-500 py-10">Loading balance sheet…</p>;
+  if (loading)
+    return (
+      <p className="text-center text-sm text-zinc-500 py-10">
+        Loading balance sheet…
+      </p>
+    );
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <label className="text-xs text-zinc-500">As of</label>
-          <input type="date" className={inputCls} value={asOf} onChange={(e) => setAsOf(e.target.value)} />
+          <input
+            type="date"
+            className={inputCls}
+            value={asOf}
+            onChange={(e) => setAsOf(e.target.value)}
+          />
         </div>
         <button onClick={handleSave} disabled={saving} className={btnPrimary}>
           {saving ? "Saving..." : "Save Balance Sheet"}
@@ -844,13 +1087,16 @@ const BalanceSheetTab: React.FC<{ txns: AccountTransaction[]; chart: AccountCate
             <span className="font-mono">{money(t.assets)}</span>
           </div>
           <p className="mt-3 text-[11px] text-zinc-500">
-            Reference: cash book net up to this date is {money(cashBookNet)}. Enter negative values for contra
-            accounts like Accumulated Depreciation.
+            Reference: cash book net up to this date is {money(cashBookNet)}.
+            Enter negative values for contra accounts like Accumulated
+            Depreciation.
           </p>
         </div>
 
         <div className={`${card} p-5`}>
-          <p className="text-sm font-semibold text-white mb-2">Liabilities &amp; Equity</p>
+          <p className="text-sm font-semibold text-white mb-2">
+            Liabilities &amp; Equity
+          </p>
           {le.map(field)}
           <div className="flex justify-between pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
             <span>Total Liabilities &amp; Equity</span>
@@ -889,7 +1135,9 @@ const ChartTab: React.FC<{
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<AccountCategory | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AccountCategory | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
 
   const usedNames = useMemo(() => new Set(txns.map((t) => t.category)), [txns]);
@@ -903,14 +1151,24 @@ const ChartTab: React.FC<{
     const c = code.trim().toUpperCase();
     const n = name.trim();
     if (!c || !n) return;
-    if (chart.some((x) => x.code === c || x.name.toLowerCase() === n.toLowerCase())) {
+    if (
+      chart.some(
+        (x) => x.code === c || x.name.toLowerCase() === n.toLowerCase(),
+      )
+    ) {
       setError("That code or name already exists.");
       return;
     }
     try {
       setSaving(true);
       setError("");
-      const created = await addCategory({ code: c, name: n, majorHead, type, notes: notes.trim() });
+      const created = await addCategory({
+        code: c,
+        name: n,
+        majorHead,
+        type,
+        notes: notes.trim(),
+      });
       setChart((prev) => sortChart([...prev, created]));
       setCode("");
       setName("");
@@ -942,34 +1200,60 @@ const ChartTab: React.FC<{
       <div className={`${card} p-5`}>
         <p className="text-sm font-semibold text-white mb-3">Add category</p>
         <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-          <input className={inputCls} placeholder="Code (EX19)" value={code} onChange={(e) => setCode(e.target.value)} />
+          <input
+            className={inputCls}
+            placeholder="Code (EX19)"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
           <input
             className={`${inputCls} col-span-2`}
             placeholder="Category name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <select className={inputCls} value={majorHead} onChange={(e) => changeHead(e.target.value as MajorHead)}>
+          <select
+            className={inputCls}
+            value={majorHead}
+            onChange={(e) => changeHead(e.target.value as MajorHead)}
+          >
             {MAJOR_HEADS.map((h) => (
-              <option key={h} className="bg-[#0f1117]">{h}</option>
+              <option key={h} className="bg-[#0f1117]">
+                {h}
+              </option>
             ))}
           </select>
-          <select className={inputCls} value={type} onChange={(e) => setType(e.target.value)}>
+          <select
+            className={inputCls}
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+          >
             {HEAD_TYPES[majorHead].map((x) => (
-              <option key={x} className="bg-[#0f1117]">{x}</option>
+              <option key={x} className="bg-[#0f1117]">
+                {x}
+              </option>
             ))}
           </select>
-          <input className={inputCls} placeholder="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <input
+            className={inputCls}
+            placeholder="Notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
         </div>
         <div className="flex items-center gap-3 mt-3">
-          <button onClick={handleAdd} disabled={saving || !code.trim() || !name.trim()} className={btnPrimary}>
+          <button
+            onClick={handleAdd}
+            disabled={saving || !code.trim() || !name.trim()}
+            className={btnPrimary}
+          >
             {saving ? "Adding..." : "Add Category"}
           </button>
           {error && <span className="text-xs text-red-400">{error}</span>}
         </div>
         <p className="mt-3 text-[11px] text-zinc-500">
-          Categories with Major Head Income or Expenses appear automatically in the Monthly Summary and the
-          Income &amp; Expense statement.
+          Categories with Major Head Income or Expenses appear automatically in
+          the Monthly Summary and the Income &amp; Expense statement.
         </p>
       </div>
 
@@ -991,18 +1275,25 @@ const ChartTab: React.FC<{
                 const used = usedNames.has(c.name);
                 return (
                   <tr key={c.id} className="hover:bg-white/[0.02]">
-                    <td className={`${td} font-mono text-zinc-500`}>{c.code}</td>
+                    <td className={`${td} font-mono text-zinc-500`}>
+                      {c.code}
+                    </td>
                     <td className={`${td} text-zinc-200`}>{c.name}</td>
                     <td className={td}>{c.majorHead}</td>
                     <td className={td}>{c.type}</td>
-                    <td className={`${td} max-w-[320px] truncate text-zinc-500`} title={c.notes}>
+                    <td
+                      className={`${td} max-w-[320px] truncate text-zinc-500`}
+                      title={c.notes}
+                    >
                       {c.notes}
                     </td>
                     <td className={`${td} text-right`}>
                       <button
                         onClick={() => setDeleteTarget(c)}
                         disabled={used}
-                        title={used ? "Used by transactions" : "Delete category"}
+                        title={
+                          used ? "Used by transactions" : "Delete category"
+                        }
                         className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         Delete
@@ -1017,15 +1308,17 @@ const ChartTab: React.FC<{
       </div>
 
       {deleteTarget && (
-        <DeleteConfirmModal loading={deleting} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} />
+        <DeleteConfirmModal
+          loading={deleting}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+        />
       )}
     </div>
   );
 };
 
 export default AccountsManagement;
-
-
 
 export const useLockBodyScroll = (locked: boolean) => {
   useEffect(() => {

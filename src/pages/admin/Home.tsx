@@ -1,409 +1,229 @@
 import React, { useState } from "react";
-import type { Client, Creative } from "../../utils/types/Types";
 import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase/firebase";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../config/firebase/firebase";
 import ClientManagement from "../../components/admin/ClientManagement";
 import WorkManagement from "../../components/admin/WorkManagement";
 import BillsManagement from "../../components/admin/BillsManagement";
 import AccountManagement from "../../components/admin/AccountManagement";
 import Dashboard from "../../components/admin/Dashboard";
 
+// ─── Types & nav config ───────────────────────────────────────────────────────
+type TabId = "dashboard" | "clients" | "work" | "bills" | "accounts";
 
-
-
-// ─── Modal Shell ──────────────────────────────────────────────────────────────
-const Modal = ({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-    <div className="bg-[#0f1117] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-        <h3 className="text-white font-semibold text-base">{title}</h3>
-        <button
-          onClick={onClose}
-          className="text-zinc-500 hover:text-white transition-colors text-xl leading-none"
-        >
-          ×
-        </button>
-      </div>
-      <div className="px-6 py-5">{children}</div>
-    </div>
-  </div>
+const Icon = ({ d, className = "w-5 h-5" }: { d: string; className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={`${className} shrink-0`}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.7}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d={d} />
+  </svg>
 );
 
-// ─── Input ────────────────────────────────────────────────────────────────────
-const Field = ({
-  label,
-  ...props
-}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
-      {label}
-    </label>
-    <input
-      {...props}
-      className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors"
-    />
-  </div>
-);
+const LOGOUT_ICON =
+  "M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9";
 
-const TextAreaField = ({
-  label,
-  ...props
-}: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
-      {label}
-    </label>
-    <textarea
-      {...props}
-      rows={3}
-      className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors resize-none"
-    />
-  </div>
-);
+const navItems: { id: TabId; label: string; subtitle: string; icon: string }[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    subtitle: "Overview of your agency",
+    icon: "M3 12l9-9 9 9M5 10v10h14V10",
+  },
+  {
+    id: "clients",
+    label: "Clients",
+    subtitle: "Manage your clients",
+    icon: "M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8",
+  },
+  {
+    id: "work",
+    label: "Work",
+    subtitle: "Creatives and deliverables",
+    icon: "M3 7h18v13H3zM8 7V4h8v3",
+  },
+  {
+    id: "bills",
+    label: "Bills",
+    subtitle: "Invoices and payments",
+    icon: "M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
+  },
+  {
+    id: "accounts",
+    label: "Accounts",
+    subtitle: "Team and access",
+    icon: "M12 12a5 5 0 100-10 5 5 0 000 10zM3 22a9 9 0 0118 0",
+  },
+];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const Home : React.FC= () => {
-  const [tab, setTab] = useState<"dashboard" | "clients" | "work"|"bills"|"accounts">("dashboard");
-  const [clients, setClients] = useState<Client[]>([]);
-  const [creatives, setCreatives] = useState<Creative[]>([]);
-  const [showEditClient, setShowEditClient] = useState<Client | null>(null);
-  const [showAddCreative, setShowAddCreative] = useState(false);
+const Home: React.FC = () => {
+  const [tab, setTab] = useState<TabId>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const navigate = useNavigate();
-
-  const [creativeForm, setCreativeForm] = useState({
-    clientId: "",
-    type: "poster" as Creative["type"],
-    title: "",
-    imageUrl: "",
-    instagramUrl: "",
-    websiteUrl: "",
-  });
-
-  const handleEditClient = () => {
-    if (!showEditClient) return;
-    setClients((p) =>
-      p.map((c) => (c.id === showEditClient.id ? showEditClient : c)),
-    );
-    setShowEditClient(null);
-  };
-
-  const handleAddCreative = () => {
-    if (!creativeForm.title || !creativeForm.clientId) return;
-    const nc: Creative = {
-      id: Date.now().toString(),
-      ...creativeForm,
-      uploadedAt: new Date().toISOString().slice(0, 10),
-    };
-    setCreatives((p) => [nc, ...p]);
-    setCreativeForm({
-      clientId: "",
-      type: "poster",
-      title: "",
-      imageUrl: "",
-      instagramUrl: "",
-      websiteUrl: "",
-    });
-    setShowAddCreative(false);
-  };
-
-  
-
-const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: "⬡" },
-  { id: "clients", label: "Clients", icon: "◈" },
-  { id: "work", label: "Work", icon: "◧" },
-  { id: "bills", label: "Bills", icon: "▤" },
-  { id: "accounts", label: "Accounts", icon: "◉" },
-];
+  const activeItem = navItems.find((n) => n.id === tab)!;
 
   const handleLogout = async () => {
     try {
+      setLoggingOut(true);
       await signOut(auth);
       navigate("/login");
     } catch (error) {
       console.log("Logout Error", error);
+    } finally {
+      setLoggingOut(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#080a0e] font-['DM_Sans',sans-serif] flex text-white">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Syne:wght@600;700;800&display=swap');
         * { box-sizing: border-box; }
         .font-display { font-family: 'Syne', sans-serif; }
         @keyframes fade-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
         .animate-fade-in { animation: fade-in 0.25s ease forwards; }
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #ffffff18; border-radius: 99px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ffffff18; border-radius: 99px; }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-fade-in { animation: none; }
+        }
       `}</style>
 
-      {/* ── Sidebar ── */}
+      {/* ── Sticky Sidebar ── */}
       <aside
-        className={`${sidebarOpen ? "w-56" : "w-16"} flex-shrink-0 bg-[#0b0d12] border-r border-white/5 flex flex-col py-6 transition-all duration-300 relative`}
+        className={`${
+          sidebarOpen ? "w-60" : "w-[72px]"
+        } sticky top-0 h-screen self-start shrink-0 z-30 flex flex-col
+        bg-gradient-to-b from-[#0d0f15] to-[#0a0c11] border-r border-white/5
+        transition-[width] duration-300 ease-out`}
       >
-        <div className="px-4 mb-8 overflow-hidden">
-          {sidebarOpen ? (
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-xs font-bold font-display">
-                A
-              </div>
-              <span className="font-display font-700 text-base text-white whitespace-nowrap">
+        {/* Brand */}
+        <div
+          className={`h-16 flex items-center border-b border-white/5 ${
+            sidebarOpen ? "px-4" : "justify-center"
+          }`}
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center font-display font-bold shadow-lg shadow-violet-900/40 shrink-0">
+            G
+          </div>
+          {sidebarOpen && (
+            <div className="ml-3 overflow-hidden">
+              <p className="font-display font-bold text-base leading-none">
                 Growvy
-              </span>
-            </div>
-          ) : (
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-xs font-bold font-display mx-auto">
-              A
+              </p>
+              <p className="text-[11px] text-zinc-500 mt-1">Admin panel</p>
             </div>
           )}
         </div>
 
-        <nav className="flex flex-col gap-1 px-2 flex-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setTab(item.id as typeof tab)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${tab === item.id ? "bg-violet-500/15 text-violet-300 border border-violet-500/20" : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"}`}
-            >
-              <span className="text-lg leading-none flex-shrink-0">
-                {item.icon}
-              </span>
-              {sidebarOpen && (
-                <span className="whitespace-nowrap">{item.label}</span>
-              )}
-            </button>
-          ))}
+        {/* Nav (scrolls internally on short screens) */}
+        <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
+          {navItems.map((item) => {
+            const active = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                title={!sidebarOpen ? item.label : undefined}
+                aria-current={active ? "page" : undefined}
+                className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+                transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60
+                ${sidebarOpen ? "" : "justify-center"}
+                ${
+                  active
+                    ? "bg-violet-500/10 text-violet-300"
+                    : "text-zinc-500 hover:text-zinc-100 hover:bg-white/5"
+                }`}
+              >
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-violet-500" />
+                )}
+                <Icon d={item.icon} />
+                {sidebarOpen && (
+                  <span className="whitespace-nowrap">{item.label}</span>
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        <button
-          onClick={() => setSidebarOpen((p) => !p)}
-          className="mx-auto mt-auto w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center text-zinc-500 hover:text-white hover:border-white/20 transition-all text-xs"
-        >
-          {sidebarOpen ? "‹" : "›"}
-        </button>
+        {/* ── Sidebar bottom: collapse + logout ── */}
+        <div className="p-3 border-t border-white/5 space-y-2">
+          <button
+            onClick={() => setSidebarOpen((p) => !p)}
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            className="w-full h-9 rounded-xl flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <Icon
+              d={sidebarOpen ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"}
+              className="w-4 h-4"
+            />
+            {sidebarOpen && <span>Collapse</span>}
+          </button>
+
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title={!sidebarOpen ? "Log out" : undefined}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+            text-red-300 bg-red-500/10 border border-red-500/20
+            hover:bg-red-500/20 hover:border-red-500/40 hover:text-red-200
+            disabled:opacity-60 disabled:cursor-not-allowed
+            transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60
+            ${sidebarOpen ? "" : "justify-center"}`}
+          >
+            <Icon d={LOGOUT_ICON} />
+            {sidebarOpen && (
+              <span className="whitespace-nowrap">
+                {loggingOut ? "Logging out…" : "Log out"}
+              </span>
+            )}
+          </button>
+        </div>
       </aside>
 
       {/* ── Main ── */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Top bar */}
-        <header className="sticky top-0 z-10 bg-[#080a0e]/90 backdrop-blur border-b border-white/5 px-8 py-4 flex items-center justify-between">
+      <main className="flex-1 min-w-0">
+        {/* Sticky top bar */}
+        <header className="sticky top-0 z-20 h-16 bg-[#080a0e]/80 backdrop-blur-xl border-b border-white/5 px-8 flex items-center justify-between">
           <div>
-            <h1 className="font-display text-lg font-700 text-white capitalize">
-              {tab}
+            <h1 className="font-display text-lg font-bold text-white leading-none">
+              {activeItem.label}
             </h1>
-            <p className="text-xs text-zinc-600 mt-0.5">
-              {tab === "dashboard" && "Business & traffic overview"}
-              {tab === "clients" && `${clients.length} total clients`}
-              {tab === "work" && `${creatives.length} creative assets`}
-            </p>
+            <p className="text-xs text-zinc-500 mt-1">{activeItem.subtitle}</p>
           </div>
+
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-zinc-500">Live</span>
-            <div
-              onClick={handleLogout}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-xs font-bold"
-            >
-              A
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-medium text-emerald-400">
+                Live
+              </span>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-xs font-bold">
+              G
             </div>
           </div>
         </header>
 
-        <div className="px-8 py-7">
-          {/* ══ DASHBOARD ══ */}
-          {tab === "dashboard" && <Dashboard/>}
-
-          {/* ══ CLIENTS ══ */}
+        <div className="px-8 py-7 max-w-[1600px] mx-auto">
+          {tab === "dashboard" && <Dashboard />}
           {tab === "clients" && <ClientManagement />}
-
-          {/* ══ WORK ══ */}
           {tab === "work" && <WorkManagement />}
-          {/* ══ BILLS ══ */}
           {tab === "bills" && <BillsManagement />}
           {tab === "accounts" && <AccountManagement />}
         </div>
       </main>
-
-      {/* ══ EDIT CLIENT MODAL ══ */}
-      {showEditClient && (
-        <Modal title="Edit Client" onClose={() => setShowEditClient(null)}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <Field
-                label="Full Name"
-                value={showEditClient.name}
-                onChange={(e) =>
-                  setShowEditClient((p) => p && { ...p, name: e.target.value })
-                }
-              />
-              <Field
-                label="Email"
-                value={showEditClient.email}
-                onChange={(e) =>
-                  setShowEditClient((p) => p && { ...p, email: e.target.value })
-                }
-              />
-            </div>
-            <TextAreaField
-              label="Description"
-              value={showEditClient.description}
-              onChange={(e) =>
-                setShowEditClient(
-                  (p) => p && { ...p, description: e.target.value },
-                )
-              }
-            />
-            <Field
-              label="Profile Image URL"
-              value={showEditClient.profileImage}
-              onChange={(e) =>
-                setShowEditClient(
-                  (p) => p && { ...p, profileImage: e.target.value },
-                )
-              }
-            />
-            <Field
-              label="Portfolio Banner URL"
-              value={showEditClient.portfolioImage}
-              onChange={(e) =>
-                setShowEditClient(
-                  (p) => p && { ...p, portfolioImage: e.target.value },
-                )
-              }
-            />
-            <div className="flex gap-3 pt-1">
-              <button
-                onClick={() => setShowEditClient(null)}
-                className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditClient}
-                className="flex-1 py-2.5 rounded-xl text-sm bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors"
-              >
-                Update Client
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* ══ ADD CREATIVE MODAL ══ */}
-      {showAddCreative && (
-        <Modal
-          title="Upload Creative"
-          onClose={() => setShowAddCreative(false)}
-        >
-          <div className="space-y-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
-                Client
-              </label>
-              <select
-                value={creativeForm.clientId}
-                onChange={(e) =>
-                  setCreativeForm((p) => ({ ...p, clientId: e.target.value }))
-                }
-                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/60 transition-colors"
-              >
-                <option value="" className="bg-[#0f1117]">
-                  Select client…
-                </option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#0f1117]">
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
-                Type
-              </label>
-              <div className="flex gap-2">
-                {(["poster", "reel", "website"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setCreativeForm((p) => ({ ...p, type: t }))}
-                    className={`flex-1 py-2 rounded-xl text-xs font-medium border transition-all capitalize ${creativeForm.type === t ? "bg-violet-500/15 border-violet-500/30 text-violet-300" : "border-white/10 text-zinc-400 hover:text-white"}`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <Field
-              label="Title"
-              value={creativeForm.title}
-              onChange={(e) =>
-                setCreativeForm((p) => ({ ...p, title: e.target.value }))
-              }
-              placeholder="e.g. Summer Campaign Poster"
-            />
-            {creativeForm.type === "poster" && (
-              <Field
-                label="Image URL / S3 Key"
-                value={creativeForm.imageUrl}
-                onChange={(e) =>
-                  setCreativeForm((p) => ({ ...p, imageUrl: e.target.value }))
-                }
-                placeholder="https://... or s3://bucket/posters/..."
-              />
-            )}
-            {creativeForm.type === "reel" && (
-              <Field
-                label="Instagram Reel URL"
-                value={creativeForm.instagramUrl}
-                onChange={(e) =>
-                  setCreativeForm((p) => ({
-                    ...p,
-                    instagramUrl: e.target.value,
-                  }))
-                }
-                placeholder="https://www.instagram.com/reel/..."
-              />
-            )}
-            {creativeForm.type === "website" && (
-              <Field
-                label="Website URL"
-                value={creativeForm.websiteUrl}
-                onChange={(e) =>
-                  setCreativeForm((p) => ({ ...p, websiteUrl: e.target.value }))
-                }
-                placeholder="https://..."
-              />
-            )}
-            <p className="text-xs text-zinc-600">
-              Images are uploaded to S3; metadata is written to Firestore.
-            </p>
-            <div className="flex gap-3 pt-1">
-              <button
-                onClick={() => setShowAddCreative(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddCreative}
-                className="flex-1 py-2.5 rounded-xl text-sm bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors"
-              >
-                Save Creative
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 };
