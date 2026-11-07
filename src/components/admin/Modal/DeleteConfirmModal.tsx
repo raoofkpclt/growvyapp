@@ -1,5 +1,5 @@
 import React from "react";
-import ModalShell, { modalBtn } from "./ModalShell";
+import ModalShell, { modalBtn } from "./Modalshell";
 
 interface Props {
   loading?: boolean;

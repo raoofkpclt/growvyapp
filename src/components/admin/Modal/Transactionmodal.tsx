@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import type { AccountCategory, AccountRegion, AccountTransaction } from "../../../utils/types/Types";
 import { addTransaction, updateTransaction } from "../../../service/Accountservice";
 import { MAJOR_HEADS, PAYMENT_MODES, REGIONS, SERVICE_CATEGORIES, toIso } from "../../../service/Accounts";
-import ModalShell, { modalBtn } from "./ModalShell";
+import ModalShell, { modalBtn } from "./Modalshell";
 
 // text-base on mobile (16px) stops iOS from zooming into inputs
 const inputCls =
