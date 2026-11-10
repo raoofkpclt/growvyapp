@@ -403,13 +403,30 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelCls}>{docType === "invoice" ? "Client" : "Received From"}</label>
-                <input
+                {/* <input
                   className={inputCls}
                   list="bill-client-list"
                   placeholder="e.g. Arjun Menon"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
-                />
+                /> */}
+
+                <input
+  className={inputCls}
+  list="bill-client-list"
+  placeholder="e.g. Arjun Menon"
+  value={clientName}
+  onChange={(e) => {
+    const name = e.target.value;
+    setClientName(name);
+
+    const selectedClient = clients.find(
+      (c) => c.name === name
+    );
+
+    setClientPhone(selectedClient?.phone || "");
+  }}
+/>
                 <datalist id="bill-client-list">
                   {clients.map((c) => (
                     <option key={c.id} value={c.name} />
@@ -441,7 +458,13 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
               <div className="space-y-3">
                 <div>
                   <label className={labelCls}>Phone</label>
-                  <input className={inputCls} placeholder="Optional" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} />
+                  <input
+  className={inputCls}
+  placeholder="Optional"
+  value={clientPhone}
+  onChange={(e) => setClientPhone(e.target.value)}
+/>
+                  {/* <input className={inputCls} placeholder="Optional" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} /> */}
                 </div>
                 {docType === "invoice" && (
                   <div>
