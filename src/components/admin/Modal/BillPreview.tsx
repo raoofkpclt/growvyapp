@@ -21,13 +21,14 @@ export const COMPANY = {
   pan: "ABEFG1062B",
 };
 export const PAYMENT = {
-  accName: "Danish Mirsha O",
+  accName: "Growvy Marketing LLP",
   bank: "Canara Bank",
-  accNo: "1734101032478",
-  ifsc: "CNRB0001734",
-  upi: "9207045840",
+  accNo: "120042591210",
+  branch: "Olavanna",
+  ifsc: "CNRB0000733",
+  swiftCode: "CNRBINBBBFD",
+  bankAddress: "Crescent Complex, Pantheerankavu, Kozhikode 673019",
 };
-
 export interface BillPreviewData {
   docType: BillDocType;
   billNo: string;
