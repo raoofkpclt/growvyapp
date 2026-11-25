@@ -32,6 +32,7 @@ export const PAYMENT = {
   swiftCode: "CNRBINBBBFD",
   bankAddress: "Crescent Complex, Pantheerankavu, Kozhikode 673019",
 };
+
 export interface BillPreviewData {
   docType: BillDocType;
   billNo: string;
@@ -606,14 +607,4 @@ const BillPreview = forwardRef<HTMLDivElement, { data: BillPreviewData }>(
   },
 );
 
-<<<<<<< HEAD
-      <div style={{ marginTop: 26, textAlign: "center", fontSize: 10, color: "#9AA2AF" }}>
-        {COMPANY.name} · LLPIN {COMPANY.llpin} · This is a system-generated document.
-      </div>
-    </div>
-  );
-});
-
-=======
->>>>>>> ac419e6 (added staff phase)
 export default BillPreview;
