@@ -1,3 +1,1546 @@
+// import React, { useEffect, useMemo, useRef, useState } from "react";
+// import type {
+//   AccountCategory,
+//   AccountTransaction,
+//   BalanceSheetData,
+//   MajorHead,
+// } from "../../utils/types/Types";
+// import TransactionModal from "./Modal/Transactionmodal";
+// import DeleteConfirmModal from "./Modal/DeleteConfirmModal";
+// import {
+//   addCategory,
+//   bulkAddTransactions,
+//   deleteCategory,
+//   deleteTransaction,
+//   getBalanceSheet,
+//   getChartOfAccounts,
+//   getTransactions,
+//   saveBalanceSheet,
+//   seedDefaultChart,
+// } from "../../service/Accountservice";
+// import {
+//   ACCOUNTS_CURRENCY,
+//   HEAD_TYPES,
+//   MAJOR_HEADS,
+//   MONTHS,
+//   REGIONS,
+//   balanceTotals,
+//   breakdownBy,
+//   fmtDate,
+//   fmtMonth,
+//   monthlySummary,
+//   periodStatement,
+//   sortChart,
+//   toIso,
+//   totals,
+//   txnKey,
+//   withRunningBalance,
+// } from "../../service/Accounts";
+// import type { BreakdownRow } from "../../service/Accounts";
+// import {
+//   exportTransactionsXlsx,
+//   parseTransactionsXlsx,
+// } from "../../service/Accountsexcel";
+// import { formatAmount, formatMoney } from "../../utils/currency";
+
+// /* ---------- shared bits ---------- */
+// type Tab = "cashbook" | "summary" | "statement" | "balance" | "chart";
+// const TABS: { id: Tab; label: string }[] = [
+//   { id: "cashbook", label: "Cash Book" },
+//   { id: "summary", label: "Monthly Summary" },
+//   { id: "statement", label: "Income & Expense" },
+//   { id: "balance", label: "Balance Sheet" },
+//   { id: "chart", label: "Chart of Accounts" },
+// ];
+
+// const money = (n: number) => formatMoney(n, ACCOUNTS_CURRENCY);
+// const amt = (n: number) => (n === 0 ? "—" : formatAmount(n, ACCOUNTS_CURRENCY));
+
+// const card = "bg-[#0f1117] border border-white/5 rounded-2xl";
+
+// // text-base on mobile (16px) stops iOS Safari zooming into inputs
+// const inputCls =
+//   "bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 sm:py-2 text-base sm:text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 transition-colors min-w-0";
+// const btnGhost =
+//   "text-xs px-3 py-2.5 sm:py-1.5 rounded-lg border border-white/10 text-zinc-300 hover:text-white hover:border-white/20 disabled:opacity-40 transition-colors";
+// const btnPrimary =
+//   "flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium px-4 py-2.5 sm:py-2 rounded-xl transition-colors";
+// const th =
+//   "px-3 py-2.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-medium whitespace-nowrap";
+// const thR = th + " text-right";
+// const td = "px-3 py-2.5 text-xs text-zinc-300 whitespace-nowrap";
+// const tdR = td + " text-right font-mono";
+
+// // hides the scrollbar on horizontally-scrolling strips (tabs, presets)
+// const noScrollbar =
+//   "overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
+// const StatCard: React.FC<{
+//   label: string;
+//   value: string;
+//   tone?: "green" | "red" | "violet";
+//   className?: string;
+// }> = ({ label, value, tone = "violet", className = "" }) => (
+//   <div className={`${card} px-4 sm:px-5 py-3 sm:py-4 min-w-0 ${className}`}>
+//     <p className="text-[10px] sm:text-[11px] uppercase tracking-wider text-zinc-500 mb-1">
+//       {label}
+//     </p>
+//     <p
+//       className={`text-base sm:text-xl font-bold truncate ${
+//         tone === "green"
+//           ? "text-emerald-400"
+//           : tone === "red"
+//             ? "text-red-400"
+//             : "text-white"
+//       }`}
+//     >
+//       {value}
+//     </p>
+//   </div>
+// );
+
+// /* =====================================================================
+//    Page
+//    ===================================================================== */
+// const AccountsManagement: React.FC = () => {
+//   const [tab, setTab] = useState<Tab>("cashbook");
+//   const [txns, setTxns] = useState<AccountTransaction[]>([]);
+//   const [chart, setChart] = useState<AccountCategory[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
+//   const [seeding, setSeeding] = useState(false);
+
+//   useEffect(() => {
+//     (async () => {
+//       try {
+//         const [t, c] = await Promise.all([
+//           getTransactions(),
+//           getChartOfAccounts(),
+//         ]);
+//         setTxns(t);
+//         setChart(c);
+//       } catch (e) {
+//         console.log(e);
+//         setError("Could not load accounts data.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     })();
+//   }, []);
+
+//   const handleSeed = async () => {
+//     try {
+//       setSeeding(true);
+//       setChart(await seedDefaultChart());
+//     } catch (e) {
+//       console.log(e);
+//       setError("Could not load the default chart of accounts.");
+//     } finally {
+//       setSeeding(false);
+//     }
+//   };
+
+//   return (
+//     <div className="animate-fade-in space-y-5 sm:space-y-6 min-w-0">
+//       {/* tabs: one scrollable row on mobile, wraps on desktop */}
+//       <div
+//         className={`flex gap-2 sm:flex-wrap pb-1 sm:pb-0 ${noScrollbar} sm:overflow-visible`}
+//       >
+//         {TABS.map((t) => (
+//           <button
+//             key={t.id}
+//             onClick={() => setTab(t.id)}
+//             className={`text-xs px-3.5 sm:px-3 py-2 sm:py-1.5 rounded-lg border transition-all whitespace-nowrap flex-shrink-0 ${
+//               tab === t.id
+//                 ? "bg-violet-600 text-white border-violet-500"
+//                 : "border-white/10 text-zinc-400 hover:text-white hover:border-white/20"
+//             }`}
+//           >
+//             {t.label}
+//           </button>
+//         ))}
+//       </div>
+
+//       {error && (
+//         <div className="flex items-center justify-between gap-3 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
+//           <span>{error}</span>
+//           <button
+//             onClick={() => setError("")}
+//             className="text-red-300/70 hover:text-red-200 text-xl leading-none px-1"
+//           >
+//             ×
+//           </button>
+//         </div>
+//       )}
+
+//       {!loading && chart.length === 0 && (
+//         <div
+//           className={`${card} p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4`}
+//         >
+//           <p className="text-sm text-zinc-300">
+//             No chart of accounts yet. Load the {`53`} default categories from
+//             your Excel sheet to get started.
+//           </p>
+//           <button
+//             onClick={handleSeed}
+//             disabled={seeding}
+//             className={btnPrimary}
+//           >
+//             {seeding ? "Loading..." : "Load default chart"}
+//           </button>
+//         </div>
+//       )}
+
+//       {loading ? (
+//         <p className="text-center text-sm text-zinc-500 py-10">
+//           Loading accounts…
+//         </p>
+//       ) : (
+//         <>
+//           {tab === "cashbook" && (
+//             <CashBookTab txns={txns} setTxns={setTxns} chart={chart} />
+//           )}
+//           {tab === "summary" && <MonthlySummaryTab txns={txns} chart={chart} />}
+//           {tab === "statement" && <StatementTab txns={txns} chart={chart} />}
+//           {tab === "balance" && <BalanceSheetTab txns={txns} chart={chart} />}
+//           {tab === "chart" && (
+//             <ChartTab txns={txns} chart={chart} setChart={setChart} />
+//           )}
+//         </>
+//       )}
+//     </div>
+//   );
+// };
+
+// /* =====================================================================
+//    1. Cash Book  (Transactions sheet)
+//    ===================================================================== */
+// const PAGE_SIZE = 50;
+
+// const CashBookTab: React.FC<{
+//   txns: AccountTransaction[];
+//   setTxns: React.Dispatch<React.SetStateAction<AccountTransaction[]>>;
+//   chart: AccountCategory[];
+// }> = ({ txns, setTxns, chart }) => {
+//   const [search, setSearch] = useState("");
+//   const [month, setMonth] = useState("all");
+//   const [region, setRegion] = useState("all");
+//   const [flow, setFlow] = useState<"all" | "income" | "expense">("all");
+//   const [adding, setAdding] = useState(false);
+//   const [editing, setEditing] = useState<AccountTransaction | null>(null);
+//   const [deleteTarget, setDeleteTarget] = useState<AccountTransaction | null>(
+//     null,
+//   );
+//   const [deleting, setDeleting] = useState(false);
+//   const [page, setPage] = useState(1);
+//   const [importing, setImporting] = useState(false);
+//   const [message, setMessage] = useState("");
+//   const fileRef = useRef<HTMLInputElement>(null);
+//   const tableRef = useRef<HTMLDivElement>(null);
+
+//   // useLockBodyScroll(adding || !!editing || !!deleteTarget);
+
+//   const byName = useMemo(() => new Map(chart.map((c) => [c.name, c])), [chart]);
+//   const rows = useMemo(() => withRunningBalance(txns), [txns]); // oldest -> newest, with running balance
+//   const months = useMemo(
+//     () =>
+//       [...new Set(txns.map((t) => t.date.slice(0, 7)))]
+//         .filter(Boolean)
+//         .sort()
+//         .reverse(),
+//     [txns],
+//   );
+
+//   const filtered = useMemo(() => {
+//     const q = search.trim().toLowerCase();
+//     return rows
+//       .filter((t) => {
+//         if (month !== "all" && !t.date.startsWith(month)) return false;
+//         if (region !== "all" && t.region !== region) return false;
+//         if (flow === "income" && t.income <= 0) return false;
+//         if (flow === "expense" && t.expense <= 0) return false;
+//         if (
+//           q &&
+//           !t.description.toLowerCase().includes(q) &&
+//           !t.category.toLowerCase().includes(q) &&
+//           !t.voucherNo.toLowerCase().includes(q)
+//         )
+//           return false;
+//         return true;
+//       })
+//       .reverse(); // newest first
+//   }, [rows, search, month, region, flow]);
+
+//   const tot = totals(filtered);
+
+//   /* ---------- pagination (50 per page) ---------- */
+//   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+//   const currentPage = Math.min(page, totalPages);
+//   const startIdx = (currentPage - 1) * PAGE_SIZE;
+//   const pageRows = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+//   // go back to page 1 whenever a filter changes
+//   useEffect(() => {
+//     setPage(1);
+//   }, [search, month, region, flow]);
+
+//   // compact page list: 1 … 4 5 6 … 20
+//   const pageNumbers = useMemo(() => {
+//     const pages: (number | "...")[] = [];
+//     for (let p = 1; p <= totalPages; p++) {
+//       if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1) {
+//         pages.push(p);
+//       } else if (pages[pages.length - 1] !== "...") {
+//         pages.push("...");
+//       }
+//     }
+//     return pages;
+//   }, [totalPages, currentPage]);
+
+//   const goTo = (p: number) => {
+//     setPage(Math.min(Math.max(1, p), totalPages));
+//     tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+//   };
+
+//   const handleDelete = async () => {
+//     if (!deleteTarget?.firestoreId) return;
+//     try {
+//       setDeleting(true);
+//       await deleteTransaction(deleteTarget.firestoreId);
+//       setTxns((prev) => prev.filter((t) => t.id !== deleteTarget.id));
+//       setDeleteTarget(null);
+//     } catch (e) {
+//       console.log(e);
+//     } finally {
+//       setDeleting(false);
+//     }
+//   };
+
+//   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     e.target.value = "";
+//     if (!file) return;
+//     try {
+//       setImporting(true);
+//       setMessage("");
+//       const parsed = await parseTransactionsXlsx(file, chart);
+
+//       // skip rows that are already saved (same date + description + amounts)
+//       const existing = new Map<string, number>();
+//       txns.forEach((t) =>
+//         existing.set(txnKey(t), (existing.get(txnKey(t)) ?? 0) + 1),
+//       );
+//       const fresh = parsed.rows.filter((r) => {
+//         const k = txnKey(r);
+//         const n = existing.get(k) ?? 0;
+//         if (n > 0) {
+//           existing.set(k, n - 1);
+//           return false;
+//         }
+//         return true;
+//       });
+
+//       if (fresh.length === 0) {
+//         setMessage(
+//           `Nothing new to import. ${parsed.rows.length} rows are already saved.`,
+//         );
+//         return;
+//       }
+//       const alreadySaved = parsed.rows.length - fresh.length;
+//       const note = parsed.unknownCategories.length
+//         ? `\n\nCategories not in your chart: ${parsed.unknownCategories.join(", ")}`
+//         : "";
+//       if (
+//         !window.confirm(
+//           `Import ${fresh.length} new transactions?\n(${alreadySaved} already saved, ${parsed.skipped} empty rows skipped)${note}`,
+//         )
+//       )
+//         return;
+
+//       const created = await bulkAddTransactions(fresh);
+//       setTxns((prev) => [...prev, ...created]);
+//       setMessage(`Imported ${created.length} transactions.`);
+//     } catch (err) {
+//       console.log(err);
+//       setMessage(
+//         "Could not read that file. Use the Accounts workbook (.xlsx) with the Transactions sheet.",
+//       );
+//     } finally {
+//       setImporting(false);
+//     }
+//   };
+
+//   const rowActions = (t: AccountTransaction) => (
+//     <>
+//       <button
+//         onClick={() => setEditing(t)}
+//         className="text-violet-300 hover:text-violet-200 text-xs px-3 py-2 md:px-0 md:py-0 md:mr-3 rounded-lg md:rounded-none bg-violet-500/10 md:bg-transparent"
+//       >
+//         Edit
+//       </button>
+//       <button
+//         onClick={() => setDeleteTarget(t)}
+//         className="text-red-400 hover:text-red-300 text-xs px-3 py-2 md:px-0 md:py-0 rounded-lg md:rounded-none bg-red-500/10 md:bg-transparent"
+//       >
+//         Delete
+//       </button>
+//     </>
+//   );
+
+//   return (
+//     <div className="space-y-4 sm:space-y-5">
+//       {/* ---------- toolbar ---------- */}
+//       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+//         {/* filters */}
+//         <div className="grid grid-cols-2 sm:flex sm:items-center sm:flex-wrap gap-2">
+//           <input
+//             value={search}
+//             onChange={(e) => setSearch(e.target.value)}
+//             placeholder="Search description, category, voucher…"
+//             className={`${inputCls} col-span-2 w-full sm:w-64`}
+//           />
+//           <select
+//             className={`${inputCls} w-full sm:w-auto`}
+//             value={month}
+//             onChange={(e) => setMonth(e.target.value)}
+//           >
+//             <option value="all" className="bg-[#0f1117]">
+//               All months
+//             </option>
+//             {months.map((m) => (
+//               <option key={m} value={m} className="bg-[#0f1117]">
+//                 {fmtMonth(m)}
+//               </option>
+//             ))}
+//           </select>
+//           <select
+//             className={`${inputCls} w-full sm:w-auto`}
+//             value={region}
+//             onChange={(e) => setRegion(e.target.value)}
+//           >
+//             <option value="all" className="bg-[#0f1117]">
+//               All regions
+//             </option>
+//             {REGIONS.map((r) => (
+//               <option key={r} value={r} className="bg-[#0f1117]">
+//                 {r}
+//               </option>
+//             ))}
+//           </select>
+//           <select
+//             className={`${inputCls} col-span-2 sm:col-span-1 w-full sm:w-auto`}
+//             value={flow}
+//             onChange={(e) =>
+//               setFlow(e.target.value as "all" | "income" | "expense")
+//             }
+//           >
+//             <option value="all" className="bg-[#0f1117]">
+//               Income &amp; Expense
+//             </option>
+//             <option value="income" className="bg-[#0f1117]">
+//               Income only
+//             </option>
+//             <option value="expense" className="bg-[#0f1117]">
+//               Expense only
+//             </option>
+//           </select>
+//         </div>
+
+//         {/* actions */}
+//         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+//           <input
+//             ref={fileRef}
+//             type="file"
+//             accept=".xlsx,.xls"
+//             className="hidden"
+//             onChange={handleImport}
+//           />
+//           <button
+//             className={btnGhost}
+//             disabled={importing}
+//             onClick={() => fileRef.current?.click()}
+//           >
+//             {importing ? "Importing…" : "Import Excel"}
+//           </button>
+//           <button
+//             className={btnGhost}
+//             disabled={filtered.length === 0}
+//             onClick={() =>
+//               exportTransactionsXlsx(
+//                 [...filtered].reverse(),
+//                 chart,
+//                 "Growvy_Transactions.xlsx",
+//               )
+//             }
+//           >
+//             Export Excel
+//           </button>
+//           <button
+//             onClick={() => setAdding(true)}
+//             className={`${btnPrimary} col-span-2 sm:col-span-1`}
+//           >
+//             <span className="text-base leading-none">+</span> Add Transaction
+//           </button>
+//         </div>
+//       </div>
+
+//       {message && (
+//         <div className="flex items-center justify-between gap-3 text-xs text-violet-200 bg-violet-500/10 border border-violet-500/20 rounded-xl px-4 py-2.5">
+//           <span>{message}</span>
+//           <button
+//             onClick={() => setMessage("")}
+//             className="text-violet-200/70 hover:text-white text-xl leading-none px-1"
+//           >
+//             ×
+//           </button>
+//         </div>
+//       )}
+
+//       {/* totals: Income + Expense side by side on mobile, Net full width */}
+//       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+//         <StatCard label="Total Income" value={money(tot.income)} tone="green" />
+//         <StatCard label="Total Expense" value={money(tot.expense)} tone="red" />
+//         <StatCard
+//           label="Net"
+//           value={money(tot.net)}
+//           tone={tot.net >= 0 ? "green" : "red"}
+//           className="col-span-2 sm:col-span-1"
+//         />
+//       </div>
+
+//       <div ref={tableRef} className={`${card} overflow-hidden scroll-mt-4`}>
+//         {/* ---------- MOBILE: card list ---------- */}
+//         <div className="md:hidden divide-y divide-white/5">
+//           {pageRows.map((t) => {
+//             const c = byName.get(t.category);
+//             const isIncome = t.income > 0;
+//             return (
+//               <div key={t.id} className="p-4 space-y-2.5">
+//                 <div className="flex items-start justify-between gap-3">
+//                   <div className="min-w-0">
+//                     <p className="text-[11px] text-zinc-500">
+//                       {fmtDate(t.date)}
+//                       {t.voucherNo ? ` · ${t.voucherNo}` : ""}
+//                     </p>
+//                     <p className="text-sm text-white break-words mt-0.5">
+//                       {t.description || "—"}
+//                     </p>
+//                   </div>
+//                   <p
+//                     className={`text-sm font-mono font-semibold whitespace-nowrap ${
+//                       isIncome ? "text-emerald-400" : "text-red-400"
+//                     }`}
+//                   >
+//                     {isIncome ? "+" : "−"}{" "}
+//                     {formatAmount(
+//                       isIncome ? t.income : t.expense,
+//                       ACCOUNTS_CURRENCY,
+//                     )}
+//                   </p>
+//                 </div>
+
+//                 <div>
+//                   <p className="text-xs text-zinc-200">{t.category || "—"}</p>
+//                   {c && (
+//                     <p className="text-[10px] text-zinc-500">
+//                       {c.majorHead} · {c.type}
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 <div className="flex flex-wrap gap-1.5">
+//                   {[t.serviceCategory, t.region, t.paymentMode]
+//                     .filter(Boolean)
+//                     .map((x, i) => (
+//                       <span
+//                         key={i}
+//                         className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-400"
+//                       >
+//                         {x}
+//                       </span>
+//                     ))}
+//                 </div>
+
+//                 <div className="flex items-center justify-between gap-3 pt-1">
+//                   <p className="text-[11px] text-zinc-500">
+//                     Balance{" "}
+//                     <span
+//                       className={`font-mono ${t.balance < 0 ? "text-red-300" : "text-zinc-200"}`}
+//                     >
+//                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
+//                     </span>
+//                   </p>
+//                   <div className="flex items-center gap-2">{rowActions(t)}</div>
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+
+//         {/* ---------- DESKTOP / TABLET: table ---------- */}
+//         <div className="hidden md:block overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="border-b border-white/5">
+//               <tr>
+//                 <th className={th}>Date</th>
+//                 <th className={th}>Voucher</th>
+//                 <th className={th}>Description</th>
+//                 <th className={th}>Category</th>
+//                 <th className={th}>Service</th>
+//                 <th className={th}>Region</th>
+//                 <th className={th}>Mode</th>
+//                 <th className={thR}>Income</th>
+//                 <th className={thR}>Expense</th>
+//                 <th className={thR}>Balance</th>
+//                 <th className={th} />
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-white/5">
+//               {pageRows.map((t) => {
+//                 const c = byName.get(t.category);
+//                 return (
+//                   <tr key={t.id} className="hover:bg-white/[0.02]">
+//                     <td className={td}>{fmtDate(t.date)}</td>
+//                     <td className={`${td} font-mono text-zinc-500`}>
+//                       {t.voucherNo || "—"}
+//                     </td>
+//                     <td
+//                       className={`${td} max-w-[260px] truncate`}
+//                       title={t.description}
+//                     >
+//                       {t.description || "—"}
+//                     </td>
+//                     <td className={td}>
+//                       <div className="text-zinc-200">{t.category || "—"}</div>
+//                       {c && (
+//                         <div className="text-[10px] text-zinc-500">
+//                           {c.majorHead} · {c.type}
+//                         </div>
+//                       )}
+//                     </td>
+//                     <td className={td}>{t.serviceCategory}</td>
+//                     <td className={td}>{t.region}</td>
+//                     <td className={td}>{t.paymentMode}</td>
+//                     <td className={`${tdR} text-emerald-400`}>
+//                       {amt(t.income)}
+//                     </td>
+//                     <td className={`${tdR} text-red-400`}>{amt(t.expense)}</td>
+//                     <td
+//                       className={`${tdR} ${t.balance < 0 ? "text-red-300" : "text-zinc-200"}`}
+//                     >
+//                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
+//                     </td>
+//                     <td className={`${td} text-right`}>{rowActions(t)}</td>
+//                   </tr>
+//                 );
+//               })}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {filtered.length === 0 && (
+//           <p className="text-center text-sm text-zinc-600 py-8">
+//             No transactions match this view.
+//           </p>
+//         )}
+
+//         {filtered.length > PAGE_SIZE && (
+//           <div className="flex items-center justify-between gap-3 flex-wrap px-4 py-3 border-t border-white/5">
+//             <p className="text-xs text-zinc-500 hidden sm:block">
+//               Showing {startIdx + 1}–
+//               {Math.min(startIdx + PAGE_SIZE, filtered.length)} of{" "}
+//               {filtered.length}
+//             </p>
+
+//             {/* mobile: Prev · Page x / y · Next */}
+//             <div className="flex sm:hidden items-center justify-between gap-2 w-full">
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === 1}
+//                 onClick={() => goTo(currentPage - 1)}
+//               >
+//                 ‹ Prev
+//               </button>
+//               <span className="text-xs text-zinc-400">
+//                 Page {currentPage} / {totalPages}
+//               </span>
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === totalPages}
+//                 onClick={() => goTo(currentPage + 1)}
+//               >
+//                 Next ›
+//               </button>
+//             </div>
+
+//             {/* desktop: full pager */}
+//             <div className="hidden sm:flex items-center gap-1.5 flex-wrap">
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === 1}
+//                 onClick={() => goTo(1)}
+//               >
+//                 «
+//               </button>
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === 1}
+//                 onClick={() => goTo(currentPage - 1)}
+//               >
+//                 Prev
+//               </button>
+
+//               {pageNumbers.map((p, i) =>
+//                 p === "..." ? (
+//                   <span
+//                     key={`dots-${i}`}
+//                     className="px-1 text-xs text-zinc-600"
+//                   >
+//                     …
+//                   </span>
+//                 ) : (
+//                   <button
+//                     key={p}
+//                     onClick={() => goTo(p)}
+//                     className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+//                       p === currentPage
+//                         ? "bg-violet-600 text-white border-violet-500"
+//                         : "border-white/10 text-zinc-300 hover:text-white hover:border-white/20"
+//                     }`}
+//                   >
+//                     {p}
+//                   </button>
+//                 ),
+//               )}
+
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === totalPages}
+//                 onClick={() => goTo(currentPage + 1)}
+//               >
+//                 Next
+//               </button>
+//               <button
+//                 className={btnGhost}
+//                 disabled={currentPage === totalPages}
+//                 onClick={() => goTo(totalPages)}
+//               >
+//                 »
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {adding && (
+//         <TransactionModal
+//           chart={chart}
+//           onClose={() => setAdding(false)}
+//           onSave={(t) => {
+//             setTxns((prev) => [...prev, t]);
+//             setAdding(false);
+//           }}
+//         />
+//       )}
+//       {editing && (
+//         <TransactionModal
+//           transaction={editing}
+//           chart={chart}
+//           onClose={() => setEditing(null)}
+//           onSave={(t) => {
+//             setTxns((prev) => prev.map((x) => (x.id === t.id ? t : x)));
+//             setEditing(null);
+//           }}
+//         />
+//       )}
+//       {deleteTarget && (
+//         <DeleteConfirmModal
+//           loading={deleting}
+//           onClose={() => setDeleteTarget(null)}
+//           onConfirm={handleDelete}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// /* =====================================================================
+//    2. Monthly Summary
+//    ===================================================================== */
+// const MonthlySummaryTab: React.FC<{
+//   txns: AccountTransaction[];
+//   chart: AccountCategory[];
+// }> = ({ txns, chart }) => {
+//   const thisYear = new Date().getFullYear();
+//   const years = useMemo(() => {
+//     const set = new Set<number>([thisYear]);
+//     txns.forEach((t) => t.date && set.add(Number(t.date.slice(0, 4))));
+//     return [...set].sort((a, b) => b - a);
+//   }, [txns, thisYear]);
+//   const [year, setYear] = useState(years[0] ?? thisYear);
+
+//   const s = useMemo(
+//     () => monthlySummary(txns, chart, year),
+//     [txns, chart, year],
+//   );
+//   const sumAll = (a: number[]) => a.reduce((x, y) => x + y, 0);
+
+//   // sticky first column: narrower on mobile so more months are visible
+//   const stickyTd = "sticky left-0 z-10 min-w-[130px] sm:min-w-[180px] whitespace-normal sm:whitespace-nowrap";
+
+//   const sectionRow = (label: string) => (
+//     <tr className="bg-white/[0.03]">
+//       <td
+//         colSpan={14}
+//         className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300"
+//       >
+//         {label}
+//       </td>
+//     </tr>
+//   );
+
+//   const totalRow = (label: string, values: number[], tone = "text-white") => (
+//     <tr className="bg-orange-500/10">
+//       <td className={`${td} ${stickyTd} bg-[#1a1410] font-semibold ${tone}`}>
+//         {label}
+//       </td>
+//       {values.map((v, i) => (
+//         <td key={i} className={`${tdR} font-semibold ${tone}`}>
+//           {amt(v)}
+//         </td>
+//       ))}
+//       <td className={`${tdR} font-semibold ${tone}`}>{amt(sumAll(values))}</td>
+//     </tr>
+//   );
+
+//   const lines = (rows: typeof s.income) =>
+//     rows.map((r) => (
+//       <tr key={r.code} className="hover:bg-white/[0.02]">
+//         <td className={`${td} ${stickyTd} bg-[#0f1117]`}>{r.category}</td>
+//         {r.months.map((v, i) => (
+//           <td key={i} className={`${tdR} ${v === 0 ? "text-zinc-600" : ""}`}>
+//             {amt(v)}
+//           </td>
+//         ))}
+//         <td className={`${tdR} text-white`}>{amt(r.total)}</td>
+//       </tr>
+//     ));
+
+//   return (
+//     <div className="space-y-3 sm:space-y-4">
+//       <div className="flex items-center gap-3">
+//         <label className="text-xs text-zinc-500">Year</label>
+//         <select
+//           className={inputCls}
+//           value={year}
+//           onChange={(e) => setYear(Number(e.target.value))}
+//         >
+//           {years.map((y) => (
+//             <option key={y} value={y} className="bg-[#0f1117]">
+//               {y}
+//             </option>
+//           ))}
+//         </select>
+//       </div>
+
+//       <p className="sm:hidden text-[11px] text-zinc-500">
+//         Swipe sideways to see all months →
+//       </p>
+
+//       <div className={`${card} overflow-hidden`}>
+//         <div className="overflow-x-auto overscroll-x-contain">
+//           <table className="w-full">
+//             <thead className="border-b border-white/5">
+//               <tr>
+//                 <th className={`${th} ${stickyTd} bg-[#0f1117]`}>Category</th>
+//                 {MONTHS.map((m) => (
+//                   <th key={m} className={thR}>
+//                     {m}
+//                   </th>
+//                 ))}
+//                 <th className={thR}>Total</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-white/5">
+//               {sectionRow("Income")}
+//               {lines(s.income)}
+//               {totalRow("Total Income", s.incomeByMonth, "text-emerald-300")}
+//               {sectionRow("Expense")}
+//               {lines(s.expense)}
+//               {totalRow("Total Expense", s.expenseByMonth, "text-red-300")}
+//               {totalRow("Net (Income − Expense)", s.netByMonth)}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// /* =====================================================================
+//    3. Income & Expense Statement (P&L)
+//    ===================================================================== */
+// const BreakdownTable: React.FC<{ title: string; rows: BreakdownRow[] }> = ({
+//   title,
+//   rows,
+// }) => (
+//   <div className={`${card} overflow-hidden`}>
+//     <p className="px-4 pt-4 pb-2 text-xs font-semibold text-white">{title}</p>
+//     <div className="overflow-x-auto">
+//       <table className="w-full">
+//         <thead className="border-b border-white/5">
+//           <tr>
+//             <th className={th}>Name</th>
+//             <th className={thR}>Income</th>
+//             <th className={thR}>Expense</th>
+//             <th className={thR}>Net</th>
+//           </tr>
+//         </thead>
+//         <tbody className="divide-y divide-white/5">
+//           {rows.map((r) => (
+//             <tr key={r.label}>
+//               <td className={`${td} whitespace-normal`}>{r.label}</td>
+//               <td className={`${tdR} text-emerald-400`}>{amt(r.income)}</td>
+//               <td className={`${tdR} text-red-400`}>{amt(r.expense)}</td>
+//               <td
+//                 className={`${tdR} ${r.net < 0 ? "text-red-300" : "text-zinc-200"}`}
+//               >
+//                 {formatAmount(r.net, ACCOUNTS_CURRENCY)}
+//               </td>
+//             </tr>
+//           ))}
+//           {rows.length === 0 && (
+//             <tr>
+//               <td
+//                 colSpan={4}
+//                 className="text-center text-xs text-zinc-600 py-5"
+//               >
+//                 No data in this period.
+//               </td>
+//             </tr>
+//           )}
+//         </tbody>
+//       </table>
+//     </div>
+//   </div>
+// );
+
+// const StatementTab: React.FC<{
+//   txns: AccountTransaction[];
+//   chart: AccountCategory[];
+// }> = ({ txns, chart }) => {
+//   const now = new Date();
+//   const [from, setFrom] = useState(
+//     toIso(new Date(now.getFullYear(), now.getMonth(), 1)),
+//   );
+//   const [to, setTo] = useState(
+//     toIso(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+//   );
+
+//   const preset = (k: "month" | "last" | "fy") => {
+//     const y = now.getFullYear();
+//     const m = now.getMonth();
+//     if (k === "month") {
+//       setFrom(toIso(new Date(y, m, 1)));
+//       setTo(toIso(new Date(y, m + 1, 0)));
+//     } else if (k === "last") {
+//       setFrom(toIso(new Date(y, m - 1, 1)));
+//       setTo(toIso(new Date(y, m, 0)));
+//     } else {
+//       const sy = m >= 3 ? y : y - 1; // Indian financial year: Apr - Mar
+//       setFrom(`${sy}-04-01`);
+//       setTo(`${sy + 1}-03-31`);
+//     }
+//   };
+
+//   const st = useMemo(
+//     () => periodStatement(txns, chart, from, to),
+//     [txns, chart, from, to],
+//   );
+//   const byRegion = useMemo(
+//     () => breakdownBy(txns, chart, from, to, "region"),
+//     [txns, chart, from, to],
+//   );
+//   const byService = useMemo(
+//     () => breakdownBy(txns, chart, from, to, "serviceCategory"),
+//     [txns, chart, from, to],
+//   );
+
+//   const section = (label: string) => (
+//     <tr className="bg-white/[0.03]">
+//       <td
+//         colSpan={2}
+//         className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-orange-300"
+//       >
+//         {label}
+//       </td>
+//     </tr>
+//   );
+//   const totalRow = (label: string, value: number, tone = "text-white") => (
+//     <tr className="bg-orange-500/10">
+//       <td className={`${td} px-4 font-semibold whitespace-normal ${tone}`}>
+//         {label}
+//       </td>
+//       <td className={`${tdR} px-4 font-semibold ${tone}`}>
+//         {formatAmount(value, ACCOUNTS_CURRENCY)}
+//       </td>
+//     </tr>
+//   );
+
+//   return (
+//     <div className="space-y-4 sm:space-y-5">
+//       {/* date range */}
+//       <div className="space-y-2.5">
+//         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5 sm:gap-3 sm:flex-wrap">
+//           <div className="min-w-0">
+//             <label className="text-[11px] text-zinc-500 block mb-1 sm:hidden">
+//               From
+//             </label>
+//             <div className="flex items-center gap-3">
+//               <label className="hidden sm:block text-xs text-zinc-500">
+//                 From
+//               </label>
+//               <input
+//                 type="date"
+//                 className={`${inputCls} w-full`}
+//                 value={from}
+//                 onChange={(e) => setFrom(e.target.value)}
+//               />
+//             </div>
+//           </div>
+//           <div className="min-w-0">
+//             <label className="text-[11px] text-zinc-500 block mb-1 sm:hidden">
+//               To
+//             </label>
+//             <div className="flex items-center gap-3">
+//               <label className="hidden sm:block text-xs text-zinc-500">
+//                 To
+//               </label>
+//               <input
+//                 type="date"
+//                 className={`${inputCls} w-full`}
+//                 min={from}
+//                 value={to}
+//                 onChange={(e) => setTo(e.target.value)}
+//               />
+//             </div>
+//           </div>
+//         </div>
+
+//         <div className={`flex gap-2 ${noScrollbar} sm:overflow-visible`}>
+//           <button
+//             className={`${btnGhost} whitespace-nowrap`}
+//             onClick={() => preset("month")}
+//           >
+//             This month
+//           </button>
+//           <button
+//             className={`${btnGhost} whitespace-nowrap`}
+//             onClick={() => preset("last")}
+//           >
+//             Last month
+//           </button>
+//           <button
+//             className={`${btnGhost} whitespace-nowrap`}
+//             onClick={() => preset("fy")}
+//           >
+//             This FY (Apr–Mar)
+//           </button>
+//         </div>
+//       </div>
+
+//       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+//         <StatCard
+//           label="Total Income"
+//           value={money(st.totalIncome)}
+//           tone="green"
+//         />
+//         <StatCard
+//           label="Total Expense"
+//           value={money(st.totalExpense)}
+//           tone="red"
+//         />
+//         <StatCard
+//           label={st.net >= 0 ? "Net Profit" : "Net Loss"}
+//           value={money(st.net)}
+//           tone={st.net >= 0 ? "green" : "red"}
+//           className="col-span-2 sm:col-span-1"
+//         />
+//       </div>
+
+//       <div className={`${card} overflow-hidden`}>
+//         <table className="w-full">
+//           <thead className="border-b border-white/5">
+//             <tr>
+//               <th className={`${th} px-4`}>Category</th>
+//               <th className={`${thR} px-4`}>Amount</th>
+//             </tr>
+//           </thead>
+//           <tbody className="divide-y divide-white/5">
+//             {section("Income")}
+//             {st.income.map((l) => (
+//               <tr key={l.code}>
+//                 <td className={`${td} px-4 whitespace-normal`}>{l.category}</td>
+//                 <td
+//                   className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
+//                 >
+//                   {amt(l.amount)}
+//                 </td>
+//               </tr>
+//             ))}
+//             {totalRow("Total Income (A)", st.totalIncome, "text-emerald-300")}
+//             {section("Expense")}
+//             {st.expense.map((l) => (
+//               <tr key={l.code}>
+//                 <td className={`${td} px-4 whitespace-normal`}>{l.category}</td>
+//                 <td
+//                   className={`${tdR} px-4 ${l.amount === 0 ? "text-zinc-600" : ""}`}
+//                 >
+//                   {amt(l.amount)}
+//                 </td>
+//               </tr>
+//             ))}
+//             {totalRow("Total Expense (B)", st.totalExpense, "text-red-300")}
+//             {totalRow(
+//               "NET PROFIT / (LOSS)  (A − B)",
+//               st.net,
+//               st.net >= 0 ? "text-emerald-300" : "text-red-300",
+//             )}
+//           </tbody>
+//         </table>
+//       </div>
+
+//       {(st.otherIn > 0 || st.otherOut > 0) && (
+//         <p className="text-xs text-zinc-500">
+//           Not included above: Asset, Liability &amp; Equity entries in this
+//           period — money in{" "}
+//           <span className="text-zinc-300">{money(st.otherIn)}</span>, money out{" "}
+//           <span className="text-zinc-300">{money(st.otherOut)}</span>. Only
+//           categories with Major Head Income or Expenses feed this statement,
+//           same as the Excel sheet.
+//         </p>
+//       )}
+
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+//         <BreakdownTable title="By Region" rows={byRegion} />
+//         <BreakdownTable title="By Client / Service Category" rows={byService} />
+//       </div>
+//     </div>
+//   );
+// };
+
+// /* =====================================================================
+//    4. Balance Sheet (manual balances, like the Excel sheet)
+//    ===================================================================== */
+// const BalanceSheetTab: React.FC<{
+//   txns: AccountTransaction[];
+//   chart: AccountCategory[];
+// }> = ({ txns, chart }) => {
+//   const [asOf, setAsOf] = useState(toIso(new Date()));
+//   const [draft, setDraft] = useState<Record<string, string>>({});
+//   const [loading, setLoading] = useState(true);
+//   const [saving, setSaving] = useState(false);
+//   const [msg, setMsg] = useState("");
+
+//   useEffect(() => {
+//     (async () => {
+//       try {
+//         const data: BalanceSheetData | null = await getBalanceSheet();
+//         if (data) {
+//           setAsOf(data.asOf);
+//           setDraft(
+//             Object.fromEntries(
+//               Object.entries(data.values).map(([k, v]) => [k, String(v)]),
+//             ),
+//           );
+//         }
+//       } catch (e) {
+//         console.log(e);
+//       } finally {
+//         setLoading(false);
+//       }
+//     })();
+//   }, []);
+
+//   const values = useMemo(
+//     () =>
+//       Object.fromEntries(
+//         Object.entries(draft).map(([k, v]) => [k, parseFloat(v) || 0]),
+//       ) as Record<string, number>,
+//     [draft],
+//   );
+//   const t = balanceTotals(chart, values);
+//   const assets = chart.filter((c) => c.majorHead === "Assets");
+//   const le = chart.filter(
+//     (c) => c.majorHead === "Liabilities" || c.majorHead === "Equity",
+//   );
+
+//   // reference only: cash book net up to the chosen date
+//   const cashBookNet = useMemo(
+//     () => totals(txns.filter((x) => x.date <= asOf)).net,
+//     [txns, asOf],
+//   );
+
+//   const handleSave = async () => {
+//     try {
+//       setSaving(true);
+//       setMsg("");
+//       await saveBalanceSheet({ asOf, values });
+//       setMsg("Balance sheet saved.");
+//     } catch (e) {
+//       console.log(e);
+//       setMsg("Could not save the balance sheet.");
+//     } finally {
+//       setSaving(false);
+//     }
+//   };
+
+//   const field = (c: AccountCategory) => (
+//     <div
+//       key={c.code}
+//       className="flex items-center justify-between gap-3 py-1.5"
+//     >
+//       <span className="text-xs text-zinc-300 min-w-0 break-words">
+//         {c.name}
+//       </span>
+//       <input
+//         type="text"
+//         inputMode="decimal"
+//         value={draft[c.code] ?? ""}
+//         placeholder="0"
+//         onFocus={(e) => e.target.select()}
+//         onChange={(e) => setDraft((p) => ({ ...p, [c.code]: e.target.value }))}
+//         className={`${inputCls} w-28 sm:w-36 flex-shrink-0 text-right font-mono text-sky-300`}
+//       />
+//     </div>
+//   );
+
+//   if (loading)
+//     return (
+//       <p className="text-center text-sm text-zinc-500 py-10">
+//         Loading balance sheet…
+//       </p>
+//     );
+
+//   return (
+//     <div className="space-y-4 sm:space-y-5">
+//       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+//         <div className="flex items-center gap-3">
+//           <label className="text-xs text-zinc-500">As of</label>
+//           <input
+//             type="date"
+//             className={`${inputCls} flex-1 sm:flex-none`}
+//             value={asOf}
+//             onChange={(e) => setAsOf(e.target.value)}
+//           />
+//         </div>
+//         <button onClick={handleSave} disabled={saving} className={btnPrimary}>
+//           {saving ? "Saving..." : "Save Balance Sheet"}
+//         </button>
+//       </div>
+
+//       {msg && <p className="text-xs text-violet-300">{msg}</p>}
+
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+//         <div className={`${card} p-4 sm:p-5`}>
+//           <p className="text-sm font-semibold text-white mb-2">Assets</p>
+//           {assets.map(field)}
+//           <div className="flex justify-between gap-3 pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
+//             <span>Total Assets</span>
+//             <span className="font-mono">{money(t.assets)}</span>
+//           </div>
+//           <p className="mt-3 text-[11px] text-zinc-500">
+//             Reference: cash book net up to this date is {money(cashBookNet)}.
+//             Enter negative values for contra accounts like Accumulated
+//             Depreciation.
+//           </p>
+//         </div>
+
+//         <div className={`${card} p-4 sm:p-5`}>
+//           <p className="text-sm font-semibold text-white mb-2">
+//             Liabilities &amp; Equity
+//           </p>
+//           {le.map(field)}
+//           <div className="flex justify-between gap-3 pt-3 mt-3 border-t border-white/10 text-sm font-semibold text-white">
+//             <span>Total Liabilities &amp; Equity</span>
+//             <span className="font-mono">{money(t.liabilitiesEquity)}</span>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div
+//         className={`rounded-xl px-4 py-3 text-sm border break-words ${
+//           Math.abs(t.diff) < 0.005
+//             ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+//             : "bg-red-500/10 border-red-500/20 text-red-300"
+//         }`}
+//       >
+//         Check (Assets − Liabilities &amp; Equity):{" "}
+//         <span className="font-mono font-semibold">{money(t.diff)}</span>
+//         {Math.abs(t.diff) < 0.005 ? " · Balanced" : " · Not balanced"}
+//       </div>
+//     </div>
+//   );
+// };
+
+// /* =====================================================================
+//    5. Chart of Accounts
+//    ===================================================================== */
+// const ChartTab: React.FC<{
+//   txns: AccountTransaction[];
+//   chart: AccountCategory[];
+//   setChart: React.Dispatch<React.SetStateAction<AccountCategory[]>>;
+// }> = ({ txns, chart, setChart }) => {
+//   const [code, setCode] = useState("");
+//   const [name, setName] = useState("");
+//   const [majorHead, setMajorHead] = useState<MajorHead>("Expenses");
+//   const [type, setType] = useState(HEAD_TYPES.Expenses[0]);
+//   const [notes, setNotes] = useState("");
+//   const [saving, setSaving] = useState(false);
+//   const [error, setError] = useState("");
+//   const [deleteTarget, setDeleteTarget] = useState<AccountCategory | null>(
+//     null,
+//   );
+//   const [deleting, setDeleting] = useState(false);
+
+//   // useLockBodyScroll(!!deleteTarget);
+
+//   const usedNames = useMemo(() => new Set(txns.map((t) => t.category)), [txns]);
+
+//   const changeHead = (h: MajorHead) => {
+//     setMajorHead(h);
+//     setType(HEAD_TYPES[h][0]);
+//   };
+
+//   const handleAdd = async () => {
+//     const c = code.trim().toUpperCase();
+//     const n = name.trim();
+//     if (!c || !n) return;
+//     if (
+//       chart.some(
+//         (x) => x.code === c || x.name.toLowerCase() === n.toLowerCase(),
+//       )
+//     ) {
+//       setError("That code or name already exists.");
+//       return;
+//     }
+//     try {
+//       setSaving(true);
+//       setError("");
+//       const created = await addCategory({
+//         code: c,
+//         name: n,
+//         majorHead,
+//         type,
+//         notes: notes.trim(),
+//       });
+//       setChart((prev) => sortChart([...prev, created]));
+//       setCode("");
+//       setName("");
+//       setNotes("");
+//     } catch (e) {
+//       console.log(e);
+//       setError("Could not add the category.");
+//     } finally {
+//       setSaving(false);
+//     }
+//   };
+
+//   const handleDelete = async () => {
+//     if (!deleteTarget?.firestoreId) return;
+//     try {
+//       setDeleting(true);
+//       await deleteCategory(deleteTarget.firestoreId);
+//       setChart((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+//       setDeleteTarget(null);
+//     } catch (e) {
+//       console.log(e);
+//     } finally {
+//       setDeleting(false);
+//     }
+//   };
+
+//   return (
+//     <div className="space-y-4 sm:space-y-5">
+//       <div className={`${card} p-4 sm:p-5`}>
+//         <p className="text-sm font-semibold text-white mb-3">Add category</p>
+//         <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 sm:gap-3">
+//           <input
+//             className={`${inputCls} w-full`}
+//             placeholder="Code (EX19)"
+//             value={code}
+//             onChange={(e) => setCode(e.target.value)}
+//           />
+//           <input
+//             className={`${inputCls} w-full col-span-2 lg:col-span-2 order-last sm:order-none`}
+//             placeholder="Category name"
+//             value={name}
+//             onChange={(e) => setName(e.target.value)}
+//           />
+//           <select
+//             className={`${inputCls} w-full`}
+//             value={majorHead}
+//             onChange={(e) => changeHead(e.target.value as MajorHead)}
+//           >
+//             {MAJOR_HEADS.map((h) => (
+//               <option key={h} className="bg-[#0f1117]">
+//                 {h}
+//               </option>
+//             ))}
+//           </select>
+//           <select
+//             className={`${inputCls} w-full col-span-2 lg:col-span-1`}
+//             value={type}
+//             onChange={(e) => setType(e.target.value)}
+//           >
+//             {HEAD_TYPES[majorHead].map((x) => (
+//               <option key={x} className="bg-[#0f1117]">
+//                 {x}
+//               </option>
+//             ))}
+//           </select>
+//           <input
+//             className={`${inputCls} w-full col-span-2 lg:col-span-1`}
+//             placeholder="Notes"
+//             value={notes}
+//             onChange={(e) => setNotes(e.target.value)}
+//           />
+//         </div>
+//         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
+//           <button
+//             onClick={handleAdd}
+//             disabled={saving || !code.trim() || !name.trim()}
+//             className={btnPrimary}
+//           >
+//             {saving ? "Adding..." : "Add Category"}
+//           </button>
+//           {error && <span className="text-xs text-red-400">{error}</span>}
+//         </div>
+//         <p className="mt-3 text-[11px] text-zinc-500">
+//           Categories with Major Head Income or Expenses appear automatically in
+//           the Monthly Summary and the Income &amp; Expense statement.
+//         </p>
+//       </div>
+
+//       <div className={`${card} overflow-hidden`}>
+//         {/* MOBILE: card list */}
+//         <div className="md:hidden divide-y divide-white/5">
+//           {chart.map((c) => {
+//             const used = usedNames.has(c.name);
+//             return (
+//               <div
+//                 key={c.id}
+//                 className="p-4 flex items-start justify-between gap-3"
+//               >
+//                 <div className="min-w-0">
+//                   <p className="text-[11px] font-mono text-zinc-500">
+//                     {c.code}
+//                   </p>
+//                   <p className="text-sm text-zinc-100 break-words">{c.name}</p>
+//                   <p className="text-[11px] text-zinc-500 mt-0.5">
+//                     {c.majorHead} · {c.type}
+//                   </p>
+//                   {c.notes && (
+//                     <p className="text-[11px] text-zinc-600 mt-1 break-words">
+//                       {c.notes}
+//                     </p>
+//                   )}
+//                 </div>
+//                 <button
+//                   onClick={() => setDeleteTarget(c)}
+//                   disabled={used}
+//                   title={used ? "Used by transactions" : "Delete category"}
+//                   className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed text-xs px-3 py-2 rounded-lg bg-red-500/10 flex-shrink-0"
+//                 >
+//                   Delete
+//                 </button>
+//               </div>
+//             );
+//           })}
+//         </div>
+
+//         {/* DESKTOP: table */}
+//         <div className="hidden md:block overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="border-b border-white/5">
+//               <tr>
+//                 <th className={th}>Code</th>
+//                 <th className={th}>Category</th>
+//                 <th className={th}>Major Head</th>
+//                 <th className={th}>Type</th>
+//                 <th className={th}>Notes</th>
+//                 <th className={th} />
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-white/5">
+//               {chart.map((c) => {
+//                 const used = usedNames.has(c.name);
+//                 return (
+//                   <tr key={c.id} className="hover:bg-white/[0.02]">
+//                     <td className={`${td} font-mono text-zinc-500`}>
+//                       {c.code}
+//                     </td>
+//                     <td className={`${td} text-zinc-200`}>{c.name}</td>
+//                     <td className={td}>{c.majorHead}</td>
+//                     <td className={td}>{c.type}</td>
+//                     <td
+//                       className={`${td} max-w-[320px] truncate text-zinc-500`}
+//                       title={c.notes}
+//                     >
+//                       {c.notes}
+//                     </td>
+//                     <td className={`${td} text-right`}>
+//                       <button
+//                         onClick={() => setDeleteTarget(c)}
+//                         disabled={used}
+//                         title={
+//                           used ? "Used by transactions" : "Delete category"
+//                         }
+//                         className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed"
+//                       >
+//                         Delete
+//                       </button>
+//                     </td>
+//                   </tr>
+//                 );
+//               })}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+
+//       {deleteTarget && (
+//         <DeleteConfirmModal
+//           loading={deleting}
+//           onClose={() => setDeleteTarget(null)}
+//           onConfirm={handleDelete}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AccountsManagement;
+
+// // export const useLockBodyScroll = (locked: boolean) => {
+// //   useEffect(() => {
+// //     if (!locked) return;
+// //     const prevOverflow = document.body.style.overflow;
+// //     const prevPadding = document.body.style.paddingRight;
+// //     const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+
+// //     document.body.style.overflow = "hidden";
+// //     if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`; // stops the page jumping sideways
+
+// //     return () => {
+// //       document.body.style.overflow = prevOverflow;
+// //       document.body.style.paddingRight = prevPadding;
+// //     };
+// //   }, [locked]);
+// // };
+
+
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type {
   AccountCategory,
@@ -42,6 +1585,14 @@ import {
   parseTransactionsXlsx,
 } from "../../service/Accountsexcel";
 import { formatAmount, formatMoney } from "../../utils/currency";
+import {
+  hasPermission,
+  type Permission,
+  type Role,
+} from "../../utils/types/staffRoles";
+
+/* ---------- access ---------- */
+type Me = { role?: Role; permissions?: Permission[] | null } | null;
 
 /* ---------- shared bits ---------- */
 type Tab = "cashbook" | "summary" | "statement" | "balance" | "chart";
@@ -101,8 +1652,17 @@ const StatCard: React.FC<{
 
 /* =====================================================================
    Page
+
+   me:
+     - undefined (not passed) = admin, full access
+     - staff profile          = access follows accounts.view / accounts.manage
+     - null                   = no profile, no access
    ===================================================================== */
-const AccountsManagement: React.FC = () => {
+const AccountsManagement: React.FC<{ me?: Me }> = ({ me }) => {
+  const allow = (p: Permission) => me === undefined || hasPermission(me, p);
+  const canManage = allow("accounts.manage"); // add / edit / delete / import / save
+  const canView = allow("accounts.view") || canManage;
+
   const [tab, setTab] = useState<Tab>("cashbook");
   const [txns, setTxns] = useState<AccountTransaction[]>([]);
   const [chart, setChart] = useState<AccountCategory[]>([]);
@@ -111,6 +1671,7 @@ const AccountsManagement: React.FC = () => {
   const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
+    if (!canView) return; // don't even fetch for people without access
     (async () => {
       try {
         const [t, c] = await Promise.all([
@@ -126,9 +1687,10 @@ const AccountsManagement: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [canView]);
 
   const handleSeed = async () => {
+    if (!canManage) return;
     try {
       setSeeding(true);
       setChart(await seedDefaultChart());
@@ -139,6 +1701,15 @@ const AccountsManagement: React.FC = () => {
       setSeeding(false);
     }
   };
+
+  // keep this AFTER all hooks so the hook order never changes
+  if (!canView) {
+    return (
+      <div className={`${card} p-8 text-center text-sm text-zinc-500`}>
+        You don't have access to Accounts.
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in space-y-5 sm:space-y-6 min-w-0">
@@ -161,6 +1732,12 @@ const AccountsManagement: React.FC = () => {
         ))}
       </div>
 
+      {!canManage && (
+        <p className="text-[11px] text-zinc-500">
+          View only — you can see accounts but not change them.
+        </p>
+      )}
+
       {error && (
         <div className="flex items-center justify-between gap-3 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5">
           <span>{error}</span>
@@ -173,7 +1750,7 @@ const AccountsManagement: React.FC = () => {
         </div>
       )}
 
-      {!loading && chart.length === 0 && (
+      {!loading && chart.length === 0 && canManage && (
         <div
           className={`${card} p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4`}
         >
@@ -198,13 +1775,25 @@ const AccountsManagement: React.FC = () => {
       ) : (
         <>
           {tab === "cashbook" && (
-            <CashBookTab txns={txns} setTxns={setTxns} chart={chart} />
+            <CashBookTab
+              txns={txns}
+              setTxns={setTxns}
+              chart={chart}
+              canManage={canManage}
+            />
           )}
           {tab === "summary" && <MonthlySummaryTab txns={txns} chart={chart} />}
           {tab === "statement" && <StatementTab txns={txns} chart={chart} />}
-          {tab === "balance" && <BalanceSheetTab txns={txns} chart={chart} />}
+          {tab === "balance" && (
+            <BalanceSheetTab txns={txns} chart={chart} canManage={canManage} />
+          )}
           {tab === "chart" && (
-            <ChartTab txns={txns} chart={chart} setChart={setChart} />
+            <ChartTab
+              txns={txns}
+              chart={chart}
+              setChart={setChart}
+              canManage={canManage}
+            />
           )}
         </>
       )}
@@ -221,7 +1810,8 @@ const CashBookTab: React.FC<{
   txns: AccountTransaction[];
   setTxns: React.Dispatch<React.SetStateAction<AccountTransaction[]>>;
   chart: AccountCategory[];
-}> = ({ txns, setTxns, chart }) => {
+  canManage: boolean;
+}> = ({ txns, setTxns, chart, canManage }) => {
   const [search, setSearch] = useState("");
   const [month, setMonth] = useState("all");
   const [region, setRegion] = useState("all");
@@ -237,8 +1827,6 @@ const CashBookTab: React.FC<{
   const [message, setMessage] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
-
-  // useLockBodyScroll(adding || !!editing || !!deleteTarget);
 
   const byName = useMemo(() => new Map(chart.map((c) => [c.name, c])), [chart]);
   const rows = useMemo(() => withRunningBalance(txns), [txns]); // oldest -> newest, with running balance
@@ -303,7 +1891,7 @@ const CashBookTab: React.FC<{
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget?.firestoreId) return;
+    if (!canManage || !deleteTarget?.firestoreId) return;
     try {
       setDeleting(true);
       await deleteTransaction(deleteTarget.firestoreId);
@@ -319,7 +1907,7 @@ const CashBookTab: React.FC<{
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
-    if (!file) return;
+    if (!file || !canManage) return;
     try {
       setImporting(true);
       setMessage("");
@@ -370,22 +1958,24 @@ const CashBookTab: React.FC<{
     }
   };
 
-  const rowActions = (t: AccountTransaction) => (
-    <>
-      <button
-        onClick={() => setEditing(t)}
-        className="text-violet-300 hover:text-violet-200 text-xs px-3 py-2 md:px-0 md:py-0 md:mr-3 rounded-lg md:rounded-none bg-violet-500/10 md:bg-transparent"
-      >
-        Edit
-      </button>
-      <button
-        onClick={() => setDeleteTarget(t)}
-        className="text-red-400 hover:text-red-300 text-xs px-3 py-2 md:px-0 md:py-0 rounded-lg md:rounded-none bg-red-500/10 md:bg-transparent"
-      >
-        Delete
-      </button>
-    </>
-  );
+  // Edit / Delete only for people who can manage accounts
+  const rowActions = (t: AccountTransaction) =>
+    !canManage ? null : (
+      <>
+        <button
+          onClick={() => setEditing(t)}
+          className="text-violet-300 hover:text-violet-200 text-xs px-3 py-2 md:px-0 md:py-0 md:mr-3 rounded-lg md:rounded-none bg-violet-500/10 md:bg-transparent"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => setDeleteTarget(t)}
+          className="text-red-400 hover:text-red-300 text-xs px-3 py-2 md:px-0 md:py-0 rounded-lg md:rounded-none bg-red-500/10 md:bg-transparent"
+        >
+          Delete
+        </button>
+      </>
+    );
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -446,24 +2036,28 @@ const CashBookTab: React.FC<{
           </select>
         </div>
 
-        {/* actions */}
+        {/* actions: Export for everyone, Import + Add only for managers */}
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={handleImport}
-          />
+          {canManage && (
+            <>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={handleImport}
+              />
+              <button
+                className={btnGhost}
+                disabled={importing}
+                onClick={() => fileRef.current?.click()}
+              >
+                {importing ? "Importing…" : "Import Excel"}
+              </button>
+            </>
+          )}
           <button
-            className={btnGhost}
-            disabled={importing}
-            onClick={() => fileRef.current?.click()}
-          >
-            {importing ? "Importing…" : "Import Excel"}
-          </button>
-          <button
-            className={btnGhost}
+            className={`${btnGhost} ${canManage ? "" : "col-span-2"}`}
             disabled={filtered.length === 0}
             onClick={() =>
               exportTransactionsXlsx(
@@ -475,12 +2069,14 @@ const CashBookTab: React.FC<{
           >
             Export Excel
           </button>
-          <button
-            onClick={() => setAdding(true)}
-            className={`${btnPrimary} col-span-2 sm:col-span-1`}
-          >
-            <span className="text-base leading-none">+</span> Add Transaction
-          </button>
+          {canManage && (
+            <button
+              onClick={() => setAdding(true)}
+              className={`${btnPrimary} col-span-2 sm:col-span-1`}
+            >
+              <span className="text-base leading-none">+</span> Add Transaction
+            </button>
+          )}
         </div>
       </div>
 
@@ -592,7 +2188,7 @@ const CashBookTab: React.FC<{
                 <th className={thR}>Income</th>
                 <th className={thR}>Expense</th>
                 <th className={thR}>Balance</th>
-                <th className={th} />
+                {canManage && <th className={th} />}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -630,7 +2226,9 @@ const CashBookTab: React.FC<{
                     >
                       {formatAmount(t.balance, ACCOUNTS_CURRENCY)}
                     </td>
-                    <td className={`${td} text-right`}>{rowActions(t)}</td>
+                    {canManage && (
+                      <td className={`${td} text-right`}>{rowActions(t)}</td>
+                    )}
                   </tr>
                 );
               })}
@@ -732,7 +2330,7 @@ const CashBookTab: React.FC<{
         )}
       </div>
 
-      {adding && (
+      {canManage && adding && (
         <TransactionModal
           chart={chart}
           onClose={() => setAdding(false)}
@@ -742,7 +2340,7 @@ const CashBookTab: React.FC<{
           }}
         />
       )}
-      {editing && (
+      {canManage && editing && (
         <TransactionModal
           transaction={editing}
           chart={chart}
@@ -753,7 +2351,7 @@ const CashBookTab: React.FC<{
           }}
         />
       )}
-      {deleteTarget && (
+      {canManage && deleteTarget && (
         <DeleteConfirmModal
           loading={deleting}
           onClose={() => setDeleteTarget(null)}
@@ -786,7 +2384,8 @@ const MonthlySummaryTab: React.FC<{
   const sumAll = (a: number[]) => a.reduce((x, y) => x + y, 0);
 
   // sticky first column: narrower on mobile so more months are visible
-  const stickyTd = "sticky left-0 z-10 min-w-[130px] sm:min-w-[180px] whitespace-normal sm:whitespace-nowrap";
+  const stickyTd =
+    "sticky left-0 z-10 min-w-[130px] sm:min-w-[180px] whitespace-normal sm:whitespace-nowrap";
 
   const sectionRow = (label: string) => (
     <tr className="bg-white/[0.03]">
@@ -1135,7 +2734,8 @@ const StatementTab: React.FC<{
 const BalanceSheetTab: React.FC<{
   txns: AccountTransaction[];
   chart: AccountCategory[];
-}> = ({ txns, chart }) => {
+  canManage: boolean;
+}> = ({ txns, chart, canManage }) => {
   const [asOf, setAsOf] = useState(toIso(new Date()));
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -1182,6 +2782,7 @@ const BalanceSheetTab: React.FC<{
   );
 
   const handleSave = async () => {
+    if (!canManage) return;
     try {
       setSaving(true);
       setMsg("");
@@ -1208,9 +2809,10 @@ const BalanceSheetTab: React.FC<{
         inputMode="decimal"
         value={draft[c.code] ?? ""}
         placeholder="0"
+        disabled={!canManage}
         onFocus={(e) => e.target.select()}
         onChange={(e) => setDraft((p) => ({ ...p, [c.code]: e.target.value }))}
-        className={`${inputCls} w-28 sm:w-36 flex-shrink-0 text-right font-mono text-sky-300`}
+        className={`${inputCls} w-28 sm:w-36 flex-shrink-0 text-right font-mono text-sky-300 disabled:opacity-70`}
       />
     </div>
   );
@@ -1234,9 +2836,11 @@ const BalanceSheetTab: React.FC<{
             onChange={(e) => setAsOf(e.target.value)}
           />
         </div>
-        <button onClick={handleSave} disabled={saving} className={btnPrimary}>
-          {saving ? "Saving..." : "Save Balance Sheet"}
-        </button>
+        {canManage && (
+          <button onClick={handleSave} disabled={saving} className={btnPrimary}>
+            {saving ? "Saving..." : "Save Balance Sheet"}
+          </button>
+        )}
       </div>
 
       {msg && <p className="text-xs text-violet-300">{msg}</p>}
@@ -1251,8 +2855,8 @@ const BalanceSheetTab: React.FC<{
           </div>
           <p className="mt-3 text-[11px] text-zinc-500">
             Reference: cash book net up to this date is {money(cashBookNet)}.
-            Enter negative values for contra accounts like Accumulated
-            Depreciation.
+            {canManage &&
+              " Enter negative values for contra accounts like Accumulated Depreciation."}
           </p>
         </div>
 
@@ -1290,7 +2894,8 @@ const ChartTab: React.FC<{
   txns: AccountTransaction[];
   chart: AccountCategory[];
   setChart: React.Dispatch<React.SetStateAction<AccountCategory[]>>;
-}> = ({ txns, chart, setChart }) => {
+  canManage: boolean;
+}> = ({ txns, chart, setChart, canManage }) => {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [majorHead, setMajorHead] = useState<MajorHead>("Expenses");
@@ -1303,8 +2908,6 @@ const ChartTab: React.FC<{
   );
   const [deleting, setDeleting] = useState(false);
 
-  // useLockBodyScroll(!!deleteTarget);
-
   const usedNames = useMemo(() => new Set(txns.map((t) => t.category)), [txns]);
 
   const changeHead = (h: MajorHead) => {
@@ -1313,6 +2916,7 @@ const ChartTab: React.FC<{
   };
 
   const handleAdd = async () => {
+    if (!canManage) return;
     const c = code.trim().toUpperCase();
     const n = name.trim();
     if (!c || !n) return;
@@ -1347,7 +2951,7 @@ const ChartTab: React.FC<{
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget?.firestoreId) return;
+    if (!canManage || !deleteTarget?.firestoreId) return;
     try {
       setDeleting(true);
       await deleteCategory(deleteTarget.firestoreId);
@@ -1362,65 +2966,67 @@ const ChartTab: React.FC<{
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <div className={`${card} p-4 sm:p-5`}>
-        <p className="text-sm font-semibold text-white mb-3">Add category</p>
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 sm:gap-3">
-          <input
-            className={`${inputCls} w-full`}
-            placeholder="Code (EX19)"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <input
-            className={`${inputCls} w-full col-span-2 lg:col-span-2 order-last sm:order-none`}
-            placeholder="Category name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <select
-            className={`${inputCls} w-full`}
-            value={majorHead}
-            onChange={(e) => changeHead(e.target.value as MajorHead)}
-          >
-            {MAJOR_HEADS.map((h) => (
-              <option key={h} className="bg-[#0f1117]">
-                {h}
-              </option>
-            ))}
-          </select>
-          <select
-            className={`${inputCls} w-full col-span-2 lg:col-span-1`}
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            {HEAD_TYPES[majorHead].map((x) => (
-              <option key={x} className="bg-[#0f1117]">
-                {x}
-              </option>
-            ))}
-          </select>
-          <input
-            className={`${inputCls} w-full col-span-2 lg:col-span-1`}
-            placeholder="Notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-          />
+      {canManage && (
+        <div className={`${card} p-4 sm:p-5`}>
+          <p className="text-sm font-semibold text-white mb-3">Add category</p>
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-2.5 sm:gap-3">
+            <input
+              className={`${inputCls} w-full`}
+              placeholder="Code (EX19)"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            <input
+              className={`${inputCls} w-full col-span-2 lg:col-span-2 order-last sm:order-none`}
+              placeholder="Category name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <select
+              className={`${inputCls} w-full`}
+              value={majorHead}
+              onChange={(e) => changeHead(e.target.value as MajorHead)}
+            >
+              {MAJOR_HEADS.map((h) => (
+                <option key={h} className="bg-[#0f1117]">
+                  {h}
+                </option>
+              ))}
+            </select>
+            <select
+              className={`${inputCls} w-full col-span-2 lg:col-span-1`}
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              {HEAD_TYPES[majorHead].map((x) => (
+                <option key={x} className="bg-[#0f1117]">
+                  {x}
+                </option>
+              ))}
+            </select>
+            <input
+              className={`${inputCls} w-full col-span-2 lg:col-span-1`}
+              placeholder="Notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
+            <button
+              onClick={handleAdd}
+              disabled={saving || !code.trim() || !name.trim()}
+              className={btnPrimary}
+            >
+              {saving ? "Adding..." : "Add Category"}
+            </button>
+            {error && <span className="text-xs text-red-400">{error}</span>}
+          </div>
+          <p className="mt-3 text-[11px] text-zinc-500">
+            Categories with Major Head Income or Expenses appear automatically
+            in the Monthly Summary and the Income &amp; Expense statement.
+          </p>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3">
-          <button
-            onClick={handleAdd}
-            disabled={saving || !code.trim() || !name.trim()}
-            className={btnPrimary}
-          >
-            {saving ? "Adding..." : "Add Category"}
-          </button>
-          {error && <span className="text-xs text-red-400">{error}</span>}
-        </div>
-        <p className="mt-3 text-[11px] text-zinc-500">
-          Categories with Major Head Income or Expenses appear automatically in
-          the Monthly Summary and the Income &amp; Expense statement.
-        </p>
-      </div>
+      )}
 
       <div className={`${card} overflow-hidden`}>
         {/* MOBILE: card list */}
@@ -1446,14 +3052,16 @@ const ChartTab: React.FC<{
                     </p>
                   )}
                 </div>
-                <button
-                  onClick={() => setDeleteTarget(c)}
-                  disabled={used}
-                  title={used ? "Used by transactions" : "Delete category"}
-                  className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed text-xs px-3 py-2 rounded-lg bg-red-500/10 flex-shrink-0"
-                >
-                  Delete
-                </button>
+                {canManage && (
+                  <button
+                    onClick={() => setDeleteTarget(c)}
+                    disabled={used}
+                    title={used ? "Used by transactions" : "Delete category"}
+                    className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed text-xs px-3 py-2 rounded-lg bg-red-500/10 flex-shrink-0"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             );
           })}
@@ -1469,7 +3077,7 @@ const ChartTab: React.FC<{
                 <th className={th}>Major Head</th>
                 <th className={th}>Type</th>
                 <th className={th}>Notes</th>
-                <th className={th} />
+                {canManage && <th className={th} />}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -1489,18 +3097,20 @@ const ChartTab: React.FC<{
                     >
                       {c.notes}
                     </td>
-                    <td className={`${td} text-right`}>
-                      <button
-                        onClick={() => setDeleteTarget(c)}
-                        disabled={used}
-                        title={
-                          used ? "Used by transactions" : "Delete category"
-                        }
-                        className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        Delete
-                      </button>
-                    </td>
+                    {canManage && (
+                      <td className={`${td} text-right`}>
+                        <button
+                          onClick={() => setDeleteTarget(c)}
+                          disabled={used}
+                          title={
+                            used ? "Used by transactions" : "Delete category"
+                          }
+                          className="text-red-400 hover:text-red-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -1509,7 +3119,7 @@ const ChartTab: React.FC<{
         </div>
       </div>
 
-      {deleteTarget && (
+      {canManage && deleteTarget && (
         <DeleteConfirmModal
           loading={deleting}
           onClose={() => setDeleteTarget(null)}
@@ -1521,20 +3131,3 @@ const ChartTab: React.FC<{
 };
 
 export default AccountsManagement;
-
-// export const useLockBodyScroll = (locked: boolean) => {
-//   useEffect(() => {
-//     if (!locked) return;
-//     const prevOverflow = document.body.style.overflow;
-//     const prevPadding = document.body.style.paddingRight;
-//     const scrollbar = window.innerWidth - document.documentElement.clientWidth;
-
-//     document.body.style.overflow = "hidden";
-//     if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`; // stops the page jumping sideways
-
-//     return () => {
-//       document.body.style.overflow = prevOverflow;
-//       document.body.style.paddingRight = prevPadding;
-//     };
-//   }, [locked]);
-// };

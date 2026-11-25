@@ -10,7 +10,7 @@ import { db } from "../../config/firebase/firebase";
 /* ---------------------------------------------------------------------
    Style tokens
    --------------------------------------------------------------------- */
-const TYPE_META: Record<string, { label: string; badge: string; dot: string }> = {
+export const TYPE_META: Record<string, { label: string; badge: string; dot: string }> = {
   poster: {
     label: "Poster",
     badge: "bg-violet-500/15 text-violet-300 border-violet-500/30",
@@ -41,7 +41,7 @@ const inputCls =
 /* ---------------------------------------------------------------------
    Lock page scroll while a layer is open
    --------------------------------------------------------------------- */
-const useLockBodyScroll = (locked: boolean) => {
+export const useLockBodyScroll = (locked: boolean) => {
   useEffect(() => {
     if (!locked) return;
     const prevOverflow = document.body.style.overflow;
@@ -59,7 +59,7 @@ const useLockBodyScroll = (locked: boolean) => {
 /* ---------------------------------------------------------------------
    Work viewer (opens when you click a card)
    --------------------------------------------------------------------- */
-const WorkViewer: React.FC<{
+export const WorkViewer: React.FC<{
   creative: Creative;
   owner?: Client;
   index: number;
@@ -67,7 +67,7 @@ const WorkViewer: React.FC<{
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
-  onDelete: () => void;
+  onDelete?: () => void; // omit to hide the Delete button (view-only staff)
 }> = ({ creative: c, owner, index, total, onClose, onPrev, onNext, onDelete }) => {
   const meta = TYPE_META[c.type] ?? TYPE_META.poster;
 
@@ -226,12 +226,14 @@ const WorkViewer: React.FC<{
                 Open full size
               </a>
             )}
-            <button
-              onClick={onDelete}
-              className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-            >
-              Delete
-            </button>
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -241,8 +243,10 @@ const WorkViewer: React.FC<{
 
 /* ---------------------------------------------------------------------
    Page
+   canManage = true  → can upload and delete (admin, or staff with works.manage)
+   canManage = false → view only (staff with works.view)
    --------------------------------------------------------------------- */
-const WorkManagement: React.FC = () => {
+const WorkManagement: React.FC<{ canManage?: boolean }> = ({ canManage = true }) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [creatives, setCreatives] = useState<Creative[]>([]);
   const [loading, setLoading] = useState(true);
@@ -322,11 +326,11 @@ const WorkManagement: React.FC = () => {
     if (viewIndex !== null && !filtered[viewIndex]) setViewIndex(null);
   }, [filtered, viewIndex]);
 
-  useLockBodyScroll(!!viewing || showAddCreative || !!deleteTarget);
+  useLockBodyScroll(!!viewing || (canManage && showAddCreative) || (canManage && !!deleteTarget));
 
   /* ---------- delete ---------- */
   const handleDelete = async () => {
-    if (!deleteTarget?.id) return;
+    if (!canManage || !deleteTarget?.id) return;
     try {
       setDeleting(true);
       setError("");
@@ -360,12 +364,14 @@ const WorkManagement: React.FC = () => {
             {creatives.length} total · {counts.poster} posters · {counts.reel} reels · {counts.website} websites
           </p>
         </div>
-        <button
-          onClick={() => setShowAddCreative(true)}
-          className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-        >
-          <span className="text-base leading-none">+</span> Upload Creative
-        </button>
+        {canManage && (
+          <button
+            onClick={() => setShowAddCreative(true)}
+            className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+          >
+            <span className="text-base leading-none">+</span> Upload Creative
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -498,13 +504,15 @@ const WorkManagement: React.FC = () => {
                     >
                       View
                     </button>
-                    <button
-                      onClick={() => setDeleteTarget(c)}
-                      className="px-3 py-2 rounded-xl text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-                      aria-label={`Delete ${c.title}`}
-                    >
-                      Delete
-                    </button>
+                    {canManage && (
+                      <button
+                        onClick={() => setDeleteTarget(c)}
+                        className="px-3 py-2 rounded-xl text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                        aria-label={`Delete ${c.title}`}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -515,7 +523,11 @@ const WorkManagement: React.FC = () => {
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-zinc-600">
               <div className="text-4xl mb-3">◧</div>
               <p className="text-sm">
-                {creatives.length === 0 ? "No works yet. Upload your first creative." : "No works match these filters."}
+                {creatives.length === 0
+                  ? canManage
+                    ? "No works yet. Upload your first creative."
+                    : "No works yet."
+                  : "No works match these filters."}
               </p>
             </div>
           )}
@@ -532,14 +544,18 @@ const WorkManagement: React.FC = () => {
           onClose={closeViewer}
           onPrev={prev}
           onNext={next}
-          onDelete={() => {
-            setDeleteTarget(viewing);
-            setViewIndex(null);
-          }}
+          onDelete={
+            canManage
+              ? () => {
+                  setDeleteTarget(viewing);
+                  setViewIndex(null);
+                }
+              : undefined
+          }
         />
       )}
 
-      {showAddCreative && (
+      {canManage && showAddCreative && (
         <AddCreativeModal
           onClose={() => setShowAddCreative(false)}
           onSave={(newCreative) => {
@@ -550,7 +566,7 @@ const WorkManagement: React.FC = () => {
         />
       )}
 
-      {deleteTarget && (
+      {canManage && deleteTarget && (
         <DeleteConfirmModal loading={deleting} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} />
       )}
     </div>

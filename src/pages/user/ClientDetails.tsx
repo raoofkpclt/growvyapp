@@ -212,7 +212,7 @@ const ClientDetails: React.FC = () => {
                   {t.featuredWorks2}
                 </h2>
 
-                {client.portfolioImage ? (
+                {client.portfolio ? (
                   <div className="mt-16">
                     <div
                       className="
@@ -228,7 +228,7 @@ const ClientDetails: React.FC = () => {
         "
                     >
                       <img
-                        src={client.portfolioImage}
+                        src={client.portfolio}
                         alt={client.name}
                         className="
           w-full

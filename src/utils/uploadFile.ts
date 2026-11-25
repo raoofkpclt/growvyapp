@@ -30,6 +30,26 @@ export const uploadFile = async (file: File): Promise<string> => {
   }
 };
 
+
+
+/** Attendance selfie (JPEG blob) -> attendance/selfies/<uid>/... */
+export const uploadSelfie = async (
+  blob: Blob,
+  uid: string,
+  kind: "in" | "out" | "again",
+): Promise<string> => {
+  const key = `attendance/selfies/${safeName(uid)}/${Date.now()}-${kind}.jpg`;
+
+  await new Upload({
+    client: s3,
+    params: { Bucket: bucketName, Key: key, Body: blob, ContentType: "image/jpeg" },
+  }).done();
+
+  return publicUrl(key);
+};
+
+
+
 export const uploadVideo = async (
   file: File,
   onProgress?: (percent: number) => void,

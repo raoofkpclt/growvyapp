@@ -274,7 +274,7 @@ const BillsManagement: React.FC = () => {
                     <button
                       onClick={() => setShowEditBill({ ...bill })}
                       className="flex-1 text-xs py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 transition-colors "
-                      disabled
+                      
                     >
                       Edit
                     </button>

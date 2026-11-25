@@ -1,16 +1,30 @@
+import type { Permission, Role } from "./staffRoles";
+import type { IdProofType } from "../types/staffId";
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 export interface Client {
-  firestoreId?: string;
   id: string;
+  firestoreId?: string;
   name: string;
-  description: string;
-  profileImage: string;
-  portfolioImage: string;
   email: string;
-  phone:string;
+  mobile: string;
+  address: string;
+  profileImage: string; // image URL
+  portfolio: string; // image URL
+  requiredServices: string[];
   status: "active" | "inactive";
   joinedDate: string;
 }
+
+export const SERVICE_OPTIONS = [
+  "Performance Marketing",
+  "Web Development",
+  "Branding",
+  "SEO",
+  "Social Media Management",
+  "Video Production",
+  "Graphic Designing",
+];
 
 export interface Creative {
   id: string;
@@ -18,19 +32,16 @@ export interface Creative {
   type: "poster" | "reel" | "website";
   title: string;
 
-  imageUrl?: string;      // poster
+  imageUrl?: string; // poster
   videoUrl?: string;
-  thumbnailUrl?: string;  // reel
-  logoUrl?: string;       // website
+  thumbnailUrl?: string; // reel
+  logoUrl?: string; // website
 
   instagramUrl?: string;
   websiteUrl?: string;
 
   uploadedAt: string;
 }
-
-
-
 
 export type BillDocType = "invoice" | "receipt";
 export type BillStatus = "paid" | "pending" | "overdue";
@@ -40,9 +51,9 @@ export type BillingPeriodType = "none" | "monthly" | "custom";
 
 export interface BillingPeriod {
   type: "monthly" | "custom";
-  from: string;   // YYYY-MM-DD
-  to: string;     // YYYY-MM-DD
-  label: string;  // "October 2026" or "01 Oct 2026 – 31 Dec 2026"
+  from: string; // YYYY-MM-DD
+  to: string; // YYYY-MM-DD
+  label: string; // "October 2026" or "01 Oct 2026 – 31 Dec 2026"
 }
 
 export interface BillItem {
@@ -88,11 +99,14 @@ export interface Bill {
   pdfUrl?: string;
 }
 
-
-
-export type MajorHead = "Assets" | "Liabilities" | "Equity" | "Income" | "Expenses";
+export type MajorHead =
+  | "Assets"
+  | "Liabilities"
+  | "Equity"
+  | "Income"
+  | "Expenses";
 export type AccountRegion = "India" | "Saudi Arabia";
- 
+
 // One row of the "Chart of Accounts" sheet
 export interface AccountCategory {
   firestoreId?: string;
@@ -103,7 +117,7 @@ export interface AccountCategory {
   type: string; // Current Asset, Fixed Asset, Expense ...
   notes: string;
 }
- 
+
 // One row of the "Transactions" (cash book) sheet
 export interface AccountTransaction {
   firestoreId?: string;
@@ -114,15 +128,57 @@ export interface AccountTransaction {
   category: string; // category name from the chart of accounts
   serviceCategory: string; // "Client / Service Category" column
   region: AccountRegion;
+  clientId?: string;
+  clientName?: string;
   paymentMode: string;
   income: number;
   expense: number;
   createdAt: number;
 }
- 
+
 // "Balance Sheet" sheet: manual balances keyed by category code
 export interface BalanceSheetData {
   asOf: string; // YYYY-MM-DD
   values: Record<string, number>;
 }
- 
+export type Staff = {
+  uid: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  active: boolean;
+  salary: number;
+  permissions: Permission[] | null;
+  photoUrl: string;
+  idProofType: IdProofType | "";
+  idProofNumber: string;
+  idProofFrontUrl: string;
+  idProofBackUrl: string;
+};
+
+export type StaffExtras = {
+  photoUrl: string;
+  idProofType: IdProofType | "";
+  idProofNumber: string;
+  idProofFrontUrl: string;
+  idProofBackUrl: string;
+};
+
+export type NewStaff = {
+  name: string;
+  email: string;
+  phone: string;
+  role: Role;
+  salary: number;
+  password: string;
+  permissions?: Permission[] | null;
+} & StaffExtras;
+
+export type StaffUpdate = {
+  name: string;
+  phone: string;
+  role: Role;
+  salary: number;
+  permissions: Permission[] | null;
+} & StaffExtras;

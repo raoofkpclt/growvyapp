@@ -424,7 +424,7 @@ const AddBillModal: React.FC<Props> = ({ onClose, onSave }) => {
       (c) => c.name === name
     );
 
-    setClientPhone(selectedClient?.phone || "");
+    setClientPhone(selectedClient?.mobile || "");
   }}
 />
                 <datalist id="bill-client-list">

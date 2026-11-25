@@ -13,9 +13,19 @@ import { db } from "../config/firebase/firebase";
 import type { Client } from "../utils/types/Types";
 
 // ADD CLIENT
-export const addClient = async (client: Client) => {
+// export const addClient = async (client: Client) => {
+//   try {
+//     await addDoc(collection(db, "clients"), client);
+//   } catch (error) {
+//     console.log("Add Client Error:", error);
+//     throw error;
+//   }
+// };
+
+export const addClient = async (client: Client): Promise<string> => {
   try {
-    await addDoc(collection(db, "clients"), client);
+    const docRef = await addDoc(collection(db, "clients"), client);
+    return docRef.id;
   } catch (error) {
     console.log("Add Client Error:", error);
     throw error;
