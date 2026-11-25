@@ -573,12 +573,20 @@ const StaffHome = () => {
           {activeItem.id === "payroll" && canPayroll && <PayrollManagement />}
 
           {activeItem.id === "task" && (
+            // <TasksPanel
+            //   viewer={viewer}
+            //   scope={attScope}
+            //   canAssign={hasPermission(staff, "tasks.assign")}
+            //   canFeedback={hasPermission(staff, "tasks.feedback")}
+            // />
             <TasksPanel
-              viewer={viewer}
-              scope={attScope}
-              canAssign={hasPermission(staff, "tasks.assign")}
-              canFeedback={hasPermission(staff, "tasks.feedback")}
-            />
+  viewer={viewer}
+  scope={attScope}
+  canAssign={hasPermission(staff, "tasks.assign")}
+  canFeedback={hasPermission(staff, "tasks.feedback")}
+  canAddOwn={hasPermission(staff, "tasks.own")}
+  canApproveSelfAdded={staff.role === "operation_manager"}
+/>
           )}
 
           {activeItem.id === "accounting" && canAccounts && (

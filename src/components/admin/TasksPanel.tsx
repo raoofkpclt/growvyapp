@@ -48,6 +48,10 @@ type Props = {
   canFeedback?: boolean;
   /** admin can approve any task; otherwise only the person who assigned it can */
   isAdmin?: boolean;
+  /** staff can add tasks for themselves (approved by an operation manager) */
+  canAddOwn?: boolean;
+  /** operation manager: can approve tasks that staff added for themselves */
+  canApproveSelfAdded?: boolean;
   /** Set both to show only one client's tasks (Client details page). */
   clientId?: string;
   clientName?: string;
@@ -63,6 +67,9 @@ const STATUS_TONE = {
   rework: "red",
   done: "emerald",
 } as const;
+
+// events caused by the person doing the work (they go to the approver, not to themselves)
+const STAFF_EVENTS: string[] = ["started", "resumed", "paused", "review"];
 
 // Firestore doc id of a client (falls back to your custom id)
 const clientKey = (c: Client) => c.firestoreId ?? String(c.id);
@@ -199,6 +206,8 @@ const TasksPanel = ({
   canAssign = false,
   canFeedback = false,
   isAdmin = false,
+  canAddOwn = false,
+  canApproveSelfAdded = false,
   clientId,
   clientName,
 }: Props) => {
@@ -213,22 +222,44 @@ const TasksPanel = ({
     [] as Staff[]
   );
 
+  // operation managers receive the approval requests for self-added tasks
+  const managers = useLoad(
+    () =>
+      canAddOwn
+        ? listStaff().catch(() => [] as Staff[])
+        : Promise.resolve([] as Staff[]),
+    [canAddOwn],
+    [] as Staff[]
+  );
+  const opManagers = managers.data.filter((s) => s.role === "operation_manager" && s.active);
+
   // when the panel is locked to one client there is no need to load the client list
   const clients = useLoad(
-    () => (canAssign && !clientId ? getClients() : Promise.resolve([] as Client[])),
-    [canAssign, clientId],
+    () =>
+      (canAssign || canAddOwn) && !clientId ? getClients() : Promise.resolve([] as Client[]),
+    [canAssign, canAddOwn, clientId],
     [] as Client[]
   );
 
   const [status, setStatus] = useState<"all" | TaskStatus>("all");
   const [assignee, setAssignee] = useState("all");
   const [open, setOpen] = useState(false);
+  const [ownMode, setOwnMode] = useState(false); // true = "Add my task", false = "Assign task"
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [rejecting, setRejecting] = useState<Task | null>(null);
   const [completing, setCompleting] = useState<Task | null>(null); // task waiting for "Complete" confirmation
   const [completeBusy, setCompleteBusy] = useState(false);
   const [err, setErr] = useState("");
+
+  const openAssign = () => {
+    setOwnMode(false);
+    setOpen(true);
+  };
+  const openOwn = () => {
+    setOwnMode(true);
+    setOpen(true);
+  };
 
   /* ───────────── attendance gate ───────────── */
   // Only the staff view ("own") is gated. Admin / HR views are not.
@@ -276,8 +307,15 @@ const TasksPanel = ({
       (assignee === "all" || t.assignedTo === assignee)
   );
 
-  // admin, or the operation staff who assigned the task, can approve it
-  const canApprove = (t: Task) => isAdmin || t.assignedBy === viewer.uid;
+  // Who can approve:
+  //  - admin: everything
+  //  - normal task: the person who assigned it
+  //  - self-added task: operation managers (never the person who added it)
+  const canApprove = (t: Task) =>
+    isAdmin ||
+    (t.selfAssigned
+      ? canApproveSelfAdded && t.assignedTo !== viewer.uid
+      : t.assignedBy === viewer.uid);
   const toApprove = list.filter((t) => t.status === "review" && canApprove(t));
 
   // one running task at a time per person (checked across ALL clients, not just this one)
@@ -298,16 +336,25 @@ const TasksPanel = ({
   /* ───────────── notifications ───────────── */
   const me = { uid: viewer.uid, name: viewer.name };
 
-  // tell the other side that a task changed
-  const tell = (event: TaskEvent, t: Task, extra = "") =>
-    notifyTaskEvent(
-      event,
-      { id: t.id, title: t.title, assignedBy: t.assignedBy, assignedTo: t.assignedTo },
-      me,
-      extra
-    );
+  // tell the other side that a task changed.
+  // Self-added tasks: updates from the staff go to every operation manager.
+  const tell = (event: TaskEvent, t: Task, extra = "") => {
+    const targets =
+      t.selfAssigned && STAFF_EVENTS.includes(event)
+        ? opManagers.map((m) => m.uid)
+        : [t.assignedBy];
 
-  // staff finished the work → approval request goes to whoever assigned it
+    targets.forEach((uid) =>
+      notifyTaskEvent(
+        event,
+        { id: t.id, title: t.title, assignedBy: uid, assignedTo: t.assignedTo },
+        me,
+        extra
+      )
+    );
+  };
+
+  // staff finished the work → approval request goes to the approver(s)
   const complete = (t: Task) =>
     guard(async () => {
       await completeTask(t.id);
@@ -328,7 +375,11 @@ const TasksPanel = ({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const person = staff.data.find((s) => s.uid === form.assignedTo);
+
+    // "Add my task" = assigned to the person who is logged in
+    const person = ownMode
+      ? { uid: viewer.uid, name: viewer.name }
+      : staff.data.find((s) => s.uid === form.assignedTo);
 
     let client: { id: string; name: string } | null = null;
     if (clientId) {
@@ -340,7 +391,9 @@ const TasksPanel = ({
 
     if (!form.title.trim() || !client || !person)
       return setErr(
-        clientId
+        ownMode
+          ? "Add a title and select the client."
+          : clientId
           ? "Add a title and choose who it's for."
           : "Add a title, select the client, and choose who it's for."
       );
@@ -358,16 +411,32 @@ const TasksPanel = ({
         assignedByName: viewer.name,
         priority: form.priority,
         dueDate: form.dueDate,
+        selfAssigned: ownMode,
       });
 
-      // tell the person responsible (their bell plays the sound)
-      notifyTaskAssigned({
-        toUid: person.uid,
-        taskTitle: form.title.trim(),
-        clientName: client!.name,
-        actor: me,
-        taskId: typeof taskId === "string" ? taskId : undefined,
-      });
+      const id = typeof taskId === "string" ? taskId : undefined;
+
+      if (ownMode) {
+        // let the operation managers know a staff member added work for themselves
+        opManagers.forEach((m) =>
+          notifyTaskAssigned({
+            toUid: m.uid,
+            taskTitle: form.title.trim(),
+            clientName: client!.name,
+            actor: me,
+            taskId: id,
+          })
+        );
+      } else {
+        // tell the person responsible (their bell plays the sound)
+        notifyTaskAssigned({
+          toUid: person.uid,
+          taskTitle: form.title.trim(),
+          clientName: client!.name,
+          actor: me,
+          taskId: id,
+        });
+      }
 
       setForm(EMPTY_FORM);
       setOpen(false);
@@ -471,8 +540,15 @@ const TasksPanel = ({
         )}
 
         {canAssign && (
-          <Btn className="w-full sm:ml-auto sm:w-auto" onClick={() => setOpen(true)}>
+          <Btn className="w-full sm:ml-auto sm:w-auto" onClick={openAssign}>
             Assign task
+          </Btn>
+        )}
+
+        {/* people who can't assign work to others can still add their own */}
+        {canAddOwn && !canAssign && (
+          <Btn className="w-full sm:ml-auto sm:w-auto" onClick={openOwn}>
+            Add my task
           </Btn>
         )}
       </div>
@@ -509,11 +585,12 @@ const TasksPanel = ({
               )}
               <p className="mt-1 text-xs leading-relaxed text-zinc-500">
                 {scope === "all" && `${t.assignedToName} · `}
-                Assigned by {t.assignedByName}
+                {t.selfAssigned ? "Added by staff" : `Assigned by ${t.assignedByName}`}
                 {t.dueDate && ` · Deadline ${t.dueDate}`}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+              {t.selfAssigned && <Badge tone="sky">Self-added</Badge>}
               <Badge tone={PRIORITY_TONE[t.priority]}>{t.priority}</Badge>
               {isOverdue(t) && <Badge tone="red">Overdue</Badge>}
               <Badge tone={STATUS_TONE[t.status]}>
@@ -561,7 +638,9 @@ const TasksPanel = ({
 
               {t.status === "review" && !canApprove(t) && (
                 <span className="text-xs text-zinc-500">
-                  Waiting for {t.assignedByName} or an admin
+                  {t.selfAssigned
+                    ? "Waiting for the operation manager or an admin"
+                    : `Waiting for ${t.assignedByName} or an admin`}
                 </span>
               )}
 
@@ -614,7 +693,9 @@ const TasksPanel = ({
       {completing && (
         <ConfirmModal
           title="Complete this task?"
-          message={`“${completing.title}” will be marked as complete and sent to ${completing.assignedByName} for approval. The timer stops.`}
+          message={`“${completing.title}” will be marked as complete and sent to ${
+            completing.selfAssigned ? "the operation manager" : completing.assignedByName
+          } for approval. The timer stops.`}
           confirmText="Complete"
           loading={completeBusy}
           onClose={() => setCompleting(null)}
@@ -637,8 +718,17 @@ const TasksPanel = ({
       )}
 
       {open && (
-        <Modal title="Assign task" onClose={() => setOpen(false)}>
+        <Modal
+          title={ownMode ? "Add my task" : "Assign task"}
+          onClose={() => setOpen(false)}
+        >
           <form onSubmit={submit} className="space-y-4">
+            {ownMode && (
+              <p className="text-sm text-zinc-400">
+                This task is for you. When you complete it, an operation manager approves it.
+              </p>
+            )}
+
             <Label text="Title">
               <input
                 className={inputCls}
@@ -681,22 +771,25 @@ const TasksPanel = ({
               </Label>
             )}
 
-            <Label text="Assign to">
-              <select
-                className={inputCls}
-                value={form.assignedTo}
-                onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
-              >
-                <option value="">Choose staff…</option>
-                {staff.data
-                  .filter((s) => s.active)
-                  .map((s) => (
-                    <option key={s.uid} value={s.uid}>
-                      {s.name}
-                    </option>
-                  ))}
-              </select>
-            </Label>
+            {!ownMode && (
+              <Label text="Assign to">
+                <select
+                  className={inputCls}
+                  value={form.assignedTo}
+                  onChange={(e) => setForm({ ...form, assignedTo: e.target.value })}
+                >
+                  <option value="">Choose staff…</option>
+                  {staff.data
+                    .filter((s) => s.active)
+                    .map((s) => (
+                      <option key={s.uid} value={s.uid}>
+                        {s.name}
+                      </option>
+                    ))}
+                </select>
+              </Label>
+            )}
+
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Label text="Priority">
                 <select
@@ -721,7 +814,7 @@ const TasksPanel = ({
             </div>
             <Notice message={err} />
             <Btn type="submit" disabled={saving} className="w-full">
-              {saving ? "Assigning…" : "Assign task"}
+              {saving ? "Saving…" : ownMode ? "Add task" : "Assign task"}
             </Btn>
           </form>
         </Modal>
