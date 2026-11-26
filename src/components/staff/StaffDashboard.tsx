@@ -17,8 +17,10 @@ import {
   dateKey,
   monthKey,
   reCheckInWithProof,
+  sweepScheduledBreaks,
   type Proof,
 } from "../../service/AttendanceService";
+import { notifyAttendanceEvent } from "../../service/NotificationService";
 import { uploadSelfie } from "../../utils/uploadFile";
 import {
   BREAK_LABELS,
@@ -26,6 +28,7 @@ import {
   canCheckIn,
   canReCheckIn,
   computeDay,
+  fmtHHMM,
   fmtIST,
   istDate,
   openBreak,
@@ -43,7 +46,11 @@ import TasksPanel from "../admin/TasksPanel";
 import { Badge, Card, useLoad } from "../admin/Modal/Ui";
 import TeamWorkOverview from "./TeamWorkOverview";
 import HrOverview from "./HrOverview";
-import { listMyTasks, STATUS_LABELS, type Task } from "../../service/TaskService";
+import {
+  listMyTasks,
+  STATUS_LABELS,
+  type Task,
+} from "../../service/TaskService";
 import { listSpecialDays } from "../../service/HolidayService";
 import { addDays, fmtDate } from "../../service/PlanService";
 import {
@@ -77,16 +84,23 @@ const TITLES: Record<Action, string> = {
 
 /* ───────────── work timer + selfie check in / out / in again ───────────── */
 export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
-  const [day, setDay] = useState<(DayInput & { selfie?: string; flagged?: boolean }) | null>(null);
+  const [day, setDay] = useState<
+    (DayInput & { selfie?: string; flagged?: boolean }) | null
+  >(null);
   const [loaded, setLoaded] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [modal, setModal] = useState<Action | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  // the real staff name, used in the alerts HR receives
+  const [realName, setRealName] = useState(name);
 
-  // profile photo (Staff.photoUrl) used for face matching
+  // profile photo (Staff.photoUrl) used for face matching, plus the staff name for alerts
   useEffect(() => {
     getStaff(uid)
-      .then((s) => setPhotoUrl(s?.photoUrl || null))
+      .then((s) => {
+        setPhotoUrl(s?.photoUrl || null);
+        if (s?.name) setRealName(s.name);
+      })
       .catch(() => setPhotoUrl(null));
   }, [uid]);
 
@@ -105,6 +119,8 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
             checkOut: raw.checkOut,
             fixedCheckOut: raw.fixedCheckOut,
             breaks: raw.breaks ?? [],
+            autoOut: raw.autoOut ?? null,
+            autoBreaksDone: raw.autoBreaksDone ?? [],
             selfie: raw.checkInProof?.selfieUrl,
             flagged: !!raw.flagged,
           });
@@ -114,7 +130,7 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
       () => {
         setDay(null);
         setLoaded(true);
-      }
+      },
     );
   }, [uid]);
 
@@ -130,11 +146,30 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
     return () => clearInterval(id);
   }, [running]);
 
+  // lunch (1:00 PM) and tea (4:00 PM): check out automatically, and tell HR
+  useEffect(() => {
+    const run = () =>
+      sweepScheduledBreaks(uid)
+        .then((kind) => {
+          if (kind)
+            void notifyAttendanceEvent("break", {
+              uid,
+              name: realName || name,
+            });
+        })
+        .catch(() => {});
+    run();
+    const id = setInterval(run, 30_000);
+    return () => clearInterval(id);
+  }, [uid, name, realName]);
+
   if (!loaded) {
-    return <div className="h-40 animate-pulse rounded-2xl border border-white/5 bg-white/[0.03]" />;
+    return (
+      <div className="h-40 animate-pulse rounded-2xl border border-white/5 bg-white/[0.03]" />
+    );
   }
 
-  /* upload the selfie, build the proof, save */
+  /* upload the selfie, build the proof, save, then tell the HR manager */
   const submit = async (action: Action, r: CaptureResult) => {
     const selfieUrl = await uploadSelfie(r.blob, uid, action);
     const proof: Proof = {
@@ -146,9 +181,19 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
       capturedAt: r.capturedAt,
       face: r.face,
     };
-    if (action === "in") await checkInWithProof(uid, name, proof);
-    else if (action === "out") await checkOutWithProof(uid, proof);
-    else await reCheckInWithProof(uid, proof);
+
+    // not awaited: a failed notification must never block attendance
+    const actor = { uid, name: realName || name };
+    if (action === "in") {
+      await checkInWithProof(uid, name, proof);
+      void notifyAttendanceEvent("check_in", actor);
+    } else if (action === "out") {
+      await checkOutWithProof(uid, proof);
+      void notifyAttendanceEvent("check_out", actor);
+    } else {
+      await reCheckInWithProof(uid, proof);
+      void notifyAttendanceEvent("back", actor);
+    }
     setModal(null);
   };
 
@@ -171,10 +216,10 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
   const againHint = !checkedIn
     ? "Check in first"
     : !checkedOut
-    ? "Available after you check out"
-    : again && !again.ok
-    ? again.reason
-    : "";
+      ? "Available after you check out"
+      : again && !again.ok
+        ? again.reason
+        : "";
 
   const ReCheckInButton = (
     <div className="flex min-w-0 flex-col gap-1 sm:items-end">
@@ -186,15 +231,18 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
         Check in again
       </button>
       {againHint && (
-        <p className="text-[11px] text-zinc-500 sm:max-w-[220px] sm:text-right">{againHint}</p>
+        <p className="text-[11px] text-zinc-500 sm:max-w-[220px] sm:text-right">
+          {againHint}
+        </p>
       )}
     </div>
   );
 
   const Note = (
     <p className="text-[11px] leading-relaxed text-zinc-500">
-      Check in needs your face to match your profile photo, taken at the office (within{" "}
-      {OFFICE.radiusMeters} m). Allow camera and location access when asked.
+      Check in needs your face to match your profile photo, taken at the office
+      (within {OFFICE.radiusMeters} m). Allow camera and location access when
+      asked.
     </p>
   );
 
@@ -205,11 +253,15 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
       <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-4 sm:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-zinc-200">You have not checked in today</p>
+            <p className="text-sm font-medium text-zinc-200">
+              You have not checked in today
+            </p>
             <p className="mt-1 text-xs text-zinc-500">
               Confirm your face at the office to start your work timer.
             </p>
-            {!can.ok && <p className="mt-2 text-xs text-amber-300">{can.reason}</p>}
+            {!can.ok && (
+              <p className="mt-2 text-xs text-amber-300">{can.reason}</p>
+            )}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start md:flex md:flex-wrap md:justify-end">
             <button
@@ -250,15 +302,17 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
             />
           )}
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-wide text-zinc-500">Work hours today</p>
+            <p className="text-[11px] uppercase tracking-wide text-zinc-500">
+              Work hours today
+            </p>
             <div className="mt-1 flex items-center gap-3">
               <span
                 className={`h-2.5 w-2.5 shrink-0 rounded-full ${
                   running && !onBreak
                     ? "animate-pulse bg-emerald-400"
                     : onBreak
-                    ? "animate-pulse bg-amber-400"
-                    : "bg-zinc-600"
+                      ? "animate-pulse bg-amber-400"
+                      : "bg-zinc-600"
                 }`}
               />
               <span
@@ -273,8 +327,8 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
               {checkedOut
                 ? `Timer paused · checked out at ${fmtIST(toMs(day.checkOut)!)}`
                 : onBreak
-                ? `On ${BREAK_LABELS[onBreak.type].toLowerCase()} break`
-                : `Timer running since ${fmtIST(r.countedStart ?? toMs(day.checkIn)!)}`}
+                  ? `On ${BREAK_LABELS[onBreak.type].toLowerCase()} break`
+                  : `Timer running since ${fmtIST(r.countedStart ?? toMs(day.checkIn)!)}`}
             </p>
             {day.flagged && (
               <p className="mt-1 text-[11px] text-amber-300">
@@ -302,19 +356,51 @@ export const WorkHoursCard = ({ uid, name }: { uid: string; name: string }) => {
               <p>Shift ends {fmtIST(r.requiredEnd)}</p>
               {running && (
                 <p className="mt-1 text-zinc-300">
-                  {left > 0 ? `${fmtLeft(left)} left` : "Shift over, please check out"}
+                  {left > 0
+                    ? `${fmtLeft(left)} left`
+                    : "Shift over, please check out"}
                 </p>
               )}
             </div>
           )}
+
           {r.breakMinutes > 0 && <p>Breaks / time out: {r.breakMinutes} min</p>}
+          {r.compensationMinutes > 0 && (
+            <p className="text-amber-300">
+              Make up {r.compensationMinutes} min: shift ends{" "}
+              {r.requiredEnd ? fmtIST(r.requiredEnd) : ""}
+            </p>
+          )}
         </div>
       </div>
 
-      {checkedOut && again?.ok && (
-        <p className="mt-3 text-xs text-amber-200/80">
-          Total saved: {fmtClock(workedMs)}. Check in again (face confirmed at the office) to
-          continue from this time. The time you were out is not counted.
+      {/* {checkedOut && day.autoOut && (
+        <p className="mt-3 rounded-lg border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-xs text-sky-200">
+          {day.autoOut === "lunch"
+            ? `Checked out automatically for lunch (${fmtHHMM(RULES.lunchStart)} to ${fmtHHMM(
+                RULES.lunchEnd
+              )}). Check in again when you are back. Before ${fmtHHMM(
+                RULES.lunchEnd
+              )} it counts as ${fmtHHMM(
+                RULES.lunchEnd
+              )}; time after that is made up at the end of your shift.`
+            : `Checked out automatically for tea (${fmtHHMM(RULES.teaStart)} to ${fmtHHMM(
+                RULES.teaEnd
+              )}). Check in again any time. After ${fmtHHMM(
+                RULES.teaEnd
+              )} the extra time is made up at the end of your shift.`}
+        </p>
+      )} */}
+
+      {checkedOut && day.autoOut === "lunch" && (
+        <p className="mt-3 rounded-lg border border-sky-400/20 bg-sky-400/10 px-3 py-2 text-xs text-sky-200">
+          {`Checked out automatically for lunch (${fmtHHMM(RULES.lunchStart)} to ${fmtHHMM(
+            RULES.lunchEnd,
+          )}). Check in again when you are back. Before ${fmtHHMM(
+            RULES.lunchEnd,
+          )} it counts as ${fmtHHMM(
+            RULES.lunchEnd,
+          )}; time after that is made up at the end of your shift.`}
         </p>
       )}
 
@@ -341,27 +427,43 @@ type StaffRecord = Awaited<ReturnType<typeof getStaff>>;
 type TabId = "overview" | "attendance" | "leave" | "work";
 
 /** this month's attendance documents for one person (doc id = uid_YYYY-MM-DD) */
-const loadMonth = async (uid: string, month: string): Promise<DocumentData[]> => {
+const loadMonth = async (
+  uid: string,
+  month: string,
+): Promise<DocumentData[]> => {
   const snap = await getDocs(
     query(
       collection(db, "attendance"),
       where(documentId(), ">=", `${uid}_${month}-01`),
-      where(documentId(), "<=", `${uid}_${month}-31`)
-    )
+      where(documentId(), "<=", `${uid}_${month}-31`),
+    ),
   );
   return snap.docs.map((d) => d.data());
 };
 
 const monthLabel = (m: string) => {
   const [y, mo] = m.split("-").map(Number);
-  return new Date(y, mo - 1, 1).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  return new Date(y, mo - 1, 1).toLocaleDateString("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
 };
 
-const Tile = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
+const Tile = ({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+}) => (
   <div className="min-w-0 rounded-xl border border-white/5 bg-white/[0.03] p-3 sm:p-4">
     <p className="truncate text-xs text-zinc-500">{label}</p>
     <p className="mt-1 text-xl font-bold text-white sm:text-2xl">{value}</p>
-    {sub && <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{sub}</p>}
+    {sub && (
+      <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{sub}</p>
+    )}
   </div>
 );
 
@@ -385,7 +487,11 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
   }, [user?.uid]);
 
   const name = nameProp ?? staff?.name ?? user?.displayName ?? "there";
-  const viewer = { uid, name: staff?.name ?? nameProp ?? user?.displayName ?? user?.email ?? "Staff" };
+  const viewer = {
+    uid,
+    name:
+      staff?.name ?? nameProp ?? user?.displayName ?? user?.email ?? "Staff",
+  };
 
   const month = monthKey();
   const today = dateKey();
@@ -393,17 +499,17 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
   const tasks = useLoad(
     () => (uid ? listMyTasks(uid) : Promise.resolve([] as Task[])),
     [uid],
-    [] as Task[]
+    [] as Task[],
   );
   const att = useLoad(
     () => (uid ? loadMonth(uid, month) : Promise.resolve([] as DocumentData[])),
     [uid, month],
-    [] as DocumentData[]
+    [] as DocumentData[],
   );
   const special = useLoad(
     () => listSpecialDays(`${month}-01`, addDays(today, 60)),
     [month, today],
-    [] as SpecialDay[]
+    [] as SpecialDay[],
   );
 
   const specials = useMemo(() => toSpecialMap(special.data), [special.data]);
@@ -420,7 +526,8 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
           breaks: raw.breaks ?? [],
         };
         if (toMs(dayInput.checkIn) === null) return null;
-        const at = toMs(dayInput.checkOut) ?? toMs(dayInput.fixedCheckOut) ?? Date.now();
+        const at =
+          toMs(dayInput.checkOut) ?? toMs(dayInput.fixedCheckOut) ?? Date.now();
         const r = computeDay(dayInput, at);
         return {
           date: dayInput.date as string,
@@ -435,7 +542,7 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
 
     const totalHours = rows.reduce((s, r) => s + r.hours, 0);
     const openDaysBeforeToday = monthDates(month).filter(
-      (d) => d < today && !isClosed(d, specials)
+      (d) => d < today && !isClosed(d, specials),
     );
     const presentBeforeToday = rows.filter((r) => r.date < today).length;
 
@@ -452,7 +559,8 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
 
   const upcoming = special.data.filter((s) => s.date >= today).slice(0, 5);
 
-  const taskCount = (s: string) => tasks.data.filter((t) => t.status === s).length;
+  const taskCount = (s: string) =>
+    tasks.data.filter((t) => t.status === s).length;
 
   // board members (and anyone given "dashboard.admin") see the admin dashboard
   const canAdminDash = hasPermission(staff, "dashboard.admin");
@@ -487,7 +595,7 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
       {user && hasPermission(staff, "attendance.own") && (
         <WorkHoursCard
           uid={user.uid}
-          name={user.displayName ?? user.email ?? ""}
+          name={staff?.name ?? user.displayName ?? user.email ?? ""}
         />
       )}
 
@@ -497,7 +605,9 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
           {!hasMgmtDash && (
             <section className="space-y-3">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-zinc-200">Assigned work</h3>
+                <h3 className="text-sm font-semibold text-zinc-200">
+                  Assigned work
+                </h3>
                 <button
                   onClick={() => setTab("work")}
                   className="shrink-0 text-xs text-violet-300 hover:text-violet-200"
@@ -531,8 +641,15 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
                     value={stats.present}
                     sub={`of ${stats.workingDays} working days`}
                   />
-                  <Tile label="Hours worked" value={stats.totalHours.toFixed(1)} sub="this month" />
-                  <Tile label="Average per day" value={`${stats.avgHours.toFixed(1)}h`} />
+                  <Tile
+                    label="Hours worked"
+                    value={stats.totalHours.toFixed(1)}
+                    sub="this month"
+                  />
+                  <Tile
+                    label="Average per day"
+                    value={`${stats.avgHours.toFixed(1)}h`}
+                  />
                   <Tile
                     label="No check-in"
                     value={stats.missed}
@@ -541,7 +658,8 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
                 </div>
                 {stats.flagged > 0 && (
                   <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-                    {stats.flagged} {stats.flagged === 1 ? "day has" : "days have"} a face check
+                    {stats.flagged}{" "}
+                    {stats.flagged === 1 ? "day has" : "days have"} a face check
                     waiting for HR review.
                   </p>
                 )}
@@ -549,7 +667,9 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
 
               <section className="space-y-3">
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-zinc-200">Recent days</h3>
+                  <h3 className="text-sm font-semibold text-zinc-200">
+                    Recent days
+                  </h3>
                   <button
                     onClick={() => setTab("attendance")}
                     className="shrink-0 text-xs text-violet-300 hover:text-violet-200"
@@ -565,14 +685,20 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
                     >
                       <p className="text-sm text-white">{fmtDate(r.date)}</p>
                       <p className="text-xs text-zinc-400">
-                        In {fmtIST(r.inMs)} · {r.outMs ? `Out ${fmtIST(r.outMs)}` : "Not checked out"} ·{" "}
-                        <span className="text-zinc-200">{r.hours.toFixed(1)}h</span>
+                        In {fmtIST(r.inMs)} ·{" "}
+                        {r.outMs ? `Out ${fmtIST(r.outMs)}` : "Not checked out"}{" "}
+                        ·{" "}
+                        <span className="text-zinc-200">
+                          {r.hours.toFixed(1)}h
+                        </span>
                       </p>
                     </div>
                   ))}
                   {!stats.rows.length && (
                     <p className="px-4 py-6 text-center text-sm text-zinc-500">
-                      {att.loading ? "Loading…" : "No attendance yet this month."}
+                      {att.loading
+                        ? "Loading…"
+                        : "No attendance yet this month."}
                     </p>
                   )}
                 </Card>
@@ -581,10 +707,15 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
           )}
 
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-zinc-200">Upcoming holidays and special days</h3>
+            <h3 className="text-sm font-semibold text-zinc-200">
+              Upcoming holidays and special days
+            </h3>
             <Card className="divide-y divide-white/5 overflow-hidden">
               {upcoming.map((s) => (
-                <div key={s.date} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div
+                  key={s.date}
+                  className="flex items-center justify-between gap-3 px-4 py-3"
+                >
                   <div className="min-w-0">
                     <p className="truncate text-sm text-white">{s.name}</p>
                     <p className="text-xs text-zinc-500">{fmtDate(s.date)}</p>
@@ -642,7 +773,8 @@ const StaffDashboard = ({ name: nameProp }: { name?: string }) => {
       {tab === "work" && uid && (
         <div className="min-w-0 space-y-4">
           <p className="text-sm text-zinc-500">
-            Start the timer when you begin, pause when you stop, and complete to send it for approval.
+            Start the timer when you begin, pause when you stop, and complete to
+            send it for approval.
           </p>
           <TasksPanel
             viewer={viewer}

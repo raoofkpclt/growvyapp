@@ -20,6 +20,10 @@ import {
   type Leave,
   type LeaveType,
 } from "../../../service/LeaveService";
+import {
+  notifyLeaveApplied,
+  notifyLeaveDecision,
+} from "../../../service/NotificationService";
 import { fmtNum } from "../../../utils/types/WorkRules";
 import {
   Badge,
@@ -212,6 +216,23 @@ const LeavePanel = ({ viewer, scope, canManage = false }: Props) => {
     }
   };
 
+  // HR approves / rejects → save, then tell the staff member (not awaited: a failed alert never blocks this)
+  const decide = (l: Leave, decision: "approved" | "rejected") =>
+    guard(async () => {
+      await decideLeave(l.id, decision, viewer.uid, viewer.name);
+      void notifyLeaveDecision(
+        decision,
+        {
+          uid: l.uid,
+          name: l.name,
+          date: l.date,
+          typeLabel: LEAVE_LABELS[l.type],
+          half: l.half,
+        },
+        { uid: viewer.uid, name: viewer.name }
+      );
+    });
+
   const openForm = (m: Mode) => {
     const today = dateKey();
     setForm({
@@ -242,8 +263,20 @@ const LeavePanel = ({ viewer, scope, canManage = false }: Props) => {
         half: form.half,
         note: form.note.trim(),
       };
-      if (mode === "apply") await applyLeave(base);
-      else await setLeave({ ...base, setBy: viewer.uid, setByName: viewer.name });
+      if (mode === "apply") {
+        await applyLeave(base);
+        // staff applied → tell the HR manager
+        void notifyLeaveApplied({
+          uid: person.uid,
+          name: person.name,
+          date: form.date,
+          typeLabel: LEAVE_LABELS[form.type],
+          half: form.half,
+          note: form.note.trim(),
+        });
+      } else {
+        await setLeave({ ...base, setBy: viewer.uid, setByName: viewer.name });
+      }
       setMode(null);
     });
     setSaving(false);
@@ -314,16 +347,9 @@ const LeavePanel = ({ viewer, scope, canManage = false }: Props) => {
               ))}
             </select>
             <div className="flex flex-wrap gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
-              {l.status !== "approved" && (
-                <Btn onClick={() => guard(() => decideLeave(l.id, "approved", viewer.uid, viewer.name))}>
-                  Approve
-                </Btn>
-              )}
+              {l.status !== "approved" && <Btn onClick={() => decide(l, "approved")}>Approve</Btn>}
               {l.status === "pending" && (
-                <Btn
-                  variant="danger"
-                  onClick={() => guard(() => decideLeave(l.id, "rejected", viewer.uid, viewer.name))}
-                >
+                <Btn variant="danger" onClick={() => decide(l, "rejected")}>
                   Reject
                 </Btn>
               )}

@@ -13,13 +13,15 @@ import MyPayslips from "../../components/staff/MyPayslips";
 import StaffProfile from "../../components/staff/StaffProfile";
 import NotificationBell from "../../components/staff/NotificationBel";
 import NotificationsPage from "../../components/staff/NotificationsPage";
-import StaffDashboard from "../../components/staff/StaffDashboard"; // adjust path to where your dashboard file is
-import StaffManagement from "../../components/admin/StaffManagement"; // adjust path to where your StaffManagement file is
-import AccountsManagement from "../../components/admin/AccountManagement"; // adjust path to where your AccountsManagement file is
-import WorkManagement from "../../components/admin/WorkManagement"; // adjust path to where your WorkManagement file is
-import ClientManagement from "../../components/admin/ClientManagement"; // adjust path to where your ClientManagement file is
-import PlanManagement from "../../components/admin/PlanManagement"; // adjust path to where your PlanManagement file is
+import StaffDashboard from "../../components/staff/StaffDashboard";
+import StaffManagement from "../../components/admin/StaffManagement";
+import AccountsManagement from "../../components/admin/AccountManagement";
+import WorkManagement from "../../components/admin/WorkManagement";
+import ClientManagement from "../../components/admin/ClientManagement";
+import PlanManagement from "../../components/admin/PlanManagement";
 import { useLoad } from "../../components/admin/Modal/Ui";
+
+import { startLiveSync } from "../../utils/liveSync";
 
 // ─── Types & icons (same icons as the admin Home) ─────────────────────────────
 type TabId =
@@ -123,6 +125,9 @@ const StaffHome = () => {
   const [loggingOut, setLoggingOut] = useState(false);
 
   const staff = me.data;
+
+  // live updates: reload page data when tasks, leave, attendance... change
+useEffect(() => startLiveSync(), []);
 
   // disabled accounts get kicked out
   useEffect(() => {
@@ -573,20 +578,14 @@ const StaffHome = () => {
           {activeItem.id === "payroll" && canPayroll && <PayrollManagement />}
 
           {activeItem.id === "task" && (
-            // <TasksPanel
-            //   viewer={viewer}
-            //   scope={attScope}
-            //   canAssign={hasPermission(staff, "tasks.assign")}
-            //   canFeedback={hasPermission(staff, "tasks.feedback")}
-            // />
             <TasksPanel
-  viewer={viewer}
-  scope={attScope}
-  canAssign={hasPermission(staff, "tasks.assign")}
-  canFeedback={hasPermission(staff, "tasks.feedback")}
-  canAddOwn={hasPermission(staff, "tasks.own")}
-  canApproveSelfAdded={staff.role === "operation_manager"}
-/>
+              viewer={viewer}
+              scope={attScope}
+              canAssign={hasPermission(staff, "tasks.assign")}
+              canFeedback={hasPermission(staff, "tasks.feedback")}
+              canAddOwn={hasPermission(staff, "tasks.own")}
+              canApproveSelfAdded={staff.role === "operation_manager"}
+            />
           )}
 
           {activeItem.id === "accounting" && canAccounts && (

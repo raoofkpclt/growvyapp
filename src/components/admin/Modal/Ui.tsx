@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLiveVersion } from "../../../utils/liveSync";
 
 /** Whoever is looking at the panel: a staff member or the admin */
 export type Viewer = { uid: string; name: string };
 
-// export const inputCls =
-//   "w-full px-3 py-2 rounded-lg text-sm text-white placeholder-zinc-600 bg-white/5 border border-white/10 outline-none focus:border-sky-500 [&>option]:bg-[#0d0f15]";
 export const inputCls =
   "w-full px-3 py-2 rounded-lg text-sm text-white placeholder-zinc-600 bg-white/5 border border-white/10 outline-none focus:border-sky-500 [color-scheme:dark] [&>option]:bg-[#0d0f15]";
+
 export const Card = ({
   className = "",
   children,
@@ -108,26 +108,50 @@ export const money = (n: number) =>
 export const errMsg = (e: unknown) =>
   e instanceof Error ? e.message : "Something went wrong";
 
-/** Runs an async loader whenever deps change; call reload() to refetch */
+/**
+ * Runs an async loader whenever deps change; call reload() to refetch.
+ * It also reloads by itself, quietly (no spinner), when live data changes
+ * (see src/utils/liveSync.ts).
+ */
 export function useLoad<T>(fn: () => Promise<T>, deps: unknown[], initial: T) {
   const [data, setData] = useState<T>(initial);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [tick, setTick] = useState(0);
+  const live = useLiveVersion();
+
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+  const prevDeps = useRef<unknown[] | null>(null);
 
   useEffect(() => {
+    const same =
+      prevDeps.current !== null &&
+      prevDeps.current.length === deps.length &&
+      prevDeps.current.every((d, i) => Object.is(d, deps[i]));
+    prevDeps.current = deps;
+    if (!same) setLoading(true);
+
     let alive = true;
-    setLoading(true);
-    setError("");
-    fn()
-      .then((d) => alive && setData(d))
-      .catch((e) => alive && setError(errMsg(e)))
-      .finally(() => alive && setLoading(false));
+    fnRef
+      .current()
+      .then((result) => {
+        if (!alive) return;
+        setData(result);
+        setError("");
+      })
+      .catch((e) => {
+        if (alive) setError(errMsg(e));
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+
     return () => {
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...deps, tick]);
+  }, [...deps, tick, live]);
 
   return { data, loading, error, reload: () => setTick((t) => t + 1) };
 }

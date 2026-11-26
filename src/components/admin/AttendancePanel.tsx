@@ -7,6 +7,7 @@ import {
   markCheckIn,
   markCheckOut,
   monthKey,
+  sweepAllScheduledBreaks,
   type Attendance,
 } from "../../service/AttendanceService";
 import { Btn, Card, Notice, errMsg, fmtTime, inputCls, useLoad, type Viewer } from "./Modal/Ui";
@@ -175,6 +176,15 @@ const AttendancePanel = ({ viewer, scope }: { viewer: Viewer; scope: "own" | "al
     [scope, viewer.uid, month],
     [] as Attendance[]
   );
+
+  // lunch / tea auto check-out for everyone who is still checked in
+  useEffect(() => {
+    if (scope !== "all") return;
+    const run = () => void sweepAllScheduledBreaks().catch(() => {});
+    run();
+    const id = setInterval(run, 60_000);
+    return () => clearInterval(id);
+  }, [scope]);
 
   const rows = scope === "all" && who !== "all" ? data.data.filter((r) => r.uid === who) : data.data;
   const people = [...new Map(data.data.map((r) => [r.uid, r.name])).entries()];
